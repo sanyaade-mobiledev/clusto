@@ -1,7 +1,9 @@
 
+import testbase
+import unittest
+
 from schema import *
 
-import unittest
 
 class TestThingSchema(unittest.TestCase):
 
