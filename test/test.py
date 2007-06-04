@@ -3,7 +3,7 @@ import testbase
 import unittest
 
 from schema import *
-
+from drivers import *
 
 class TestThingSchema(unittest.TestCase):
 
@@ -16,6 +16,7 @@ class TestThingSchema(unittest.TestCase):
 
     def tearDown(self):
 
+        ctx.current.clear()
         metadata.dispose()
 
 
@@ -35,11 +36,54 @@ class TestThingSchema(unittest.TestCase):
         f=Thing.selectone(Thing.c.name=='foo1')
 
         self.assertEqual(len(f.connections), 2)
+
+    def testDrivers(self):
+
         
+        s1=Server('s1')
+        s2=Server('s2')
 
+        t1=Thing('t1', 'foo')
+        t2=Thing('t2', 'foo')
 
+        self.assertEqual(s1.thingtype, 'server')
+                                 
+        ctx.current.flush()
+
+        l=Server.select()
+        
+        self.assertEqual(len(l), 2)
+
+        o=Thing.select()
+        self.assertEqual(len(o), 4)
+        ctx.current.flush()
+        
+    def testAttributes(self):
+
+        s1=Server('s4')
+        
+        ctx.current.flush()
+        
+        s=Server.selectone(Server.c.name=='s4')
+
+        s.attrs.append(Attribute('g',1))
+        s.attrs['a'] = 2
+        s.attrs['b'] = 3
+        
+        ctx.current.flush()        
+
+        self.assertEqual(s.attrs['driver'], 'Server')
+        a = Attribute.select()
+        self.assertEqual(len(a), 4)
+
+        n1 = Netscaler('one1')
+
+        self.assertEqual(n1.attrs['vendor'], 'citrix')
+        ctx.current.flush()
+
+               
+        
 if __name__ == '__main__':
-    #unittest.main()
     suite = unittest.makeSuite(TestThingSchema)
     unittest.TextTestRunner(verbosity=2).run(suite)
-
+    
