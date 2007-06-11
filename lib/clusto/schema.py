@@ -155,9 +155,16 @@ class Thing(object):
 
         ta = ThingAssociation(self, thing)
         
+        ctx.current.flush()
 
-        
+    @classmethod
+    def ThingByName(self,name):
 
+        """take a name of a thing and return a thing object"""
+
+        thing=Thing.select(Thing.c.name==name)[0]
+
+        return(thing)
 
     
 class ThingAssociation(object):
