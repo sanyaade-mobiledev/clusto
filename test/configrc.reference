@@ -12,14 +12,14 @@ diggserver01.osversion etch
 diggserver01.rel diggserver01nic0
 diggserver01.rel diggserver01nic1
 diggserver01.rel diggserver01fibr2
-diggserver01.rel php01
+diggserver01.rel php1
 
 diggserver02.type server
 diggserver02.fqdn devel01.digg.internal
 diggserver02.os debian
 diggserver02.osversion etch
 diggserver02.rel diggserver02nic0
-diggserver02.rel php02
+diggserver02.rel memcached1
 
 diggserver02nic0.type ethernic
 diggserver02nic0.ip x.x.x.x
@@ -64,16 +64,16 @@ php.http_children 20
 php.memory_size 128M
 
 php1.type service
-php1.instance 2
+php1.instance 1
 php1.http_children 25
 php1.rel php
 php1.rel diggserver01
 
 memcached.type role
-memcache.size 2G
+memcached.size 2G
 
-memcache1.type service
-memcache1.instance 1
-memcache1.rel memcached
-memacche1.rel diggserver02
+memcached1.type service
+memcached1.instance 1
+memcached1.rel memcached
+memacched1.rel diggserver02
 
