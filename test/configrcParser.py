@@ -47,6 +47,7 @@ class ParseConfigRc(file):
         f.close()
         
         objects.setdefault(object, {})['name'] = ksplit[0]
+
         # put all of the relations into a hash
         # and test to see if they all make sense
         # I have tested it somewhat, but this might fail if
@@ -63,6 +64,7 @@ class ParseConfigRc(file):
                 continue
 
         # check and make sure all rels match
+
         for li in rellist.values():
             for i in li:
                 if rellist.has_key(i):
@@ -139,8 +141,6 @@ class UseDb:
         
         """drops the database"""
         metadata.dispose()
-
-
 
 if __name__ == '__main__':
 

@@ -62,6 +62,7 @@ php.type role
 php.http_server apache
 php.http_children 20
 php.memory_size 128M
+php.rel php1
 
 php1.type service
 php1.instance 1
@@ -71,9 +72,10 @@ php1.rel diggserver01
 
 memcached.type role
 memcached.size 2G
+memcached.rel memcached1
 
 memcached1.type service
 memcached1.instance 1
 memcached1.rel memcached
-memacched1.rel diggserver02
+memcached1.rel diggserver02
 
