@@ -20,8 +20,7 @@ class ParseConfigRc(file):
         objects = {}
         for line in f:
 
-            #FIXME this isn't working and an empty line will fail
-            if line == "":
+            if line == "\n":
                 continue
             sline = line.split(' ',1)
             key = sline[0]
@@ -145,7 +144,7 @@ class UseDb:
 
 if __name__ == '__main__':
 
-    file = "things2.configrc"
+    file = "configrc.reference"
     parsedfile=ParseConfigRc(file)
 
     (objects,rellist) = parsedfile.parse()
