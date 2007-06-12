@@ -1,8 +1,6 @@
 
 from schema import *
 
-
-
 class ClustoType(Thing):
 
     __metaclass__ = ClustoThing
@@ -13,14 +11,9 @@ class ClustoType(Thing):
 
         Thing.__init__(self, name, type(self).clustotype)
 
-        
-
-
 class Server(ClustoType):
 
     clustotype = "server"
-
-    
 
 class PowerStrip(ClustoType):
     clustotype = "powerstrip"
