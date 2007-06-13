@@ -66,7 +66,8 @@ class TestThingSchema(unittest.TestCase):
         
         s=Server.selectone(Server.c.name=='s4')
 
-        s.attrs.append(Attribute('g',1))
+        #s.attrs.append(Attribute('g',1))
+        s.attrs['g'] = 1
         s.attrs['a'] = 2
         s.attrs['b'] = 3
         
@@ -94,6 +95,13 @@ class TestThingSchema(unittest.TestCase):
         
         print s1
         print s2
+
+        ctx.current.flush()
+
+        s=Server.select()
+
+        for i in s:
+            print i
         
 if __name__ == '__main__':
     suite = unittest.makeSuite(TestThingSchema)

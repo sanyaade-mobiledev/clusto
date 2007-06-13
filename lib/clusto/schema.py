@@ -6,6 +6,7 @@ Clusto schema
 from sqlalchemy import *
 from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
+from sqlalchemy.ext.associationproxy import association_proxy
 
 import sys
 # session context
@@ -52,7 +53,8 @@ class Attribute(object):
 
 assign_mapper(ctx, Attribute, attr_table)
 
-class AttributeDict(dict):
+
+class ZAttributeDict(dict):
     def __init__(self, attrlist):
         self.attrlist = attrlist
         self.attrdict = {}
@@ -79,6 +81,20 @@ class AttributeDict(dict):
     #    return self.attrlist.__iter__()
 
 
+class AttributeDictNEW(dict):
+    """
+    My Attribute Dict
+    """
+    def append(self, item): 
+         self[item.name] = item 
+    def __iter__(self): 
+         return self.itervalues()  
+    def a__getitem__(self, item):
+        sys.stderr.write(str(type(item)))
+        return super(AttributeDictNEW, self).__getitem__(item.name)
+
+    
+
 driverlist = {}
 
 class ClustoThing(type):
@@ -99,14 +115,15 @@ class ClustoThing(type):
 
         
         assign_mapper(ctx, cls, s, properties={
-            'attrslist' : relation(Attribute, lazy=False,
-                                   cascade='all, delete-orphan',),
+            '_attrs' : relation(Attribute, lazy=False,
+                                cascade='all, delete-orphan',
+                                collection_class=AttributeDictNEW),
+            
 
                 })
 
         
         super(ClustoThing, cls).__init__(name, bases, dct)
-        
 
 
 class Thing(object):
@@ -114,22 +131,23 @@ class Thing(object):
     __metaclass__ = ClustoThing
 
     metaattrs = {}
+
+    attrs = association_proxy('_attrs', 'value')
     
     def __init__(self, name, thingtype):
         self.name = name
         self.thingtype = thingtype
 
-        #self.attrslist = []
-        self.attrs = AttributeDict(self.attrslist)
         self.attrs['driver'] = self.drivername
 
         self.attrs.update(self.metaattrs)
+
 
     def __str__(self):
 
         out = ["%s.type %s\n" % (self.name, self.thingtype)]
         for attr in self.attrs:
-            out.append("%s.%s %s\n" % (self.name, attr, self.attrs[attr]))
+            out.append("%s.%s %s\n" % (self.name, attr.name, attr.value))
 
         for con in self.connections:
             out.append("%s.rel %s" % (self.name, con.name))
@@ -149,7 +167,8 @@ class Thing(object):
 
             ## this is a crude brute force method of getting Things in the
             ## form of their respective driver objects
-            print "HERE: ", newthing.attrslist
+            ## I think I can just change __class__ for the object to make it
+            ## work
             #newthing = driverlist[newthing.attrs['driver']].selectfirst_by(name=itemname)
             connlist.append(newthing)
 
@@ -166,20 +185,15 @@ class Thing(object):
         for i in conn:
             i.delete()
 
-        ctx.current.flush()
-        
 
     def connect(self, thing):
 
         ta = ThingAssociation(self, thing)
         
-        ctx.current.flush()
-        
     @classmethod
     def ThingByName(self,name):
         
         """take a name of a thing and return a thing object"""
-
         thing=Thing.select(Thing.c.name==name)[0]
 
         return(thing)
