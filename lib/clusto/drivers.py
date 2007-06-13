@@ -15,12 +15,16 @@ class Server(ClustoType):
 
     clustotype = "server"
 
+    
+
 class PowerStrip(ClustoType):
     clustotype = "powerstrip"
+
     
 
 class LoadBalancer(ClustoType):
     clustotype = "loadbalancer"
+
 
 class Netscaler(LoadBalancer):
 

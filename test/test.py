@@ -81,7 +81,19 @@ class TestThingSchema(unittest.TestCase):
         self.assertEqual(n1.attrs['vendor'], 'citrix')
         ctx.current.flush()
 
-               
+    def testOutput(self):
+
+        s1 = Server('s5')
+        s1.attrs['version'] = 1
+        s1.attrs['model'] = 'amd'
+        
+        s2 = Server('s6')
+        s2.attrs['version'] = 2
+        s2.attrs['vender'] = 'penguin computing'
+        s1.connect(s2)
+        
+        print s1
+        print s2
         
 if __name__ == '__main__':
     suite = unittest.makeSuite(TestThingSchema)

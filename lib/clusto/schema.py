@@ -75,8 +75,8 @@ class AttributeDict(dict):
         dict.__setitem__(self, item.name, item.value)        
         self.attrdict[item.name] = item
         
-    def __iter__(self):
-        return self.attrlist.itervalues()
+    #def __iter__(self):
+    #    return self.attrlist.__iter__()
 
 
 driverlist = {}
@@ -85,14 +85,15 @@ class ClustoThing(type):
     def __init__(cls, name, bases, dct):
 
         cls.drivername = name
-
+        driverlist[cls.drivername] = cls
+        
         if hasattr(cls, 'clustotype'):
             s = select([thing_table],
                        thing_table.c.thingtype==cls.clustotype
                        ).alias(cls.clustotype+'alias')
 
 
-            driverlist[cls.drivername] = cls
+
         else:
             s = thing_table
 
@@ -124,6 +125,17 @@ class Thing(object):
 
         self.attrs.update(self.metaattrs)
 
+    def __str__(self):
+
+        out = ["%s.type %s\n" % (self.name, self.thingtype)]
+        for attr in self.attrs:
+            out.append("%s.%s %s\n" % (self.name, attr, self.attrs[attr]))
+
+        for con in self.connections:
+            out.append("%s.rel %s" % (self.name, con.name))
+
+        return ''.join(out)
+
     def _get_connections(self):
 
         connlist = []
@@ -133,7 +145,13 @@ class Thing(object):
 
         for i in ta:
             itemname = (i.thing_name1 == self.name) and i.thing_name2 or i.thing_name1
-            connlist.append(Thing.selectfirst_by(name=itemname))
+            newthing = Thing.selectfirst_by(name=itemname)
+
+            ## this is a crude brute force method of getting Things in the
+            ## form of their respective driver objects
+            print "HERE: ", newthing.attrslist
+            #newthing = driverlist[newthing.attrs['driver']].selectfirst_by(name=itemname)
+            connlist.append(newthing)
 
         return connlist
 
@@ -156,10 +174,10 @@ class Thing(object):
         ta = ThingAssociation(self, thing)
         
         ctx.current.flush()
-
+        
     @classmethod
     def ThingByName(self,name):
-
+        
         """take a name of a thing and return a thing object"""
 
         thing=Thing.select(Thing.c.name==name)[0]
