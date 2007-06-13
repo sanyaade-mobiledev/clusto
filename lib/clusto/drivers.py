@@ -15,7 +15,8 @@ class Server(ClustoType):
 
     clustotype = "server"
 
-    
+
+
 
 class PowerStrip(ClustoType):
     clustotype = "powerstrip"
