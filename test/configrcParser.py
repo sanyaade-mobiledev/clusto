@@ -136,7 +136,6 @@ class UseDb:
         
         ctx.current.flush()
 
-
     def dropDatabase(self):
         
         """drops the database"""
