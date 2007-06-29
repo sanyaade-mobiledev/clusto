@@ -137,9 +137,7 @@ class Thing(object):
     def __init__(self, name, thingtype):
         self.name = name
         self.thingtype = thingtype
-
         self.attrs['driver'] = self.drivername
-
         self.attrs.update(self.metaattrs)
 
 
@@ -190,6 +188,11 @@ class Thing(object):
 
         ta = ThingAssociation(self, thing)
         
+    def getAttrByName(self, name):
+
+        thing=self.attrs[name]
+        return(thing)
+
     @classmethod
     def ThingByName(self,name):
         
@@ -198,12 +201,48 @@ class Thing(object):
 
         return(thing)
 
-    
+    @classmethod
+    def getAllThings(self):
+
+        things=Thing.select()
+        return(things)
+
+    @classmethod
+    def getThingsByKey(self,name):
+        """takes a service name and returns server objects"""
+
+        li=[]
+        things=Thing.getAllThings()
+        for i in things:
+            try:
+                if i.attrs[name]:
+                    li.append(i)
+            except:
+                continue
+
+        return(li)
+
+    @classmethod
+    def getAllServicesByValue(self,name):
+        """takes a service name and returns server objects"""
+
+        # broken at the moment
+        li=[]
+        things=Thing.getAllThings()
+        for i in things:
+            try:
+                if i.attrs[name]:
+                    li.append(i)
+            except:
+                continue
+
+        return(li)
+
+   
 class ThingAssociation(object):
     def __init__(self, thing1, thing2):
         self.thing_name1 = thing1.name
         self.thing_name2 = thing2.name
-
 
 assign_mapper(ctx, ThingAssociation, thingthing_table)
 
