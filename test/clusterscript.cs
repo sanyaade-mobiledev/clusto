@@ -1,8 +1,8 @@
-
-cluster_root: /digg
-
+cluster_root:/digg
+mykey:myvalue
 >>
-roles:php.*,dbslave.*
+name:test task
+services:php.*,dbslave.*
 runmode:host 
 ---
 
@@ -10,14 +10,13 @@ echo "hello world" > [[[cluster_root]]]/[[[clusterId]]]/[[[service]]]/file.out
 
 <<
 
+
 >>
-roles:php1-3
-runmode:hostwithrole
-shell:python
-cluster_root:/foo
+name:test task II
+services:php.*
+runmode:host
 ---
 
-
-echo "blah blah"
+echo "hello world" > [[[cluster_root]]]/[[[clusterId]]]/[[[service]]]/file.out
 
 <<
