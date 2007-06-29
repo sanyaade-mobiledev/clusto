@@ -15,7 +15,7 @@ def fopen (filename,mode):
 
 def tempFile():
 
-    # for the moment, don't use this more than once a second
+    # for the moment, don't use this more than once a quarter  second or so
     t = time.time()
     name = "/tmp/temp--%s" % t
     return (name)
