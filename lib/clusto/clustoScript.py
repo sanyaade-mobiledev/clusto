@@ -1,5 +1,5 @@
 import libDigg
-import parseCs
+import csParse
 import time
 import os
 
@@ -148,7 +148,6 @@ class QueueRunner:
 
                 runningTasks+=1
                 if not self.verbose == 0:
-                    print "\n"
                     print "starting chunk %s task %s on %s" % (chunknum,t.tasknum,ip)
 
                 # pass the task to the queue
@@ -165,7 +164,9 @@ class QueueRunner:
 
         # first, push out each script            
         host = t.task['ip']
-        tmpCmd = "scp %s %s@%s:/tmp" % (t.tempFile,self.user,host)
+        user = "root"
+        print "scp %s %s@%s:/tmp" % (t.tempFile,user,host)
+        tmpCmd = "scp %s %s@%s:/tmp" % (t.tempFile,user,host)
         tmpPipe = os.popen(tmpCmd)
         t.tmpCopy = tmpPipe.readlines()
         tmpExit = tmpPipe.close()
@@ -178,28 +179,31 @@ class QueueRunner:
 
         if not t.tmpExit == 0:
             print "copying script to %s unsuccessful" % ip
+            print t.tmpCopy
+            print t.tmpExit
             os.exit()
 
         # then run each task
-        cmd = "ssh %s@%s %s %s" % (self.user,host,self.shell,t.tempFile)
+        cmd = "ssh %s@%s %s %s " % (self.user,host,self.shell,t.tempFile)
         cmdPipe = os.popen(cmd)
         t.cmdRun = cmdPipe.readlines()
         t.cmdExit = cmdPipe.close()
 
         if t.cmdExit == None:
             t.cmdExit = 0
+        else:
+            t.cmdExit = tmpExit
 
         if not t.cmdExit == 0:
             print "running script on %s unsuccessful: %s" % (ip,t.tempFile)
-            print "output:"
             print t.cmdRun
-            print "exit status: %s " % t.cmdExit
+            print t.cmdExit
             if not self.onError == "continue":
                 os.exit()
 
-        if not self.verbose == 0 and t.cmdExit == 0:
+        if not self.verbose == 0:
             for line in t.cmdRun:
-                print "output %s" % line
+                print line
 
     def cleanUp(self):
 

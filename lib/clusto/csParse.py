@@ -1,5 +1,4 @@
 
-import testbase
 import libDigg
 
 class parseCs:
@@ -31,7 +30,7 @@ class parseCs:
             clusterScript.setdefault('globalHeader', {})[k] = v
 
 
-    def parseTasks(self):
+    def parseChunks(self):
     
         """parses the rest of the clusterscript file to put into each task into a dictionary"""
 
