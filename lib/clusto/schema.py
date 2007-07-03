@@ -19,14 +19,14 @@ ctx = SessionContext(create_session)
 
 thing_table = Table('things', metadata,
                     Column('name', String(128), primary_key=True),
-                    Column('thingtype', String(128)),
+                    #Column('thingtype', String(128)),
                     mysql_engine='InnoDB'
                     )
 
 attr_table = Table('thing_attrs', metadata,
                    Column('attr_id', Integer, primary_key=True),
                    Column('thing_name', String(128), ForeignKey('things.name', ondelete="CASCADE", onupdate="CASCADE")),
-                   Column('name', String(1024)),
+                   Column('key', String(1024)),
                    Column('value', String),
                    mysql_engine='InnoDB'
                    )
@@ -39,8 +39,8 @@ thingthing_table = Table('thing_thing', metadata,
 
 
 class Attribute(object):
-    def __init__(self, name, value, thing_name=None):
-        self.name = name
+    def __init__(self, key, value, thing_name=None):
+        self.key = key
         self.value = value
 
         if thing_name:
@@ -48,91 +48,72 @@ class Attribute(object):
 
     def __str__(self):
         return "thingname: %s, keyname: %s, value: %s" % (self.thing_name,
-                                                          self.name,
+                                                          self.key,
                                                           self.value)
 
 assign_mapper(ctx, Attribute, attr_table)
 
 
-class ZAttributeDict(dict):
-    def __init__(self, attrlist):
-        self.attrlist = attrlist
-        self.attrdict = {}
-
-        for i in attrlist:
-            self[i.name] = i.value
-            self.attrdict[i.name] = i
-            
-    def __setitem__(self, name, value):
-        
-        if name in self.attrdict:
-            self.attrdict[name].value = value
-        else:
-            newattr = Attribute(name,value)
-            self.append(newattr)
-            
-    def append(self, item):
-        
-        self.attrlist.append(item)
-        dict.__setitem__(self, item.name, item.value)        
-        self.attrdict[item.name] = item
-        
-    #def __iter__(self):
-    #    return self.attrlist.__iter__()
-
-
-class AttributeDictNEW(dict):
+class AttributeDict(dict):
     """
-    My Attribute Dict
+    This is a Multi-valued Attribute Dict
     """
     def append(self, item): 
-         self[item.name] = item 
+         self[item.key] = item 
     def __iter__(self): 
          return self.itervalues()  
-    def a__getitem__(self, item):
-        sys.stderr.write(str(type(item)))
-        return super(AttributeDictNEW, self).__getitem__(item.name)
-
-    
-
-driverlist = {}
+    def __setitem__(self, key, value):
+        if isinstance(value, list):
+            dict.__setitem__(self,key, value)
+        else:
+            self.setdefault(key, []).append(value)
+    def x__delitem__(self, key):
+        for i in self[key]:
+            del(i)
+        self.pop(key)
+        
+driverlist = []
 
 class ClustoThing(type):
     def __init__(cls, name, bases, dct):
 
-        cls.drivername = name
-        driverlist[cls.drivername] = cls
-        
-        if hasattr(cls, 'clustotype'):
+        tempattrs = {}
+
+        for klass in bases:
+            if hasattr(klass, 'metaattrs'):
+                tempattrs.update(klass.metaattrs)
+
+        tempattrs.update(cls.metaattrs)
+        cls.metaattrs = tempattrs
+        driverlist.append(cls)
+        if not cls.metaattrs.has_key('clustotype'):
+            ## I should do something clever if it's missing
+            raise DriverException("Driver %s missing clustotype metaattrs"
+                                  % cls.__name__)
+
+
+        if cls.metaattrs['clustotype'] != 'thing':
             s = select([thing_table],
-                       thing_table.c.thingtype==cls.clustotype
-                       ).alias(cls.clustotype+'alias')
-
-
+                       and_(
+                       attr_table.c.key=='clustotype',
+                       attr_table.c.value==cls.metaattrs['clustotype'],
+                       attr_table.c.thing_name==thing_table.c.name)
+                       ).alias(cls.metaattrs['clustotype']+'alias')
 
         else:
             s = thing_table
-
+            
         
         assign_mapper(ctx, cls, s, properties={
             '_attrs' : relation(Attribute, lazy=False,
-                                cascade='all, delete-orphan',
-                                collection_class=AttributeDictNEW),
-            
-
+                                cascade='all, delete-orphan',)
                 })
 
         
         super(ClustoThing, cls).__init__(name, bases, dct)
 
 
-class Thing(object):
 
-    __metaclass__ = ClustoThing
-
-    metaattrs = {}
-
-    attrs = association_proxy('_attrs', 'value')
     
     def __init__(self, name, thingtype):
         self.name = name
@@ -246,3 +227,6 @@ class ThingAssociation(object):
 
 assign_mapper(ctx, ThingAssociation, thingthing_table)
 
+class DriverException(Exception):
+    """exception for driver errors"""
+    pass

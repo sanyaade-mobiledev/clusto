@@ -22,20 +22,25 @@ class TestThingSchema(unittest.TestCase):
 
     def testThingConnections(self):
         
-        t=Thing('foo1', 'newtype')
-        t2=Thing('subfoo', 'subtype')
-        t3=Thing('foo2', 'othertype')
+        t=Thing('foo1',  'newtype')
+        t2=Thing('subfoo' 'subtype')
+        t3=Thing('foo2' 'othertype')
+        s=Server('serv1')
 
+        t.connect(s)
         ctx.current.flush()
 
         ta1=ThingAssociation(t,t2)
         ta2=ThingAssociation(t3,t)
 
         ctx.current.flush()
-
+        ctx.current.clear()
+        
         f=Thing.selectone(Thing.c.name=='foo1')
 
-        self.assertEqual(len(f.connections), 2)
+        for i in f.connections:
+            pass #sys.stderr.write('\n' + i.name +": " + str(i.metaattrs) + '\n')
+        self.assertEqual(len(f.connections), 3)
 
     def testDrivers(self):
 
@@ -46,7 +51,7 @@ class TestThingSchema(unittest.TestCase):
         t1=Thing('t1', 'foo')
         t2=Thing('t2', 'foo')
 
-        self.assertEqual(s1.thingtype, 'server')
+        self.assertEqual(s1.getAttr('clustotype'), 'server')
                                  
         ctx.current.flush()
 
@@ -67,42 +72,37 @@ class TestThingSchema(unittest.TestCase):
         s=Server.selectone(Server.c.name=='s4')
 
         #s.attrs.append(Attribute('g',1))
-        s.attrs['g'] = 1
-        s.attrs['a'] = 2
-        s.attrs['b'] = 3
+        s.addAttr('g', 1)
+        s.addAttr('a', 2)
+        s.addAttr('b', 3)
         
         ctx.current.flush()        
 
-        self.assertEqual(s.attrs['driver'], 'Server')
         a = Attribute.select()
         self.assertEqual(len(a), 4)
 
         n1 = Netscaler('one1')
 
-        self.assertEqual(n1.attrs['vendor'], 'citrix')
+        self.assertEqual(n1.getAttr('vendor'), 'citrix')
+        
         ctx.current.flush()
 
     def testOutput(self):
 
         s1 = Server('s5')
-        s1.attrs['version'] = 1
-        s1.attrs['model'] = 'amd'
+        s1.addAttr('version', 1)
+        s1.addAttr('model', 'amd')
         
+                
         s2 = Server('s6')
-        s2.attrs['version'] = 2
-        s2.attrs['vender'] = 'penguin computing'
+        s2.addAttrs([('version', 2), ('vender', 'penguin computing')])
+        
         s1.connect(s2)
         
-        print s1
-        print s2
-
         ctx.current.flush()
 
         s=Server.select()
 
-        for i in s:
-            print i
-        
 if __name__ == '__main__':
     suite = unittest.makeSuite(TestThingSchema)
     unittest.TextTestRunner(verbosity=2).run(suite)
