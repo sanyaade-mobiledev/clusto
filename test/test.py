@@ -22,9 +22,9 @@ class TestThingSchema(unittest.TestCase):
 
     def testThingConnections(self):
         
-        t=Thing('foo1',  'newtype')
-        t2=Thing('subfoo' 'subtype')
-        t3=Thing('foo2' 'othertype')
+        t=Thing('foo1')
+        t2=Thing('subfoo')
+        t3=Thing('foo2')
         s=Server('serv1')
 
         t.connect(s)
@@ -39,7 +39,7 @@ class TestThingSchema(unittest.TestCase):
         f=Thing.selectone(Thing.c.name=='foo1')
 
         for i in f.connections:
-            pass #sys.stderr.write('\n' + i.name +": " + str(i.metaattrs) + '\n')
+            pass #sys.stderr.write('\n' + i.name +": " + str(i.meta_attrs) + '\n')
         self.assertEqual(len(f.connections), 3)
 
     def testDrivers(self):
@@ -48,8 +48,8 @@ class TestThingSchema(unittest.TestCase):
         s1=Server('s1')
         s2=Server('s2')
 
-        t1=Thing('t1', 'foo')
-        t2=Thing('t2', 'foo')
+        t1=Thing('t1')
+        t2=Thing('t2')
 
         self.assertEqual(s1.getAttr('clustotype'), 'server')
                                  

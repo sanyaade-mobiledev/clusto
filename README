@@ -1,0 +1,10 @@
+
+Things seem to fall into 3 general categories:
+
+1. Equipment - Things like servers, switches, racks, routers, etc.
+
+2. Parts - Things like NICS, ports, U (rack space), etc.
+
+3. Resources - IP ranges/network blocks, space (U, datacenter space), etc.
+
+These are loose categories 

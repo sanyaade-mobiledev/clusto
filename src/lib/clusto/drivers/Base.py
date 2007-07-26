@@ -1,46 +1,63 @@
-from schema import *
+from clusto.schema import *
 #from sqlalchemyhelpers import _AssociationMultiDict
 
 class Thing(object):
 
     __metaclass__ = ClustoThing
 
-    metaattrs = {'clustotype': 'thing'}
+    meta_attrs = {'clustotype': 'thing'}
 
+    required_attrs = []
+    
     # I can't get multivalued dict like behavior working quite right
     # and I'm not entirely sure that's the best interface anyway.
     #attrs = association_proxy('_attrs', 'value',
     #                          proxy_factory=_AssociationMultiDict)
     
-    def __init__(self, name, thingtype=None):
+    def __init__(self, name, *args, **kwargs):
         
         self.name = name
 
 
-        if thingtype:
-            self.addAttr('clustotype', thingtype)
+        #if thingtype:
+        #    self.addAttr('clustotype', thingtype)
+        if len(self.required_attrs) != (len(args) + len(kwargs)):
+            raise TypeError(self.__class__.__name__ + "() wrong number of arguments given.")
+        
 
-        self.updateAttrs(self.metaattrs)
+        ra = list(self.required_attrs)
+
+        for arg in kwargs:
+            if arg in ra:
+                self.addAttr(arg, kwargs[arg])
+                ra.remove(arg)
+
+        for arg in args:
+            self.addAttr(ra.pop(0), arg)
+
+        self.updateAttrs(self.meta_attrs)
 
 
     def __new__(self, *args, **kwargs):
 
         newthing = super(Thing, self).__new__(self, *args, **kwargs)
-        newthing._setProperClass()
+        #newthing._setProperClass()
         return newthing
 
     def _setProperClass(self):
-        s=set(self.metaattrs.items())
-        possible_classes = [ i for i in driverlist
-                             if (s.issubset(set(i.metaattrs.items())))]
+        s=set(self.getAttrs())
 
-        
+        possible_classes = [ i for i in driverlist
+                             if (s.issuperset(set(i.meta_attrs.items())))]
+
+
         # sort the possible_classes so that the least specific one is used
-        # (the one with the fewest metaattrs)
+        # (the one with the fewest meta_attrs)
         # I'm not sure if this is the most correct behaviour
-        possible_classes.sort(cmp=lambda x,y: cmp(len(x.metaattrs),
-                                                  len(y.metaattrs)),)
+        possible_classes.sort(cmp=lambda x,y: cmp(len(x.meta_attrs),
+                                                  len(y.meta_attrs)),)
                               
+
         #sys.stderr.write('setPropClass: ' + str(possible_classes) + '\n')
         self.__class__ = possible_classes.pop(0)
 
@@ -73,6 +90,7 @@ class Thing(object):
             ## work
             #newthing = driverlist[newthing.attrs['driver']].selectfirst_by(name=itemname)
             #newthing.__class__ = driverlist[newthing.attrs['driver']]
+            #newthing._setProperClass()
             connlist.append(newthing)
 
         return connlist
@@ -93,27 +111,6 @@ class Thing(object):
 
         ta = ThingAssociation(self, thing)
         
-    @classmethod
-    def ThingByName(self,name):
-
-        """take a name of a thing and return a thing object"""
-        thing=Thing.select(Thing.c.name==name)[0]
-
-        return(thing)
-
-    def getByName(self, name):
-        pass
-
-    @classmethod
-    def query(self, **queryparams):
-        """
-        This function lets you search for Things.
-
-        
-        
-        """
-
-        pass
         
 
     def addAttr(self, key, value):
@@ -175,12 +172,14 @@ class Thing(object):
         all lists.  
         """
 
+        attrs = self._attrs
+        
         if keys:
             attrlist = [(i.key, i.value)
-                        for i in self._attrs if i.key in keys]
+                        for i in attrs if i.key in keys]
             
         else:
-            attrlist = [(i.key, i.value) for i in self._attrs]
+            attrlist = [(i.key, i.value) for i in attrs]
 
 
         if asdict:
@@ -222,7 +221,11 @@ class Thing(object):
 
         attr = filter(lambda x: x.key == keyval[0] and x.value == keyval[1],
                       self._attrs)
-        attr.value = newval
+
+        if not attr:
+            self.addAttr(keyval, newval)
+        else:
+            attr[0].value = newval
         
     def updateAttrs(self, attrdict, replaceAttrs=True):
         """
@@ -244,3 +247,58 @@ class Thing(object):
         self.addAttrs(attrdict.items())
             
             
+    def getConnectedMatching(self, matchdict):
+        """
+        Get the objects this Thing is directly connected to that match the
+        given criteria.
+
+        matchdict should be AttributeDict compatible
+        """
+
+        return [athing for athing in self.connections if athing.isMatch(matchdict)]
+
+    def isMatch(self, matchdict):
+        """
+        Does this Thing match the given matchdict.
+
+        """
+
+        ## this has got to be a fairly slow way of doing this
+
+        keyshare = [x.key for x in self._attrs]
+
+        for key in matchdict:
+            if key not in keyshare:
+                return False
+            
+            matchedkeys = [x.value for x in self._attrs if x.key == key]
+            matchedkeys.sort()
+            
+            values = matchdict[key]
+
+            values.sort()
+
+            if values != matchedkeys:
+                return False
+
+        return True
+
+    def searchSelfAndPartsForAttrs(self, query):
+        """
+        search for information about myself and my Parts
+        """
+
+        pass
+    
+
+
+def Resource(Thing):
+    meta_attrs = {'clustotype' : 'resource' }
+
+    
+
+
+def Part(Thing):
+
+    meta_attrs = {'clustotype' : 'part' }
+

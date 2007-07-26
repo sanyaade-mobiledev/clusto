@@ -8,6 +8,8 @@ from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
 from sqlalchemy.ext.associationproxy import association_proxy
 
+from sqlalchemyhelpers import ClustoMapperExtension
+
 import sys
 # session context
 
@@ -57,6 +59,18 @@ assign_mapper(ctx, Attribute, attr_table)
 class AttributeDict(dict):
     """
     This is a Multi-valued Attribute Dict
+
+    This behaves much like a normal dict except that all values are lists.
+
+    When setting values the following rules apply:
+        if the key does not exist and the value is a scalar then the value is
+        put into a new list pointed to by the key.
+
+        if the key does exist and the value is a scalar then the value is
+        appended to the list of values pointed to by that key.
+
+        if the value is a list then the value gets set to the given list and
+        any old values for that key are discarded.
     """
     def append(self, item): 
          self[item.key] = item 
@@ -71,8 +85,10 @@ class AttributeDict(dict):
         for i in self[key]:
             del(i)
         self.pop(key)
-        
-driverlist = []
+
+    
+
+driverlist = set()
 
 class ClustoThing(type):
     def __init__(cls, name, bases, dct):
@@ -80,25 +96,25 @@ class ClustoThing(type):
         tempattrs = {}
 
         for klass in bases:
-            if hasattr(klass, 'metaattrs'):
-                tempattrs.update(klass.metaattrs)
+            if hasattr(klass, 'meta_attrs'):
+                tempattrs.update(klass.meta_attrs)
 
-        tempattrs.update(cls.metaattrs)
-        cls.metaattrs = tempattrs
-        driverlist.append(cls)
-        if not cls.metaattrs.has_key('clustotype'):
+        tempattrs.update(cls.meta_attrs)
+        cls.meta_attrs = tempattrs
+        driverlist.add(cls)
+        if not cls.meta_attrs.has_key('clustotype'):
             ## I should do something clever if it's missing
-            raise DriverException("Driver %s missing clustotype metaattrs"
+            raise DriverException("Driver %s missing clustotype meta_attrs"
                                   % cls.__name__)
 
 
-        if cls.metaattrs['clustotype'] != 'thing':
+        if cls.meta_attrs['clustotype'] != 'thing':
             s = select([thing_table],
                        and_(
                        attr_table.c.key=='clustotype',
-                       attr_table.c.value==cls.metaattrs['clustotype'],
+                       attr_table.c.value==cls.meta_attrs['clustotype'],
                        attr_table.c.thing_name==thing_table.c.name)
-                       ).alias(cls.metaattrs['clustotype']+'alias')
+                       ).alias(cls.meta_attrs['clustotype']+'alias')
 
         else:
             s = thing_table
@@ -107,7 +123,8 @@ class ClustoThing(type):
         assign_mapper(ctx, cls, s, properties={
             '_attrs' : relation(Attribute, lazy=False,
                                 cascade='all, delete-orphan',)
-                })
+                },
+                      extension=ClustoMapperExtension())
 
         
         super(ClustoThing, cls).__init__(name, bases, dct)

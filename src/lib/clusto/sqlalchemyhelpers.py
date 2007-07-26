@@ -1,4 +1,5 @@
 
+from sqlalchemy.orm import Mapper, MapperExtension
 from sqlalchemy.ext.associationproxy import _AssociationDict
 
 _NotProvided = object()
@@ -182,3 +183,25 @@ class _AssociationMultiDict(_AssociationDict):
     def copy(self):
         return dict(self.items())
 
+
+
+
+
+class ClustoMapperExtension(MapperExtension):
+
+    def populate_instance(self, mapper, selectcontext, row, instance, identitykey, isnew):
+        """called right before the mapper, after creating an instance from a row, passes the row
+        to its MapperProperty objects which are responsible for populating the object's attributes.
+        If this method returns EXT_PASS, it is assumed that the mapper should do the appending, else
+        if this method returns any other value or None, it is assumed that the append was handled by this method.
+
+        Essentially, this method is used to have a different mapper populate the object:
+
+            def populate_instance(self, mapper, selectcontext, instance, row, identitykey, isnew):
+                othermapper.populate_instance(selectcontext, instance, row, identitykey, isnew, frommapper=mapper)
+                return True
+        """
+
+        Mapper.populate_instance(mapper, selectcontext, instance, row, identitykey, isnew)
+        instance._setProperClass()
+        return True

@@ -1,3 +1,4 @@
 import sys
-sys.path.insert(0, './lib/clusto')
+sys.path.insert(0, './src/lib/')
+
 

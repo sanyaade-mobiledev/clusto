@@ -1,34 +1,21 @@
 
 from Base import Thing
 
-class Server(Thing):
-
-    metaattrs = { 'clustotype': 'server' }
-
-
-
-class PowerStrip(Thing):
-    metaattrs = { 'clustotype': 'powerstrip' }
-
     
-
 class LoadBalancer(Thing):
-    metaattrs = { 'clustotype': 'loadbalancer' }
+    meta_attrs = { 'clustotype': 'loadbalancer' }
 
 
 
 class OpenGearLoadBalancer(LoadBalancer):
-    metaattrs = { 'vendor': 'opengear' }
+    meta_attrs = { 'vendor': 'opengear' }
     
 
 class Netscaler(LoadBalancer):
 
-    metaattrs = { 'vendor': 'citrix' }
+    meta_attrs = { 'vendor': 'citrix' }
 
 
-class ConsoleServer(Thing):
-    
-    metaattrs = { 'clustotype': 'consoleserver' }
 
 
 class Class(Thing):
@@ -39,7 +26,7 @@ class Class(Thing):
     For example, servers connected to the 'mysqlserver' class would
     have the mysql server related packages and configurations installed
     """
-    metaattrs = { 'clustotype': 'class' }
+    meta_attrs = { 'clustotype': 'class' }
 
 class Role(Thing):
     """
@@ -48,7 +35,7 @@ class Role(Thing):
     For example, a server connected to the 'dbslave' role will have the
     job of acting as a database slave in a master/slaves configuration.
     """
-    metaattrs = { 'clustotype': 'role' }
+    meta_attrs = { 'clustotype': 'role' }
 
 class Service(Thing):
     """
@@ -56,7 +43,7 @@ class Service(Thing):
 
     For example, dbslave01, dbslave02... 
     """
-    metaattrs = { 'clustotype': 'service' }
+    meta_attrs = { 'clustotype': 'service' }
 
 class Cluster(Thing):
     """
@@ -65,10 +52,10 @@ class Cluster(Thing):
     For example, several servers can be connected to the 'production' cluster
     to signify that they all be used in the production environment.
     """
-    metaattrs = { 'clustotype': 'cluster' }
+    meta_attrs = { 'clustotype': 'cluster' }
 
     
 class Defaults(Thing):
 
-    metaattrs = { 'clustotype': 'defaults' }
+    meta_attrs = { 'clustotype': 'defaults' }
 
