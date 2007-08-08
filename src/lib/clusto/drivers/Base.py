@@ -138,13 +138,30 @@ class Thing(object):
             i.delete()
 
 
-    def connect(self, thing):
+    def connect(self, thing, force=False):
         """
         Connect a given Thing to self
-        """
-        ta = ThingAssociation(self, thing)
-        
 
+        Normally tests if self isConnectable to the given thing.
+
+        if force is set to True then the connectability test is skipped
+        """
+
+        if not force:
+            if not (self.isConnectable(thing) and thing.isConnectable(self)):
+                raise ConnectionException("%s and %s are not connectable" %
+                                          (self.name, thing.name))
+            
+        ta = ThingAssociation(self, thing)
+
+        
+    def isConnectable(self, thing):
+        """
+        Can this Thing connect to the given Thing
+        """
+
+        return True
+        
     ##
     # Attribute related functions
     #
@@ -160,8 +177,6 @@ class Thing(object):
                 allmeta.extend(i.meta_attrs.items())
 
         return allmeta
-
-
 
 
     def addAttr(self, key, value):
