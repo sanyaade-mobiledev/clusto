@@ -1,8 +1,10 @@
 
+from clusto.drivers.Base import Thing
 from clusto.schema import *
 
 class Clusto:
 
+        
     @classmethod
     def query(self, matchdicts, notdicts):
         """

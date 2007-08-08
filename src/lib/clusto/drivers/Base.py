@@ -290,18 +290,33 @@ class Thing(object):
 
     def isMatch(self, matchdict):
         """
-        Does this Thing match the given matchdict.
+        Does this Thing exactly match the given matchdict.
 
         """
 
+        attrs = self.getAttrs()
+        attrs.sort()
+
+        match = matchdict.items()
+        match.sort()
+        
+        return match == attrs
+
+    def hasMatchingAttrs(self, matchdict):
+        """
+        Does this Thing have attributes that match the given matchdict
+        """
+        
         ## this has got to be a fairly slow way of doing this
 
         keyshare = [x.key for x in self._attrs]
 
-        for key in matchdict:
+        
+        for key in matchdict.keys():
+
             if key not in keyshare:
                 return False
-            
+
             matchedkeys = [x.value for x in self._attrs if x.key == key]
             matchedkeys.sort()
             
@@ -314,18 +329,35 @@ class Thing(object):
 
         return True
 
-    def searchSelfAndPartsForAttrs(self, query):
+
+    def searchSelfAndPartsForAttrs(self, matchdict, alreadySearched=None):
         """
-        search for information about myself and my Parts
+        search for information about myself, my Parts, and those Things that
+        are closely connected to self.  Where 'closely connected' means
+        directly connected or separated only by Parts.
         """
 
-        pass
+        # a depth first search of the connections
+        result = []
+        if not alreadySearched:
+            alreadySearched = set()
+        for item in self.connections:
+            if item.name in alreadySearched:
+                continue
+            alreadySearched.add(item.name)
+            if item.hasMatchingAttrs(matchdict):
+                result.append(item)
+
+            if item.isPart():
+                result.extend(item.searchSelfAndPartsForAttrs(matchdict,
+                                                              alreadySearched))
+            
+        return result
     
     def isPart(self):
         return isinstance(self, Part)
 
-    
-        
+
 
 class Resource(Thing):
     meta_attrs = {'clustotype' : 'resource' }
