@@ -1,6 +1,7 @@
 from clusto.schema import *
 #from sqlalchemyhelpers import _AssociationMultiDict
 
+    
 class Thing(object):
 
     __metaclass__ = ClustoThing
@@ -22,51 +23,62 @@ class Thing(object):
         #if thingtype:
         #    self.addAttr('clustotype', thingtype)
         if len(self.required_attrs) != (len(args) + len(kwargs)):
-            raise TypeError(self.__class__.__name__ + "() wrong number of arguments given.")
+            raise TypeError(self.__class__.__name__ +
+                            "() wrong number of arguments given.")
         
 
-        ra = list(self.required_attrs)
+        reqattrs = list(self.required_attrs)
 
         for arg in kwargs:
-            if arg in ra:
+            if arg in reqattrs:
                 self.addAttr(arg, kwargs[arg])
-                ra.remove(arg)
+                reqattrs.remove(arg)
 
         for arg in args:
-            self.addAttr(ra.pop(0), arg)
-
-        self.updateAttrs(self.meta_attrs)
+            self.addAttr(reqattrs.pop(0), arg)
 
 
-    def __new__(self, *args, **kwargs):
+        
+        for i in reversed(self.__class__.mro()):
+            if hasattr(i, 'meta_attrs'):
+                self.updateAttrs(i.meta_attrs, replaceAttrs=False)
 
-        newthing = super(Thing, self).__new__(self, *args, **kwargs)
+        if hasattr(self, 'setup'):
+            self.setup()
+            
+
+
+    def __new__(cls, *args, **kwargs):
+
+        newthing = super(Thing, cls).__new__(cls, *args, **kwargs)
         #newthing._setProperClass()
         return newthing
 
     def _setProperClass(self):
-        s=set(self.getAttrs())
+        """
+        Set the class for the proper object to the best suited driver
+        """
 
-        possible_classes = [ i for i in driverlist
-                             if (s.issuperset(set(i.meta_attrs.items())))]
+        attrset = set(self.getAttrs())
+        possible_classes = [ i for i in DRIVERLIST
+                             if (attrset.issuperset(set(i._all_meta_attrs.items())))]
 
 
-        # sort the possible_classes so that the least specific one is used
-        # (the one with the fewest meta_attrs)
+        # sort the possible_classes so that the most specific one is used
+        # (the one with the most matching meta_attrs)
         # I'm not sure if this is the most correct behaviour
-        possible_classes.sort(cmp=lambda x,y: cmp(len(x.meta_attrs),
-                                                  len(y.meta_attrs)),)
+        possible_classes.sort(cmp=lambda x, y: cmp(len(x._all_meta_attrs.items()),
+                                                   len(y._all_meta_attrs.items())),)
                               
 
-        #sys.stderr.write('setPropClass: ' + str(possible_classes) + '\n')
-        self.__class__ = possible_classes.pop(0)
+        self.__class__ = possible_classes.pop(-1)
 
         
-    def a__str__(self):
+    def __str__(self):
 
-        out = ["%s.type %s\n" % (self.name, self._attrs['clustotype'])]
+        out = []
         for attr in self._attrs:
-            out.append("%s.%s %s\n" % (self.name, attr.name, attr.value))
+            out.append("%s.%s %s\n" % (self.name, attr.key, attr.value))
 
         for con in self.connections:
             out.append("%s.rel %s" % (self.name, con.name))
@@ -81,7 +93,9 @@ class Thing(object):
                                          ThingAssociation.c.thing_name2==self.name))
 
         for i in ta:
-            itemname = (i.thing_name1 == self.name) and i.thing_name2 or i.thing_name1
+            itemname = (i.thing_name1 == self.name) \
+                       and i.thing_name2 or i.thing_name1
+            
             newthing = Thing.selectfirst_by(name=itemname)
 
             ## this is a crude brute force method of getting Things in the
@@ -95,6 +109,15 @@ class Thing(object):
 
         return connlist
 
+    @classmethod
+    def allMetaAttrs(self):
+
+        allmeta = []
+        for i in self.mro():
+            if hasattr(i, 'meta_attrs'):
+                allmeta.extend(i.meta_attrs.items())
+
+        return allmeta
 
     connections = property(_get_connections)
     
@@ -148,7 +171,8 @@ class Thing(object):
         Delete the attribute matching the given key/value pair
         """
         attr = filter(lambda x: x.key == key and x.value == value, self._attrs)
-        del(attr)
+        for i in attr:
+            self._attrs.remove(i)
 
     def delAttrs(self, key):
         """
@@ -157,8 +181,10 @@ class Thing(object):
         attrlist = filter(lambda x: x.key == key, self._attrs)
 
         for i in attrlist:
-            del(i)
+            self._attrs.remove(i)
+            
         
+
         
     def getAttrs(self, keys=None, asdict=False):
         """
@@ -198,6 +224,11 @@ class Thing(object):
 
         return justone and attrlist[0].value or [a.value for a in attrlist]
 
+    def hasAttr(self, key):
+
+        attrlist = filter(lambda x: x.key == key, self._attrs)
+
+        return attrlist and True or False
 
     def setAttrs(self, key, valuelist):
         """
@@ -290,15 +321,19 @@ class Thing(object):
 
         pass
     
+    def isPart(self):
+        return isinstance(self, Part)
 
+    
+        
 
-def Resource(Thing):
+class Resource(Thing):
     meta_attrs = {'clustotype' : 'resource' }
 
     
 
 
-def Part(Thing):
+class Part(Thing):
 
     meta_attrs = {'clustotype' : 'part' }
 

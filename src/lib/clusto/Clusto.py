@@ -1,5 +1,5 @@
 
-from schema import *
+from clusto.schema import *
 
 class Clusto:
 
@@ -18,5 +18,5 @@ class Clusto:
         """
         Save all the changes to objects.
         """
-        ctx.current.flush()
+        CTX.current.flush()
                 

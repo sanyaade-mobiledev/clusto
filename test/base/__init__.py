@@ -1,7 +1,8 @@
 
 
 
-#__all__ = ["ThingTests"]
+__all__ = ["ThingTests", "ClustoTests"]
 
-from ThingTests import TestThingSchema
+from ThingTests import * 
+from ClustoTests import *
 

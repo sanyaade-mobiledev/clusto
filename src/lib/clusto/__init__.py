@@ -6,4 +6,4 @@ import drivers
 
 
 def flush():
-    ctx.current.flush()
+    CTX.current.flush()

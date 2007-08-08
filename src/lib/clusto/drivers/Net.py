@@ -1,9 +1,9 @@
-from clusto.drivers import Thing
-from clusto.drivers import Part
+from clusto.drivers.Base import Thing, Part, Resource
+import sys
 
 import IPy
 
-class Network(Thing):
+class Network(Resource):
     """
     represents a network block
     """
@@ -48,7 +48,7 @@ class Network(Thing):
         
 
 class IP(Thing):
-    meta_attrs = {'custotype': 'ip' }
+    meta_attrs = {'clustotype': 'ip' }
     
     required_attrs = ['ipaddr', 'netmask']
 
@@ -56,13 +56,14 @@ class IP(Thing):
 
 class NIC(Part):
 
-    meta_attrs = {'clustotype': 'nic'}
+
+    meta_attrs = {'clustotype': 'nic', }
 
     required_attrs = ['macaddr']
 
     #connectables = [Server, Port]
 
-
+        
 class NICMixin:
 
     mixin_nic_args = ['macaddrs']
@@ -81,7 +82,7 @@ class NICMixin:
 
 class IPMixin:
 
-    def getIP(self):
+    def getIP(self, allIPs=False):
         """
         Return the first ip connected to this Thing.
         """
@@ -90,7 +91,10 @@ class IPMixin:
         iplist = filter(lambda x: isinstance(x, IP),
                         self.connections)
 
-        return iplist and iplist[0] or None
+        if iplist:
+            return allIPs and iplist or iplist[0]
+        else:
+            return None
 
     def setIP(self, ip):
         iplist = filter(lambda x: isinstance(x, IP),

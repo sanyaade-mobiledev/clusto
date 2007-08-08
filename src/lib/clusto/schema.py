@@ -3,44 +3,57 @@ Clusto schema
 
 """
 
+#from sqlalchemy import DynamicMetaData, create_session, select, and_, relation
+#from sqlalchemy import Table, Column, ForeignKey, String, Integer
 from sqlalchemy import *
+
 from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
-from sqlalchemy.ext.associationproxy import association_proxy
 
-from sqlalchemyhelpers import ClustoMapperExtension
+from clusto.sqlalchemyhelpers import ClustoMapperExtension
 
 import sys
 # session context
 
 
-metadata = DynamicMetaData()
+METADATA = DynamicMetaData()
 
 
-ctx = SessionContext(create_session)
+CTX = SessionContext(create_session)
 
-thing_table = Table('things', metadata,
+THING_TABLE = Table('things', METADATA,
                     Column('name', String(128), primary_key=True),
                     #Column('thingtype', String(128)),
                     mysql_engine='InnoDB'
                     )
 
-attr_table = Table('thing_attrs', metadata,
+ATTR_TABLE = Table('thing_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
-                   Column('thing_name', String(128), ForeignKey('things.name', ondelete="CASCADE", onupdate="CASCADE")),
+                   Column('thing_name', String(128),
+                          ForeignKey('things.name', ondelete="CASCADE",
+                                     onupdate="CASCADE")),
                    Column('key', String(1024)),
                    Column('value', String),
                    mysql_engine='InnoDB'
                    )
 
-thingthing_table = Table('thing_thing', metadata,
-                         Column('thing_name1', String(128), ForeignKey('things.name', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
-                         Column('thing_name2', String(128), ForeignKey('things.name', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
+THINGTHING_TABLE = Table('thing_thing', METADATA,
+                         Column('thing_name1', String(128),
+                                ForeignKey('things.name', ondelete="CASCADE",
+                                           onupdate="CASCADE"),
+                                primary_key=True),
+                         Column('thing_name2', String(128),
+                                ForeignKey('things.name', ondelete="CASCADE",
+                                           onupdate="CASCADE"),
+                                primary_key=True),
                          mysql_engine='InnoDB'
                          )
 
 
 class Attribute(object):
+    """
+    Attribute class holds key/value pair backed by DB
+    """
     def __init__(self, key, value, thing_name=None):
         self.key = key
         self.value = value
@@ -48,12 +61,12 @@ class Attribute(object):
         if thing_name:
             self.thing_name = thing_name
 
-    def __str__(self):
+    def __repr__(self):
         return "thingname: %s, keyname: %s, value: %s" % (self.thing_name,
                                                           self.key,
                                                           self.value)
 
-assign_mapper(ctx, Attribute, attr_table)
+assign_mapper(CTX, Attribute, ATTR_TABLE)
 
 
 class AttributeDict(dict):
@@ -72,72 +85,87 @@ class AttributeDict(dict):
         if the value is a list then the value gets set to the given list and
         any old values for that key are discarded.
     """
-    def append(self, item): 
-         self[item.key] = item 
+    def append(self, item):
+        """Add an item to the dictionary"""
+        self[item.key] = item 
     def __iter__(self): 
-         return self.itervalues()  
+        return self.itervalues()  
     def __setitem__(self, key, value):
         if isinstance(value, list):
-            dict.__setitem__(self,key, value)
+            dict.__setitem__(self[key], value)
         else:
             self.setdefault(key, []).append(value)
-    def x__delitem__(self, key):
-        for i in self[key]:
-            del(i)
-        self.pop(key)
 
-    
+    def items(self):
+        items = []
 
-driverlist = set()
+        for key in self.keys():
+            for value in self[key]:
+                items.append((key, value))
+
+        return items
+            
+    def update(self, somedict, replace=False):
+
+        for key in somedict:
+            self[key] = somedict[key]
+        
+
+DRIVERLIST = set()
 
 class ClustoThing(type):
+    """
+    Metaclass for all clusto stored objects
+    """
     def __init__(cls, name, bases, dct):
 
-        tempattrs = {}
+        if not cls.meta_attrs.has_key('clustotype'):
+            ## I should do something clever if it's missing
+            raise DriverException("Driver %s missing clustotype meta_attrs"
+                                  % cls.__name__)
+        
+        tempattrs = AttributeDict()
 
         for klass in bases:
             if hasattr(klass, 'meta_attrs'):
                 tempattrs.update(klass.meta_attrs)
 
         tempattrs.update(cls.meta_attrs)
-        cls.meta_attrs = tempattrs
-        driverlist.add(cls)
-        if not cls.meta_attrs.has_key('clustotype'):
-            ## I should do something clever if it's missing
-            raise DriverException("Driver %s missing clustotype meta_attrs"
-                                  % cls.__name__)
 
+        cls._all_meta_attrs = tempattrs
+        DRIVERLIST.add(cls)
 
         if cls.meta_attrs['clustotype'] != 'thing':
-            s = select([thing_table],
-                       and_(
-                       attr_table.c.key=='clustotype',
-                       attr_table.c.value==cls.meta_attrs['clustotype'],
-                       attr_table.c.thing_name==thing_table.c.name)
-                       ).alias(cls.meta_attrs['clustotype']+'alias')
+            selection = select([THING_TABLE],
+                               and_(ATTR_TABLE.c.key=='clustotype',
+                                    ATTR_TABLE.c.value==cls.meta_attrs['clustotype'],
+                                    ATTR_TABLE.c.thing_name==THING_TABLE.c.name)
+                               ).alias(cls.meta_attrs['clustotype']+'alias')
 
         else:
-            s = thing_table
+            selection = THING_TABLE
             
         
-        assign_mapper(ctx, cls, s, properties={
+        assign_mapper(CTX, cls, selection, properties={
             '_attrs' : relation(Attribute, lazy=False,
                                 cascade='all, delete-orphan',)
                 },
                       extension=ClustoMapperExtension())
 
-        
         super(ClustoThing, cls).__init__(name, bases, dct)
 
 
 
     
 class ThingAssociation(object):
+    """
+    Relationship between two Things
+    """
     def __init__(self, thing1, thing2):
         self.thing_name1 = thing1.name
         self.thing_name2 = thing2.name
 
-assign_mapper(ctx, ThingAssociation, thingthing_table)
+assign_mapper(CTX, ThingAssociation, THINGTHING_TABLE)
 
 class DriverException(Exception):
     """exception for driver errors"""

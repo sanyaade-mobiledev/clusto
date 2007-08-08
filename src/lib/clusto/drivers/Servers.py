@@ -1,5 +1,5 @@
-from clusto.drivers import Thing
-from clusto.drivers import NICMixin
+from clusto.drivers.Base import Thing
+from clusto.drivers.Net import NICMixin
 
 
 class Server(Thing, NICMixin):
