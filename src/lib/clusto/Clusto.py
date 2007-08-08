@@ -2,23 +2,13 @@
 from clusto.drivers.Base import Thing
 from clusto.schema import *
 
-class Clusto:
 
-        
-    @classmethod
-    def query(self, matchdicts, notdicts):
-        """
-        Query clusto for Things.
+def flush():
+    CTX.current.flush()
 
-        
-        """
-        
-        pass
 
-    @classmethod
-    def save(self):
-        """
-        Save all the changes to objects.
-        """
-        CTX.current.flush()
+def getByName(name):
+    return Thing.selectone(Thing.c.name == name)
                 
+
+
