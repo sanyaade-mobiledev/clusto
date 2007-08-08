@@ -85,6 +85,22 @@ class AttributeDict(dict):
         if the value is a list then the value gets set to the given list and
         any old values for that key are discarded.
     """
+
+    def __init__(self, somedict=None):
+
+        if somedict:
+
+            if isinstance(somedict, dict):
+                for i in somedict:
+                    self[i] = somedict[i]
+            elif isinstance(somedict, list):
+                for i in somedict:
+                    self[i[0]] = i[1]
+        else:
+            super(dict, self).__init__()
+        
+        
+        
     def append(self, item):
         """Add an item to the dictionary"""
         self[item.key] = item 
@@ -92,7 +108,7 @@ class AttributeDict(dict):
         return self.itervalues()  
     def __setitem__(self, key, value):
         if isinstance(value, list):
-            dict.__setitem__(self[key], value)
+            dict.__setitem__(self, key, value)
         else:
             self.setdefault(key, []).append(value)
 
