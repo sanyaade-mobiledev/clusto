@@ -1,5 +1,5 @@
 import unittest
-from clusto.schema import METADATA, CTX
+from clusto.schema import METADATA, CTX, AttributeDict
 import clusto
 from clusto.drivers.Base import *
 
@@ -162,5 +162,102 @@ class TestThingSchema(unittest.TestCase):
         tq1 = Thing.selectone(Thing.c.name == 'part1')
 
         self.assert_(tq1.isPart())
+
+
+    def testIsMatch(self):
+
+        t1 = Thing('t1')
+        t2 = Thing('t2')
+
+        t1.addAttr('a1', 1)
+        t1.addAttr('a2', 2)
+        clusto.flush()
+
+        t1 = Thing.selectone(Thing.c.name == 't1')
         
+        self.assert_(t1.isMatch(AttributeDict({'clustotype': 'thing',
+                                               'a1':1,
+                                               'a2':2})))
+        
+
+    def testConnectionsSearch(self):
+
+        # things
+        t1 = Thing('t1')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', 1)
+        t2.addAttr('attr2', 2)
+
+        t4.addAttr('attr1', 1)
+        t4.addAttr('attr2', 2)
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+
+        clusto.flush()
+
+        t1 = Thing.selectone(Thing.c.name == 't1')
+        result = t1.searchSelfAndPartsForAttrs(AttributeDict({'attr1':1,
+                                                              'attr2':2}))
+
+        result.sort()
+
+        expectedresult = [t2, t4]
+        expectedresult.sort()
+        
+        
+        self.assert_(result == expectedresult)
+
+    def testConnectionSearchForType(self):
+
+        # things
+        t1 = Thing('t1')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', 1)
+        t2.addAttr('attr2', 2)
+
+        t4.addAttr('attr1', 1)
+        t4.addAttr('attr2', 2)
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+
+        clusto.flush()
+
+        t1 = Thing.selectone(Thing.c.name == 't1')
+        result = t1.searchSelfAndPartsForAttrs(AttributeDict(Thing.meta_attrs))
+
+        result.sort()
+
+        expectedresult = [t2, t4, t3]
+        expectedresult.sort()
+        
+        
+        self.assert_(result == expectedresult)
         
