@@ -8,3 +8,10 @@ Things seem to fall into 3 general categories:
 3. Resources - IP ranges/network blocks, space (U, datacenter space), etc.
 
 These are loose categories 
+
+
+Kinds of matching:
+
+1. the given key value pairs exist in Thing
+2. for the given keys the values match exactly in the Thing
+3. the given key/values exactly match attributes of Thing

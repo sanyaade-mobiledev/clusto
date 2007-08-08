@@ -47,10 +47,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        tq = Thing.selectone(Thing.c.name == 'foo1')
-
-        self.assertEqual(Thing.meta_attrs['clustotype'],
-                         tq.getAttr('clustotype'))
+        tq = clusto.getByName('foo1')
 
         
         self.assertEqual('one',
@@ -66,7 +63,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        tq = Thing.selectone(Thing.c.name == 'foo1')
+        tq = clusto.getByName('foo1')
 
         values = tq.getAttr('attr1', justone=False)
 
@@ -86,7 +83,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        tq = Thing.selectone(Thing.c.name == 'foo1')
+        tq = clusto.getByName('foo1')
         
         values = tq.getAttr('attr1', justone=False)
         
@@ -96,7 +93,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        v = tq.getAttr('attr1', justone=False)
+        v = tq.getAttrs(['attr1'], onlyvalues=True)#, justone=False)
         v.sort()
         
         self.assertEqual([1,3,4,5], v)
@@ -104,7 +101,7 @@ class TestThingSchema(unittest.TestCase):
         tq.setAttrs('attr1', ['a','b'])
 
         clusto.flush()
-        tq = Thing.selectone(Thing.c.name == 'foo1')
+        tq = clusto.getByName('foo1')
 
         values = tq.getAttr('attr1', justone=False)
 
@@ -133,8 +130,8 @@ class TestThingSchema(unittest.TestCase):
 
         self.assert_(t2 not in t3.connections)
 
-        tt2 = Thing.selectone(Thing.c.name == 'foo2')
-        tt3 = Thing.selectone(Thing.c.name == 'foo3')
+        tt2 = clusto.getByName('foo2')
+        tt3 = clusto.getByName('foo3')
 
         tt3.connect(tt2)
         clusto.flush()
@@ -159,7 +156,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        tq1 = Thing.selectone(Thing.c.name == 'part1')
+        tq1 = clusto.getByName('part1')
 
         self.assert_(tq1.isPart())
 
@@ -170,14 +167,27 @@ class TestThingSchema(unittest.TestCase):
         t2 = Thing('t2')
 
         t1.addAttr('a1', 1)
+        t1.addAttr('a1', 3)
         t1.addAttr('a2', 2)
         clusto.flush()
 
-        t1 = Thing.selectone(Thing.c.name == 't1')
+        t1 = clusto.getByName('t1')
         
-        self.assert_(t1.isMatch(AttributeDict({'clustotype': 'thing',
-                                               'a1':1,
-                                               'a2':2})))
+        self.assert_(not t1.isMatch(AttributeDict({'a1':1,
+                                                   'a2':2}),
+                                    exact=True))
+
+        self.assert_(t1.isMatch(AttributeDict({'a1':1})))
+
+        self.assert_(not t1.isMatch(AttributeDict({'a1':1}),
+                                    completekeys=True))
+        
+
+        self.assert_(t1.isMatch(AttributeDict([('a1',1),
+                                               ('a1',3)]),
+                                completekeys=True))
+
+        
         
 
     def testConnectionsSearch(self):
@@ -209,7 +219,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        t1 = Thing.selectone(Thing.c.name == 't1')
+        t1 = clusto.getByName('t1')
         result = t1.searchSelfAndPartsForAttrs(AttributeDict({'attr1':1,
                                                               'attr2':2}))
 
@@ -221,7 +231,7 @@ class TestThingSchema(unittest.TestCase):
         
         self.assert_(result == expectedresult)
 
-    def testConnectionSearchForType(self):
+    def atestConnectionSearchForType(self):
 
         # things
         t1 = Thing('t1')
@@ -250,7 +260,7 @@ class TestThingSchema(unittest.TestCase):
 
         clusto.flush()
 
-        t1 = Thing.selectone(Thing.c.name == 't1')
+        t1 = clusto.getByName('t1')
         result = t1.searchSelfAndPartsForAttrs(AttributeDict(Thing.meta_attrs))
 
         result.sort()
@@ -261,3 +271,16 @@ class TestThingSchema(unittest.TestCase):
         
         self.assert_(result == expectedresult)
         
+
+    def testGetAttrs(self):
+
+        t1 = Thing('t1')
+        t1.addAttr('a', 1)
+        t1.addAttr('a', 2)
+        t1.addAttr('b', 3)
+        
+        clusto.flush()
+
+        t = clusto.getByName('t1')
+
+        self.assert_(t.getAttrs(onlyvalues=True, sort=True) == [1,2,3])

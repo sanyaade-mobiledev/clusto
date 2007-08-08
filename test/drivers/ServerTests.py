@@ -28,8 +28,7 @@ class TestServer(unittest.TestCase):
         
         s = Thing.selectone(Thing.c.name=='serv1')
 
-        self.assertEqual("\n".join(["serv1.clustotype thing",
-                                    "serv1.clustotype server",
+        self.assertEqual("\n".join(["serv1.clustotype server",
                                     ""]),
                          str(s))
 

@@ -6,7 +6,7 @@ class Thing(object):
 
     __metaclass__ = ClustoThing
 
-    meta_attrs = {'clustotype': 'thing'}
+    meta_attrs = {}
 
     required_attrs = []
     
@@ -85,8 +85,14 @@ class Thing(object):
 
         return ''.join(out)
 
+    
+    ##
+    # Connection related functions
+    ##
     def _get_connections(self):
-
+        """
+        Returns a list of things this Thing is connected to.
+        """
         connlist = []
         
         ta = ThingAssociation.select(or_(ThingAssociation.c.thing_name1==self.name,
@@ -109,19 +115,13 @@ class Thing(object):
 
         return connlist
 
-    @classmethod
-    def allMetaAttrs(self):
-
-        allmeta = []
-        for i in self.mro():
-            if hasattr(i, 'meta_attrs'):
-                allmeta.extend(i.meta_attrs.items())
-
-        return allmeta
-
-    connections = property(_get_connections)
     
+    connections = property(_get_connections)
+        
     def disconnect(self, thing):
+        """
+        Disconnect a given Thing from self
+        """
 
         conn = ThingAssociation.select(or_(ThingAssociation.c.thing_name1==self.name,
                                            ThingAssociation.c.thing_name2==self.name))
@@ -131,10 +131,30 @@ class Thing(object):
 
 
     def connect(self, thing):
-
+        """
+        Connect a given Thing to self
+        """
         ta = ThingAssociation(self, thing)
         
+
+    ##
+    # Attribute related functions
+    #
+    @classmethod
+    def allMetaAttrs(self):
+        """
+        Return a list of all the meta_attrs for this class
+        """
         
+        allmeta = []
+        for i in self.mro():
+            if hasattr(i, 'meta_attrs'):
+                allmeta.extend(i.meta_attrs.items())
+
+        return allmeta
+
+
+
 
     def addAttr(self, key, value):
         """
@@ -186,7 +206,8 @@ class Thing(object):
         
 
         
-    def getAttrs(self, keys=None, asdict=False):
+    def getAttrs(self, keys=None, asdict=False,
+                 onlyvalues=False, sort=False):
         """
         Returns a list of the key value pairs of the attributes associated
         with this Thing.
@@ -195,22 +216,27 @@ class Thing(object):
         return all attributes.
         
         If asdict is True then it'll return a dictionary where the values are
-        all lists.  
+        all lists.
+
+        If sorted is True then a simple sort() will be called on the on the
+        list before returning
         """
 
         attrs = self._attrs
-        
+
+        # return just value or key/value tuple
+        rettype = onlyvalues and (lambda x: x.value) \
+                  or (lambda x: (x.key, x.value))
         if keys:
-            attrlist = [(i.key, i.value)
-                        for i in attrs if i.key in keys]
-            
+            attrlist = [rettype(i) for i in attrs if i.key in keys]
         else:
-            attrlist = [(i.key, i.value) for i in attrs]
-
-
-        if asdict:
-            attrlist = AttributeDict(attrlist)
+            attrlist = [rettype(i) for i in attrs]
             
+        attrlist.sort()
+
+        if asdict and not onlyvalues:
+            attrlist = AttributeDict(attrlist)
+        
         return attrlist
 
     def getAttr(self, key, justone=True):
@@ -224,9 +250,12 @@ class Thing(object):
 
         return justone and attrlist[0].value or [a.value for a in attrlist]
 
-    def hasAttr(self, key):
+    def hasAttr(self, key, value=None):
 
-        attrlist = filter(lambda x: x.key == key, self._attrs)
+        if value:
+            attrlist = filter(lambda x: x.key == key and x.value == value, self._attrs)
+        else:
+            attrlist = filter(lambda x: x.key == key, self._attrs)
 
         return attrlist and True or False
 
@@ -277,8 +306,12 @@ class Thing(object):
             
         self.addAttrs(attrdict.items())
             
-            
-    def getConnectedMatching(self, matchdict):
+
+
+    ##
+    # Matching and searching functions
+    #
+    def getConnectedMatching(self, matchdict, exact=False):
         """
         Get the objects this Thing is directly connected to that match the
         given criteria.
@@ -286,27 +319,39 @@ class Thing(object):
         matchdict should be AttributeDict compatible
         """
 
-        return [athing for athing in self.connections if athing.isMatch(matchdict)]
+        return [athing for athing in self.connections
+                if athing.isMatch(matchdict, exact=exact)]
 
-    def isMatch(self, matchdict):
+    def isMatch(self, matchdict, exact=False, completekeys=False):
         """
-        Does this Thing exactly match the given matchdict.
+        Does this Thing match the given matchdict.
 
+        if exact is True then the matchdict has to exactly match all the
+        attributes.
         """
+
 
         attrs = self.getAttrs()
-        attrs.sort()
+        for item in matchdict.items():
+            try:
+                attrs.remove(item)
+            except:
+                return False
 
-        match = matchdict.items()
-        match.sort()
-        
-        return match == attrs
+        if exact:
+            return (len(attrs) == 0)
 
-    def hasMatchingAttrs(self, matchdict):
+        if completekeys:
+            attrdict = AttributeDict(attrs)
+            return not bool(set(matchdict.keys()) & set(attrdict.keys()))
+
+        return True
+
+
+    def defunct_hasMatchingAttrs(self, matchdict):
         """
         Does this Thing have attributes that match the given matchdict
         """
-        
         ## this has got to be a fairly slow way of doing this
 
         keyshare = [x.key for x in self._attrs]
@@ -330,7 +375,8 @@ class Thing(object):
         return True
 
 
-    def searchSelfAndPartsForAttrs(self, matchdict, alreadySearched=None):
+    def defunct_searchSelfAndPartsForAttrs(self, matchdict, exaxtmatch = False,
+                                           semi = False, alreadySearched=None):
         """
         search for information about myself, my Parts, and those Things that
         are closely connected to self.  Where 'closely connected' means
@@ -350,9 +396,10 @@ class Thing(object):
 
             if item.isPart():
                 result.extend(item.searchSelfAndPartsForAttrs(matchdict,
-                                                              alreadySearched))
+                                                              alreadySearched=alreadySearched))
             
         return result
+
     
     def isPart(self):
         return isinstance(self, Part)

@@ -101,9 +101,6 @@ class AttributeDict(dict):
         
         
         
-    def append(self, item):
-        """Add an item to the dictionary"""
-        self[item.key] = item 
     def __iter__(self): 
         return self.itervalues()  
     def __setitem__(self, key, value):
@@ -111,6 +108,10 @@ class AttributeDict(dict):
             dict.__setitem__(self, key, value)
         else:
             self.setdefault(key, []).append(value)
+
+    def append(self, item):
+        """Add an item to the dictionary"""
+        self[item.key] = item 
 
     def items(self):
         items = []
@@ -135,7 +136,7 @@ class ClustoThing(type):
     """
     def __init__(cls, name, bases, dct):
 
-        if not cls.meta_attrs.has_key('clustotype'):
+        if not cls.meta_attrs.has_key('clustotype') and not name == "Thing":
             ## I should do something clever if it's missing
             raise DriverException("Driver %s missing clustotype meta_attrs"
                                   % cls.__name__)
@@ -151,7 +152,7 @@ class ClustoThing(type):
         cls._all_meta_attrs = tempattrs
         DRIVERLIST.add(cls)
 
-        if cls.meta_attrs['clustotype'] != 'thing':
+        if name != "Thing":
             selection = select([THING_TABLE],
                                and_(ATTR_TABLE.c.key=='clustotype',
                                     ATTR_TABLE.c.value==cls.meta_attrs['clustotype'],
