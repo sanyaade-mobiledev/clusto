@@ -1,6 +1,6 @@
 
 from clusto.drivers.Base import Thing
-from clusto.schema import *
+from clusto.schema import CTX
 
 
 def flush():

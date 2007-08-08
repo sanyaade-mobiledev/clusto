@@ -1,7 +1,8 @@
 import unittest
 from clusto.schema import METADATA, CTX, AttributeDict
 import clusto
-from clusto.drivers.Base import *
+from clusto.drivers.Base import Thing, Part
+from clusto.drivers.Servers import Server
 
 class TestThingSchema(unittest.TestCase):
 
@@ -16,6 +17,7 @@ class TestThingSchema(unittest.TestCase):
 
         CTX.current.clear()
         METADATA.dispose()
+
 
     def testThingObject(self):
 
@@ -144,22 +146,6 @@ class TestThingSchema(unittest.TestCase):
         
         self.assert_(tt2 not in tt3.connections)
         
-    def testIsPart(self):
-
-        t1 = Thing('foo1')
-
-        self.assertEqual(t1.isPart(), False)
-
-        t2 = Part('part1')
-
-        self.assertEqual(t2.isPart(), True)
-
-        clusto.flush()
-
-        tq1 = clusto.getByName('part1')
-
-        self.assert_(tq1.isPart())
-
 
     def testIsMatch(self):
 
@@ -183,94 +169,14 @@ class TestThingSchema(unittest.TestCase):
                                     completekeys=True))
         
 
-        self.assert_(t1.isMatch(AttributeDict([('a1',1),
-                                               ('a1',3)]),
+        self.assert_(t1.isMatch(AttributeDict([('a1', 1),
+                                               ('a1', 3)]),
                                 completekeys=True))
 
         
         
 
-    def testConnectionsSearch(self):
 
-        # things
-        t1 = Thing('t1')
-        t2 = Thing('t2')
-        t3 = Thing('t3')
-        t4 = Thing('t4')
-        t5 = Thing('t5')
-
-        t2.addAttr('attr1', 1)
-        t2.addAttr('attr2', 2)
-
-        t4.addAttr('attr1', 1)
-        t4.addAttr('attr2', 2)
-        
-        # part
-        tp1 = Part('tp1')
-        tp2 = Part('tp2')
-        tp3 = Part('tp3')
-
-        t1.connect(t2)
-        t1.connect(tp1)
-        tp1.connect(t3)
-        tp1.connect(tp2)
-        tp2.connect(t4)
-        
-
-        clusto.flush()
-
-        t1 = clusto.getByName('t1')
-        result = t1.searchSelfAndPartsForAttrs(AttributeDict({'attr1':1,
-                                                              'attr2':2}))
-
-        result.sort()
-
-        expectedresult = [t2, t4]
-        expectedresult.sort()
-        
-        
-        self.assert_(result == expectedresult)
-
-    def atestConnectionSearchForType(self):
-
-        # things
-        t1 = Thing('t1')
-        t2 = Thing('t2')
-        t3 = Thing('t3')
-        t4 = Thing('t4')
-        t5 = Thing('t5')
-
-        t2.addAttr('attr1', 1)
-        t2.addAttr('attr2', 2)
-
-        t4.addAttr('attr1', 1)
-        t4.addAttr('attr2', 2)
-        
-        # part
-        tp1 = Part('tp1')
-        tp2 = Part('tp2')
-        tp3 = Part('tp3')
-
-        t1.connect(t2)
-        t1.connect(tp1)
-        tp1.connect(t3)
-        tp1.connect(tp2)
-        tp2.connect(t4)
-        
-
-        clusto.flush()
-
-        t1 = clusto.getByName('t1')
-        result = t1.searchSelfAndPartsForAttrs(AttributeDict(Thing.meta_attrs))
-
-        result.sort()
-
-        expectedresult = [t2, t4, t3]
-        expectedresult.sort()
-        
-        
-        self.assert_(result == expectedresult)
-        
 
     def testGetAttrs(self):
 
@@ -283,4 +189,92 @@ class TestThingSchema(unittest.TestCase):
 
         t = clusto.getByName('t1')
 
-        self.assert_(t.getAttrs(onlyvalues=True, sort=True) == [1,2,3])
+        self.assert_(t.getAttrs(onlyvalues=True, sort=True) == [1, 2, 3])
+
+    def testConnectionSearchForType(self):
+
+        # Servers
+        t1 = Server('t1')
+        t2 = Server('t2')
+        t3 = Server('t3')
+        t4 = Server('t4')
+        t5 = Server('t5')
+
+        t2.addAttr('attr1', 1)
+        t2.addAttr('attr2', 2)
+
+        t4.addAttr('attr1', 1)
+        t4.addAttr('attr2', 2)
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+
+        clusto.flush()
+
+        t1 = clusto.getByName('t1')
+
+        result2 = t1.searchConnections([{'matchdict': AttributeDict(Server.allMetaAttrs())}])
+
+        result2.sort(cmp=lambda x, y: cmp(x.name, y.name))
+
+        expectedresult = [t2, t4, t3]
+        expectedresult.sort(cmp=lambda x, y: cmp(x.name, y.name))
+
+        
+        self.assert_(result2 == expectedresult)
+        
+
+    def testConnectionsSearch(self):
+
+        # things
+        t1 = Thing('tp')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', '1')
+        t2.addAttr('attr2', '2')
+
+        t4.addAttr('attr1', '1')
+        t4.addAttr('attr2', '2')
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+        clusto.flush()
+
+        tp = clusto.getByName('tp')
+
+        
+        query = [{'matchdict': AttributeDict({'attr1':'1',
+                                              'attr2':'2'})}]
+        
+        result = tp.searchConnections(query)
+
+        result.sort(cmp=lambda x, y: cmp(x.name, y.name))
+
+        expectedresult = [t2, t4]
+        expectedresult.sort(cmp=lambda x, y: cmp(x.name, y.name))
+        
+            
+        self.assert_(result == expectedresult)
+
+        

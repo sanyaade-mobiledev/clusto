@@ -1,5 +1,4 @@
 from clusto.schema import *
-#from sqlalchemyhelpers import _AssociationMultiDict
 
     
 class Thing(object):
@@ -54,6 +53,15 @@ class Thing(object):
         #newthing._setProperClass()
         return newthing
 
+    def __eq__(self, otherthing):
+        """
+        Am I the same as the Other Thing.
+        """
+
+        ## each Thing must have a unique name so I'll just compare those
+
+        return self.name == otherthing.name
+
     def _setProperClass(self):
         """
         Set the class for the proper object to the best suited driver
@@ -81,7 +89,7 @@ class Thing(object):
             out.append("%s.%s %s\n" % (self.name, attr.key, attr.value))
 
         for con in self.connections:
-            out.append("%s.rel %s" % (self.name, con.name))
+            out.append("%s._rel %s\n" % (self.name, con.name))
 
         return ''.join(out)
 
@@ -328,8 +336,8 @@ class Thing(object):
 
         if exact is True then the matchdict has to exactly match all the
         attributes.
+        
         """
-
 
         attrs = self.getAttrs()
         for item in matchdict.items():
@@ -348,63 +356,56 @@ class Thing(object):
         return True
 
 
-    def defunct_hasMatchingAttrs(self, matchdict):
+    connector = False
+
+    def searchConnections(self, matchargs=(), nonmatchargs=(),
+                          alreadySearched=None):
         """
-        Does this Thing have attributes that match the given matchdict
-        """
-        ## this has got to be a fairly slow way of doing this
+        Search for OtherThings connected to this Thing.
 
-        keyshare = [x.key for x in self._attrs]
+        This is a complicated function.  It takes in two arguments.
 
-        
-        for key in matchdict.keys():
+        matchargs - a list of dictionaries with key/values that get past
+                    to each connected object's isMatch function
 
-            if key not in keyshare:
-                return False
+        nonmatchargs - same format as matchargs but Things matching these
+                       matching dictionaries are discarded
 
-            matchedkeys = [x.value for x in self._attrs if x.key == key]
-            matchedkeys.sort()
-            
-            values = matchdict[key]
+        Effectively the elements of these lists are OR'd together.
 
-            values.sort()
-
-            if values != matchedkeys:
-                return False
-
-        return True
-
-
-    def defunct_searchSelfAndPartsForAttrs(self, matchdict, exaxtmatch = False,
-                                           semi = False, alreadySearched=None):
-        """
-        search for information about myself, my Parts, and those Things that
-        are closely connected to self.  Where 'closely connected' means
-        directly connected or separated only by Parts.
+        Things that set the member variable 'connector' to True get searched
+        recursively.
         """
 
-        # a depth first search of the connections
-        result = []
         if not alreadySearched:
-            alreadySearched = set()
+            alreadySearched = set([self.name])
+
+        result = []
+
         for item in self.connections:
+
             if item.name in alreadySearched:
                 continue
-            alreadySearched.add(item.name)
-            if item.hasMatchingAttrs(matchdict):
-                result.append(item)
+            else:
+                alreadySearched.add(item.name)
 
-            if item.isPart():
-                result.extend(item.searchSelfAndPartsForAttrs(matchdict,
-                                                              alreadySearched=alreadySearched))
-            
+            for args in matchargs:
+                if item.isMatch(**args):
+                    result.append(item)
+                if item.connector:
+                    result.extend(item.searchConnections(matchargs,
+                                                         nonmatchargs,
+                                                         alreadySearched))
+
+
+        for args in nonmatchargs:
+            for item in result:
+                if item.isMatch(**args):
+                    result.remove(item)
+        
+
         return result
-
     
-    def isPart(self):
-        return isinstance(self, Part)
-
-
 
 class Resource(Thing):
     meta_attrs = {'clustotype' : 'resource' }
@@ -416,3 +417,4 @@ class Part(Thing):
 
     meta_attrs = {'clustotype' : 'part' }
 
+    connector = True
