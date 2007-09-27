@@ -23,6 +23,42 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assert_(len(clusto.driverlist) >= 3)
 
+    def testRename(self):
+
+        t1 = Thing('t1')
+        t1.addAttr('attr1', '1')
+        t2 = Thing('t2')
+        t2.addAttr('attr2', '2')
+        t3 = Thing('t3')
+        t3.addAttr('attr3', '3')
+
+        t1.connect(t2)
+        t1.connect(t3)
+
+        clusto.flush()
+
+        clusto.rename('t1', 'newname')
+
+        clusto.flush()
+
+        self.assertRaises(LookupError, clusto.getByName, 't1')
+
+
+        tt1 = clusto.getByName('newname')
+
+        self.assert_(tt1.getAttr('attr1') == '1')
+        self.assertEqual(set([x.name for x in tt1.searchConnections()]),
+                         set(['t2','t3']))
+                     
+        
+        tt2 = clusto.getByName('t2')
+
+        cons = tt2.searchConnections()
+      
+        self.assert_(set([x.name for x in cons]) == set(['newname']))
+
+        
+
 class TestClustoQuery(testbase.ClustoTestBase):
     def setUp(self):
 
@@ -94,5 +130,3 @@ class TestClustoQuery(testbase.ClustoTestBase):
         self.assert_(set([i.name for i in result])
                      == set(['tp']))
 
-
-    
