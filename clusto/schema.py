@@ -128,7 +128,7 @@ class AttributeDict(dict):
             self[key] = somedict[key]
         
 
-DRIVERLIST = set()
+DRIVERLIST = {}
 
 class ClustoThing(type):
     """
@@ -150,7 +150,7 @@ class ClustoThing(type):
         tempattrs.update(cls.meta_attrs)
 
         cls._all_meta_attrs = tempattrs
-        DRIVERLIST.add(cls)
+        DRIVERLIST[cls.__name__] = cls
 
         if name != "Thing":
             selection = select([THING_TABLE],

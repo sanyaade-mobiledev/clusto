@@ -1,16 +1,11 @@
 
-from clust.drivers import Thing, Part
+from clusto.drivers.Base import Thing, Part
 
 
-class ConsoleServer(Thing, N):
+class ConsoleServer(Thing):
 
     meta_attrs = {'clustotype': 'consoleserver'}
 
-
-
-class OpenGearConsoleServer(ConsoleServer):
-
-    meta_attrs = {'vendor': 'opengear' }
 
 
 class ConsolePort(Part):

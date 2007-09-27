@@ -2,7 +2,9 @@ from clusto.schema import *
 
     
 class Thing(object):
-
+    """
+    Anything
+    """
     __metaclass__ = ClustoThing
 
     meta_attrs = {}
@@ -68,15 +70,15 @@ class Thing(object):
         """
 
         attrset = set(self.getAttrs())
-        possible_classes = [ i for i in DRIVERLIST
-                             if (attrset.issuperset(set(i._all_meta_attrs.items())))]
+        possible_classes = [ DRIVERLIST[i] for i in DRIVERLIST
+                             if (attrset.issuperset(set(DRIVERLIST[i]._all_meta_attrs.items())))]
 
 
         # sort the possible_classes so that the most specific one is used
         # (the one with the most matching meta_attrs)
         # I'm not sure if this is the most correct behaviour
-        possible_classes.sort(cmp=lambda x, y: cmp(len(x._all_meta_attrs.items()),
-                                                   len(y._all_meta_attrs.items())),)
+        possible_classes.sort(cmp=lambda x, y: cmp(x._all_meta_attrs.items(),
+                                                   y._all_meta_attrs.items()))
                               
 
         self.__class__ = possible_classes.pop(-1)
@@ -92,6 +94,7 @@ class Thing(object):
             out.append("%s._rel %s\n" % (self.name, con.name))
 
         return ''.join(out)
+
 
     
     ##
@@ -458,9 +461,8 @@ class Thing(object):
     def query(self, *args, **kwargs):
         pass
 
-class Resource(Thing):
-    meta_attrs = {'clustotype' : 'resource' }
-
+#class Resource(Thing):
+#    meta_attrs = {'clustotype' : 'resource' }
     
 
 

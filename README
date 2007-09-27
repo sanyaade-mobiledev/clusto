@@ -33,4 +33,38 @@ for r in racks:
 * get console for server X
 * add service W on server X to loadbalancer vip Y
 
+clusto expressions (maybe)
+-----------------------
 
+driver:Console connected to name:server2
+ - return the console connected to 'server2'
+
+driver:Server
+ - return all serves
+
+driver:Server connected to name:rack002
+ - return servers in rack002
+
+attr:foo,12 and driver:Server
+ - return servers with attr foo,12
+
+pattern
+-------
+alphanumeric
+* glob supported ? 
+* regex supported ?
+
+pattern types
+----------
+name:<somename> 
+driver:<driver>
+attr:<key,val>
+
+operators
+---------
+not, or, and, 
+
+functions
+---------
+haskey
+connected to

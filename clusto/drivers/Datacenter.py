@@ -4,7 +4,7 @@ from clusto.drivers.Base import Thing
 
 class Datacenter(Thing):
     """
-    A Datacenter
+    a datacenter
     """
 
     meta_attrs = {'clustotype':'datacenter'}
@@ -13,7 +13,7 @@ class Datacenter(Thing):
 
 class Rack(Thing):
     """
-    A Rack
+    a rack
     """
 
     meta_attrs = {'clustotype':'rack'}

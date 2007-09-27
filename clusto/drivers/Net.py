@@ -1,9 +1,9 @@
-from clusto.drivers.Base import Thing, Part, Resource
+from clusto.drivers.Base import Thing, Part
 import sys
 
 import IPy
 
-class Network(Resource):
+class Network(Thing):
     """
     represents a network block
     """
@@ -48,7 +48,9 @@ class Network(Resource):
         
 
 class NIC(Part):
-
+    """
+    a single NIC
+    """
 
     meta_attrs = {'clustotype': 'nic', }
 
@@ -79,6 +81,9 @@ class NICMixin:
         return retval
 
 class IP(Thing):
+    """
+    a single IP
+    """
     meta_attrs = {'clustotype': 'ip' }
     
     required_attrs = ['ipaddr', 'netmask']

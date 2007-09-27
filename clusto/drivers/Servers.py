@@ -3,7 +3,10 @@ from clusto.drivers.Net import NICMixin
 
 
 class Server(Thing, NICMixin):
-
+    """
+    server
+    """
+    
     meta_attrs = { 'clustotype': 'server' }
 
 
@@ -13,6 +16,9 @@ class Server(Thing, NICMixin):
 
 
 class ConsoleServer(Thing):
-    
+    """
+    console server
+    """
     meta_attrs = { 'clustotype': 'consoleserver' }
+
 

@@ -2,9 +2,11 @@
 from clusto.drivers.Base import Thing, Attribute
 from clusto.schema import CTX, DRIVERLIST, METADATA
 from sqlalchemy import and_, or_, literal
+from sqlalchemy.exceptions import InvalidRequestError
 
 
 driverlist = DRIVERLIST
+
 
 def connect(dsn):
     METADATA.connect(dsn)
@@ -12,11 +14,15 @@ def connect(dsn):
 def flush():
     CTX.current.flush()
 
-#save = flush
 
 def getByName(name):
-    return Thing.selectone(Thing.c.name == name)
-                
+    try:
+        return Thing.selectone(Thing.c.name == name)
+    except InvalidRequestError:
+        raise LookupError(name + " does not exist.")
+
+def initclusto():
+    METADATA.create_all()
 
 def query(attrs=(), names=(), ofTypes=(), filterArgs=()):
     """
@@ -92,10 +98,26 @@ def query(attrs=(), names=(), ofTypes=(), filterArgs=()):
     return retval
             
 
-                                   
-            
-            
-            
-                    
+def rename(oldname, newname):
+    """
+    Rename a Thing from oldname to newname.
+    """
+
+    old = getByName(oldname)
+
+    new = Thing(newname)
+
+    new.addAttrs(old.getAttrs())
+
+
+    cons = old.searchConnections()
+
+    for athing in cons:
+        new.connect(athing)
+        old.disconnect(athing)
+
+    old.delete()
 
     
+    
+
