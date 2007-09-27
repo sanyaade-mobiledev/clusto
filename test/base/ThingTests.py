@@ -341,7 +341,3 @@ class TestThingSchema(unittest.TestCase):
         
         clusto.flush()
     
-        
-        
-
-                            
