@@ -80,7 +80,7 @@ class TestClustoQuery(testbase.ClustoTestBase):
         self.assert_(set([i.name for i in result]) == set(['t4', 't5']))
 
         result = clusto.query(ofTypes=[Thing])
-        print [i.name for i in result]
+
         self.assert_(len(result) == 8)
 
         

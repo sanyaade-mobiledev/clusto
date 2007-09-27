@@ -1,7 +1,7 @@
 
 from clusto.drivers.Base import Thing, Attribute
 from clusto.schema import CTX, DRIVERLIST, METADATA
-from sqlalchemy import *
+from sqlalchemy import and_, or_, literal
 
 
 driverlist = DRIVERLIST

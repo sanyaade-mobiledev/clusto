@@ -1,6 +1,7 @@
 import sys
-sys.path.insert(0, './src/lib/')
-sys.path.insert(1, './tests')
+import os
+
+sys.path.insert(0, os.curdir)
 
 
 import unittest

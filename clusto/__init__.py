@@ -6,3 +6,6 @@ from clusto.drivers.Base import *
 from clusto.Clusto import *
 
 
+import scripthelpers
+
+
