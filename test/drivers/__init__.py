@@ -1,4 +1,5 @@
 
-__all__ = ["ServerTests"]
+__all__ = ["ServerTests", "DatacenterTests"]
 
 from ServerTests import *
+from DatacenterTests import *

@@ -162,7 +162,15 @@ class ClustoThing(type):
         else:
             selection = THING_TABLE
             
-        
+
+        # setup all_meta_attrs
+        allmeta = []
+        for i in cls.mro():
+            if hasattr(i, 'meta_attrs'):
+                allmeta.extend(i.meta_attrs.items())
+
+        cls.all_meta_attrs = allmeta
+
         assign_mapper(CTX, cls, selection, properties={
             '_attrs' : relation(Attribute, lazy=False,
                                 cascade='all, delete-orphan',)

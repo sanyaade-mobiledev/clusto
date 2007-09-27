@@ -32,3 +32,5 @@ for r in racks:
 
 * get console for server X
 * add service W on server X to loadbalancer vip Y
+
+

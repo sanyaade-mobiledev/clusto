@@ -71,9 +71,7 @@ class TestThingSchema(unittest.TestCase):
 
         self.assertEqual(3, len(values))
 
-        values.sort()
-
-        self.assertEqual([1,2,3], values)
+        self.assertEqual([1,2,3], sorted(values))
 
     def testAttrOperations(self):
 
@@ -96,9 +94,8 @@ class TestThingSchema(unittest.TestCase):
         clusto.flush()
 
         v = tq.getAttrs(['attr1'], onlyvalues=True)#, justone=False)
-        v.sort()
         
-        self.assertEqual([1,3,4,5], v)
+        self.assertEqual([1,3,4,5], sorted(v))
         
         tq.setAttrs('attr1', ['a','b'])
 
@@ -222,15 +219,14 @@ class TestThingSchema(unittest.TestCase):
 
         t1 = clusto.getByName('t1')
 
-        result2 = t1.searchConnections([{'matchdict': AttributeDict(Server.allMetaAttrs())}])
+        result2 = t1.connectedByType(Server)
 
-        result2.sort(cmp=lambda x, y: cmp(x.name, y.name))
+        compare = lambda x, y: cmp(x.name, y.name)
 
         expectedresult = [t2, t4, t3]
-        expectedresult.sort(cmp=lambda x, y: cmp(x.name, y.name))
 
-        
-        self.assert_(result2 == expectedresult)
+        self.assert_(sorted(result2, cmp=compare)
+                     == sorted(expectedresult, cmp=compare))
         
 
     def testConnectionsSearch(self):
@@ -278,3 +274,74 @@ class TestThingSchema(unittest.TestCase):
         self.assert_(result == expectedresult)
 
         
+    def testSearchBlank(self):
+
+        # things
+        t1 = Thing('tp')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', '1')
+        t2.addAttr('attr2', '2')
+
+        t4.addAttr('attr1', '1')
+        t4.addAttr('attr2', '2')
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+        clusto.flush()
+
+        tp = clusto.getByName('tp')
+        
+        self.assert_(len(tp.searchConnections()) == 5)
+
+        res = tp.searchConnections(nonmatchargs=[{'matchdict':
+                                                  AttributeDict({'clustoname':
+                                                                 'tp2'})}])
+
+        self.assert_(len(res) == 4)
+        self.assert_(filter(lambda x: x.name == 'tp2', res) == [])
+
+    def testQuery(self):
+        
+        # things
+        t1 = Thing('tp')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', '1')
+        t2.addAttr('attr2', '2')
+
+        t4.addAttr('attr1', '1')
+        t4.addAttr('attr2', '2')
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+        clusto.flush()
+    
+        
+        
+
+                            

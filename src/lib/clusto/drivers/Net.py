@@ -47,13 +47,6 @@ class Network(Resource):
 
         
 
-class IP(Thing):
-    meta_attrs = {'clustotype': 'ip' }
-    
-    required_attrs = ['ipaddr', 'netmask']
-
-    
-
 class NIC(Part):
 
 
@@ -63,25 +56,45 @@ class NIC(Part):
 
     #connectables = [Server, Port]
 
-        
+    
 class NICMixin:
 
     mixin_nic_args = ['macaddrs']
 
+    def numNICs(self):
+        return len(self.connectedByType(NIC))
+        
     def addNIC(self, macaddr):
-        self.connect(NIC(self.name, macaddr=macaddr))
+        self.connect(NIC(self.name+'nic'+str(self.numNICs), macaddr=macaddr))
     
     def getMACs(self):
-        nics = filter(lambda x: isinstance(x, NIC), self.connections)
+        nics = self.connectedByType(NIC)
 
         return [ nic.getAttr('macaddr') for nic in nics ]
 
     def getNIC(self, macaddr):
-        return filter(lambda x: x.getAttr('macaddr') == macaddr,
-                      self.connections)[0]
+
+        retval = self.getConnectedMatching(AttributeDict({'macaddr':macaddr}))
+                                
+        return retval
+
+class IP(Thing):
+    meta_attrs = {'clustotype': 'ip' }
+    
+    required_attrs = ['ipaddr', 'netmask']
+
+    def canConnectTo(self, thing):
+        """
+        IPs can only connect to things that are NICs or Networks
+        """
+        return thing.isOfType(NIC) or thing.isOfType(Network)
+
 
 class IPMixin:
-
+    """
+    This Mixin contains helper functions for Things that may have IPs closely
+    associated with them, like Servers, Routers, and Switches.
+    """
     def getIP(self, allIPs=False):
         """
         Return the first ip connected to this Thing.

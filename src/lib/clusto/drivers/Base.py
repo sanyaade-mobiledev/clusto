@@ -7,7 +7,7 @@ class Thing(object):
 
     meta_attrs = {}
 
-    required_attrs = []
+    required_attrs = ()
     
     # I can't get multivalued dict like behavior working quite right
     # and I'm not entirely sure that's the best interface anyway.
@@ -142,22 +142,22 @@ class Thing(object):
         """
         Connect a given Thing to self
 
-        Normally tests if self isConnectable to the given thing.
+        Normally tests if self canConnectTo the given thing.
 
         if force is set to True then the connectability test is skipped
         """
 
         if not force:
-            if not (self.isConnectable(thing) and thing.isConnectable(self)):
+            if not (self.canConnectTo(thing) and thing.canConnectTo(self)):
                 raise ConnectionException("%s and %s are not connectable" %
                                           (self.name, thing.name))
             
         ta = ThingAssociation(self, thing)
 
         
-    def isConnectable(self, thing):
+    def canConnectTo(self, thing):
         """
-        Can this Thing connect to the given Thing
+        Can this Thing connect to the given Thing. returns a boolean
         """
 
         return True
@@ -165,19 +165,6 @@ class Thing(object):
     ##
     # Attribute related functions
     #
-    @classmethod
-    def allMetaAttrs(self):
-        """
-        Return a list of all the meta_attrs for this class
-        """
-        
-        allmeta = []
-        for i in self.mro():
-            if hasattr(i, 'meta_attrs'):
-                allmeta.extend(i.meta_attrs.items())
-
-        return allmeta
-
 
     def addAttr(self, key, value):
         """
@@ -345,16 +332,32 @@ class Thing(object):
         return [athing for athing in self.connections
                 if athing.isMatch(matchdict, exact=exact)]
 
+    def isOfType(self, something):
+        """
+        Is this thing of the same type as the Thing/Driver given
+        """
+
+        return something.isMatch(AttributeDict(something.all_meta_attrs))
+
     def isMatch(self, matchdict, exact=False, completekeys=False):
         """
         Does this Thing match the given matchdict.
 
         if exact is True then the matchdict has to exactly match all the
         attributes.
-        
-        """
 
+        if completekeys is True then the complete set of values for the
+        keys given in matchdict have to match this Thing.  This thing may
+        still have other keys that aren't specified in matchdict.
+        """
+            
         attrs = self.getAttrs()
+
+        # if clustoname is included in the matchdict then the name
+        # should be included as an element of the search
+        if 'clustoname' in matchdict.keys():
+            attrs.append(('clustoname', self.name))
+
         for item in matchdict.items():
             try:
                 attrs.remove(item)
@@ -404,9 +407,27 @@ class Thing(object):
             else:
                 alreadySearched.add(item.name)
 
+            # an empty matchargs should match everything
+            if matchargs == ():
+                result.append(item)
+                if item.connector:
+                    result.extend(item.searchConnections(matchargs,
+                                                         nonmatchargs,
+                                                         alreadySearched))
+                    
             for args in matchargs:
+
                 if item.isMatch(**args):
                     result.append(item)
+
+                    # I'm not sure if this behaviour here is correct
+                    # The idea is that if I found a match I shouldn't
+                    # traverse up the connector.
+                    # Like if I was searching for a specific NIC connected to
+                    # a server then I woudn't want to travers up the NIC
+                    # to the also search the IPs connected to it.
+                    continue 
+                
                 if item.connector:
                     result.extend(item.searchConnections(matchargs,
                                                          nonmatchargs,
@@ -420,7 +441,22 @@ class Thing(object):
         
 
         return result
-    
+
+    def connectedByType(self, somedriver, invert=False):
+        """
+        Given a driver get Things connected to self that match that driver.
+        """
+
+        searchargs = {invert and 'nonmatchargs' or 'matchargs':
+                      [{'matchdict':
+                        AttributeDict(somedriver.all_meta_attrs)}]}
+        
+        retval = self.searchConnections(**searchargs)
+
+        return retval
+
+    def query(self, *args, **kwargs):
+        pass
 
 class Resource(Thing):
     meta_attrs = {'clustotype' : 'resource' }

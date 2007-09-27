@@ -9,22 +9,6 @@ class Server(Thing, NICMixin):
 
     #required_attrs = ['serialnumber']
         
-    def addIP(self, nic, ip):
-        """
-        add an IP to this server
-        """
-        pass
-
-
-    def getIPs(self):
-        """
-        returns the IPs associated with this server
-        """
-        pass
-
-    def getConsole(self):
-        pass
-
 
 
 

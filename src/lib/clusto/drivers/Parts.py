@@ -1,11 +1,15 @@
-from Base import Thing
-#from Servers import Server
+from Base import Part
 
-
-class Port(Thing):
+class Port(Part):
     meta_attrs = {'clustotype': 'port'}
-    #required_attrs = []
 
+    required_attrs = ('portnum',)
+
+    connector = True
+
+    def canConnectTo(self, something):
+
+        return not something.isOfType(Port)
     
 
     
