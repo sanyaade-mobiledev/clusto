@@ -8,6 +8,8 @@ from optparse import OptionParser
 
 import clusto
 
+from clusto.scripthelpers import *
+
 def usage():
     """
     The usage of this script.
@@ -19,8 +21,6 @@ def usage():
                      ])
                      
 
-class CommandError(Exception):
-    pass
 
 def runcmd(cmd, args=()):
     env = dict(os.environ)
@@ -36,21 +36,36 @@ def runcmd(cmd, args=()):
     return os.spawnve(os.P_WAIT, cmd, args, env)
 
     
-def main(argv):
+def main(args):
 
+    parser = OptionParser()
+
+    parser.add_option("-f", "--file", action="store",
+                      type="string", dest="filename")
+    parser.add_option("--dsn", action="store",
+                      type="string", dest="dsn")
+    parser.disable_interspersed_args()
+    (options, argv) = parser.parse_args(args[1:])
+
+    if options.filename:
+        os.environ['CLUSTOCONF'] = os.path.realpath(options.filename)
+        
+    
     try:
-        if len(argv) <= 1:
+        if len(argv) == 0:
+            print usage()
             command = clusto.scripthelpers.getCommand('help')
         else:
-            command = clusto.scripthelpers.getCommand(argv[1])
+            command = clusto.scripthelpers.getCommand(argv[0])
             if not command:
-                raise CommandError("Command %s doesn't exist." % (argv[1]))
+                raise CommandError("Command %s doesn't exist." % (argv[0]))
 
-        runcmd(command)
+        return runcmd(command, argv[1:])
+        
     except CommandError, msg:
         print msg
         print usage()
-        runcmd(clusto.scripthelpers.getCommand('help'))
+        return runcmd(clusto.scripthelpers.getCommand('help'))
 
 
 if __name__ == '__main__':

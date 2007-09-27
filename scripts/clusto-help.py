@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+Print the help for clusto
+"""
+
 
 import sys
 import clusto.scripthelpers
@@ -13,6 +17,7 @@ def main(argv):
     for i in clusto.scripthelpers.scriptpaths:
         scripts.update(map(lambda s: s.split('-')[1].split('.')[0],
                            clusto.scripthelpers.listClustoScripts(i)))
+
 
     helpmsg.extend(sorted(scripts))
 
