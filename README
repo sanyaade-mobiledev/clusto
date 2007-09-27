@@ -15,3 +15,20 @@ Kinds of matching:
 1. the given key value pairs exist in Thing
 2. for the given keys the values match exactly in the Thing
 3. the given key/values exactly match attributes of Thing
+
+
+Questions I'd like to be able to answer questions like:
+
+* get 4 servers in datacenter Z with status == unallocated 
+  each in a different rack
+
+servers = []
+d = clusto.getByName('datacenterZ')
+racks = d.getConnectedMatching(AttributeDict(Racks.allMetaAttrs()))
+for r in racks:
+    s = r.getConnectedMatching(Servers.allMetaAttrs() + [('status', 'unallocated')])
+    servers.append(s.pop())
+
+
+* get console for server X
+* add service W on server X to loadbalancer vip Y
