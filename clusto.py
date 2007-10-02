@@ -12,12 +12,13 @@ from clusto.scripthelpers import *
     
 def main(args):
 
-    parser = OptionParser()
+    parser = OptionParser(usage="%prog [options] <command> [command args]")
 
     parser.add_option("-f", "--file", action="store",
                       type="string", dest="configfile")
     parser.add_option("--dsn", action="store",
                       type="string", dest="dsn")
+
     parser.disable_interspersed_args()
     (options, argv) = parser.parse_args(args[1:])
 
@@ -26,7 +27,7 @@ def main(args):
     
     try:
         if len(argv) == 0 or argv[0] == 'help':
-            print usage()
+            print parser.get_usage()
             command = clusto.scripthelpers.getCommand('help')
         else:
             command = clusto.scripthelpers.getCommand(argv[0])
@@ -37,7 +38,7 @@ def main(args):
         
     except CommandError, msg:
         print msg
-        print usage()
+        print parser.get_usage()
         return runcmd(clusto.scripthelpers.getCommand('help'))
 
 

@@ -128,6 +128,8 @@ def setupClustoEnv(options):
 
     if os.environ.has_key('CLUSTOCONFIG'):
         config = getClustoConfig(os.environ['CLUSTOCONFIG'])
+    else:
+        config = getClustoConfig()
 
     if not os.environ.has_key('CLUSTODSN'):
         os.environ['CLUSTODSN'] = config.get('clusto','dsn')
@@ -145,6 +147,8 @@ class ClustoScript(object):
 
     usage = "%prog [options]"
     option_list = []
+    num_args = None
+    short_description = "sample short descripton"
     
     def __init__(self):
         self.parser = OptionParser(usage=self.usage,
@@ -154,7 +158,7 @@ class ClustoScript(object):
                                 action="callback",
                                callback=self._help_description,
                                dest="helpdesc",
-                               help="print out the help description")
+                               help="print out the short command description")
 
         
     
@@ -175,6 +179,9 @@ def runscript(scriptclass):
     config, logger = initScript()
 
     try:
+        if script.num_args != None and script.num_args != len(argv)-1:
+            raise CmdLineError("Wrong number of arguments.")
+        
         retval = script.main(argv,
                              options,
                              config=config,
@@ -182,7 +189,7 @@ def runscript(scriptclass):
 
     except (CmdLineError, LookupError), msg:
         print msg
-        print usage
+        script.parser.print_help()
         return 1
 
     

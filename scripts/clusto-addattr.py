@@ -15,33 +15,24 @@ from clusto.scripthelpers import *
 from sqlalchemy.exceptions import SQLError
 
 
-def parseargs(args):
+class addAttr(ClustoScript):
 
-    if len(args) != 3:
-        raise CmdLineError("Wrong number of arguments.")
+    usage = "%prog [options] <thingname> <key> <value>"
+    short_description = "add an attribute to a thing"
 
-    thingname = args[0]
-    keyname = args[1]
-    value = args[2]
-    
-    return thingname, keyname, value
+    option_list = [make_option("-r", "--replace", action="store_true",
+                               dest="replace",
+                               help="replace all keys with the given key")]
 
-def main(argv, config=None):
+    num_args = 3
 
-    parser = OptionParser(usage="usage: %prog [options] <thingname> <key> <value>")
+    def main(self, argv, options, config, log):
 
-    parser.add_option("-r", "--replace", action="store_true",
-                      dest="replace",
-                      help="replace all keys with the given key")
+        thingname = argv[1]
+        keyname = argv[2]
+        value = argv[3]
 
     
-    (options, args) = parser.parse_args(argv)
-
-    config, log = clusto.scripthelpers.initScript()
-    
-    try: 
-        thingname, keyname, value = parseargs(args[1:])
-
         thing = clusto.getByName(thingname)
 
         if options.replace:
@@ -50,12 +41,9 @@ def main(argv, config=None):
         thing.addAttr(keyname, value)
         clusto.flush()
 
-    except (CmdLineError, LookupError), msg:
-        print msg
-        print parser.print_help()
-        sys.exit(1)
+                    
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    runscript(addAttr)
         
 

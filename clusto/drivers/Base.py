@@ -88,12 +88,15 @@ class Thing(object):
 
         out = []
         for attr in self._attrs:
-            out.append("%s.%s %s\n" % (self.name, attr.key, attr.value))
+            out.append("%s.%s %s" % (self.name, attr.key, attr.value))
 
         for con in self.connections:
-            out.append("%s._rel %s\n" % (self.name, con.name))
+            out.append("%s._rel %s" % (self.name, con.name))
 
-        return ''.join(out)
+        if not self.hasAttr('clustotype'):
+            out.append("%s.clustotype thing" % (self.name))
+            
+        return '\n'.join(out)
 
 
     
