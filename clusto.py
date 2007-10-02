@@ -5,35 +5,9 @@ import os
 
 from optparse import OptionParser
 
-
 import clusto
 
 from clusto.scripthelpers import *
-
-def usage():
-    """
-    The usage of this script.
-    """
-
-    return ' '.join([sys.argv[0],
-                     "<command>",
-                     "[command args]",
-                     ])
-                     
-
-
-def runcmd(cmd, args=()):
-    env = dict(os.environ)
-    env['PYTHONPATH'] = ':'.join(sys.path)
-
-    if not os.path.exists(cmd):
-        raise CommandError("File Not Found.")
-    if not os.access(cmd, os.X_OK):
-        raise CommandError(cmd + " not Executable.")
-
-    args = [cmd] + list(args)
-
-    return os.spawnve(os.P_WAIT, cmd, args, env)
 
     
 def main(args):
@@ -41,18 +15,17 @@ def main(args):
     parser = OptionParser()
 
     parser.add_option("-f", "--file", action="store",
-                      type="string", dest="filename")
+                      type="string", dest="configfile")
     parser.add_option("--dsn", action="store",
                       type="string", dest="dsn")
     parser.disable_interspersed_args()
     (options, argv) = parser.parse_args(args[1:])
 
-    if options.filename:
-        os.environ['CLUSTOCONF'] = os.path.realpath(options.filename)
-        
+
+    config = setupClustoEnv(options)
     
     try:
-        if len(argv) == 0:
+        if len(argv) == 0 or argv[0] == 'help':
             print usage()
             command = clusto.scripthelpers.getCommand('help')
         else:
