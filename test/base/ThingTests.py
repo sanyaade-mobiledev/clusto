@@ -3,6 +3,7 @@ from clusto.schema import METADATA, CTX, AttributeDict
 import clusto
 from clusto.drivers.Base import Thing, Part
 from clusto.drivers.Servers import Server
+from clusto.exceptions import *
 
 class TestThingSchema(unittest.TestCase):
 
@@ -219,7 +220,7 @@ class TestThingSchema(unittest.TestCase):
 
         t1 = clusto.getByName('t1')
 
-        result2 = t1.connectedByType(Server)
+        result2 = t1.getConnectedByType(Server)
 
         compare = lambda x, y: cmp(x.name, y.name)
 
@@ -341,3 +342,50 @@ class TestThingSchema(unittest.TestCase):
         
         clusto.flush()
     
+    def testDoubleConnect(self):
+
+        t1 = Thing('tp')
+        t2 = Thing('t2')
+        t3 = Thing('t3')
+        t4 = Thing('t4')
+        t5 = Thing('t5')
+
+        t2.addAttr('attr1', '1')
+        t2.addAttr('attr2', '2')
+
+        t4.addAttr('attr1', '1')
+        t4.addAttr('attr2', '2')
+        
+        # part
+        tp1 = Part('tp1')
+        tp2 = Part('tp2')
+        tp3 = Part('tp3')
+
+        t1.connect(t2)
+        t1.connect(tp1)
+        tp1.connect(t3)
+        tp1.connect(tp2)
+        tp2.connect(t4)
+        
+        clusto.flush()
+
+        t1.connect(t2)
+        t1.connect(t2)
+        t1.connect(t2)
+        t1.connect(t2)
+        t1.connect(t2)
+
+        clusto.flush()
+
+        self.assertEqual(len(t1.connections), 2)
+
+        self.assert_(t2 in t1.connections)
+
+
+    def testSelfConnect(self):
+
+        # shouldn't be able to connect to yourself
+        t1 = Thing('t1')
+
+        self.assertRaises(ConnectionException, t1.connect, t1)
+        

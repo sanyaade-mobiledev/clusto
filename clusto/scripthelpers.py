@@ -148,6 +148,7 @@ class ClustoScript(object):
     usage = "%prog [options]"
     option_list = []
     num_args = None
+    num_args_min = 0
     short_description = "sample short descripton"
     
     def __init__(self):
@@ -179,7 +180,7 @@ def runscript(scriptclass):
     config, logger = initScript()
 
     try:
-        if script.num_args != None and script.num_args != len(argv)-1:
+        if (script.num_args != None and script.num_args != (len(argv)-1)) or script.num_args_min > (len(argv)-1):
             raise CmdLineError("Wrong number of arguments.")
         
         retval = script.main(argv,

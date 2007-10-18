@@ -1,5 +1,5 @@
 from clusto.schema import *
-
+from clusto.exceptions import *
     
 class Thing(object):
     """
@@ -153,12 +153,16 @@ class Thing(object):
         if force is set to True then the connectability test is skipped
         """
 
+        if thing is self:
+            raise ConnectionException("Cannot connect to self")
+        
         if not force:
             if not (self.canConnectTo(thing) and thing.canConnectTo(self)):
                 raise ConnectionException("%s and %s are not connectable" %
                                           (self.name, thing.name))
-            
-        ta = ThingAssociation(self, thing)
+
+        if thing.name not in [i.name for i in self.connections]:
+            ta = ThingAssociation(self, thing)
 
         
     def canConnectTo(self, thing):
@@ -264,6 +268,9 @@ class Thing(object):
         
         attrlist = filter(lambda x: x.key == key, self._attrs)
 
+        if not attrlist:
+            raise KeyError(key)
+        
         return justone and attrlist[0].value or [a.value for a in attrlist]
 
     def hasAttr(self, key, value=None):
@@ -448,7 +455,7 @@ class Thing(object):
 
         return result
 
-    def connectedByType(self, somedriver, invert=False):
+    def getConnectedByType(self, somedriver, invert=False):
         """
         Given a driver get Things connected to self that match that driver.
         """
@@ -464,12 +471,33 @@ class Thing(object):
     def query(self, *args, **kwargs):
         pass
 
-#class Resource(Thing):
-#    meta_attrs = {'clustotype' : 'resource' }
-    
+class Resource(Thing):
+    """
+    Resources
+
+    a feature of a resource is that it can have dependancies on various Things
+    those dependencies can then be checked against the clustodb
+    ## FIXME I'm not sure that's the right functionality
+    """
+    meta_attrs = {'clustotype' : 'resource' }
+    connector = True
+
+    def addDepends(self):
+        pass
+
+    def checkDepends(self):
+        pass
+
+    def removeDepends(self):
+        pass
 
 
 class Part(Thing):
+    """
+    A Part is a Thing that generally doesn't stand on its
+    own.  It will be things like 'nic' which always exist inside another
+    device.
+    """
 
     meta_attrs = {'clustotype' : 'part' }
 

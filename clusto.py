@@ -9,7 +9,7 @@ import clusto
 
 from clusto.scripthelpers import *
 
-    
+
 def main(args):
 
     parser = OptionParser(usage="%prog [options] <command> [command args]")

@@ -41,10 +41,10 @@ class Rack(Thing):
         """
 
         retval = {}
-        allRUs = self.connectedByType(RackU)
+        allRUs = self.getConnectedByType(RackU)
 
         for u in allRUs:
-            retval[int(u.getAttr('unumber'))] = u.connectedByType(Rack,
+            retval[int(u.getAttr('unumber'))] = u.getConnectedByType(Rack,
                                                                   invert=True)[0]
 
         return retval
