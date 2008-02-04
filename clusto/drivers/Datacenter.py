@@ -1,8 +1,9 @@
 
 from clusto.drivers.Base import Thing
+from clusto.drivers.Mixins import LocationMixin
+import clusto
 
-
-class Datacenter(Thing):
+class Datacenter(Thing, LocationMixin):
     """
     a datacenter
     """
@@ -11,7 +12,30 @@ class Datacenter(Thing):
 
     required_attrs = ('location',)
 
-class Rack(Thing):
+    def canConnectTo(self, thing):
+        return isinstance(thing, (Cage, Colo))
+    
+
+class Colo(Thing, LocationMixin):
+    """
+    a colo
+    """
+
+    meta_attrs = {'clustotype':'colo'}
+
+    def canConnectTo(self, thing):
+        return isinstance(thing, (Cage, Rack, Datacenter))
+    
+class Cage(Thing, LocationMixin):
+    """
+    a cage
+    """
+    meta_attrs = {'clustotype':'cage'}
+
+    #def canConnectTo(self, thing):
+    #    return isinstance(thing, [Colo, Rack, Cage, Datacenter])
+
+class Rack(Thing, LocationMixin):
     """
     a rack
     """
@@ -27,12 +51,13 @@ class Rack(Thing):
 
         newUs = []
         for num in ulocations:
-            newUs.append(RackU(self.name + '%02d' % num,
+            newUs.append(RackU(self.name + 'u%02d' % num,
                                unumber=num))
 
         for u in newUs:
-            self.connect(u)
-            thing.connect(u)
+            u.insert(thing)
+            self.insert(u)
+
 
     def getRackContents(self):
         """
@@ -52,7 +77,7 @@ class Rack(Thing):
             
 
 
-class RackU(Thing):
+class RackU(Thing, LocationMixin):
     """
     Rack U location
     """

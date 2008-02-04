@@ -55,6 +55,8 @@ class Thing(object):
         #newthing._setProperClass()
         return newthing
 
+
+        
     def __eq__(self, otherthing):
         """
         Am I the same as the Other Thing.
@@ -213,6 +215,7 @@ class Thing(object):
         attr = filter(lambda x: x.key == key and x.value == value, self._attrs)
         for i in attr:
             self._attrs.remove(i)
+            i.delete()
 
     def delAttrs(self, key):
         """
@@ -222,9 +225,8 @@ class Thing(object):
 
         for i in attrlist:
             self._attrs.remove(i)
+            i.delete()
             
-        
-
         
     def getAttrs(self, keys=None, asdict=False,
                  onlyvalues=False, sort=False):

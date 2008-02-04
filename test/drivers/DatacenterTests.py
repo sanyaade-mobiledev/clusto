@@ -2,7 +2,9 @@
 from testbase import *
 
 from clusto.drivers.Base import Thing
-from clusto.drivers.Datacenter import Rack, RackU, Datacenter
+from clusto.drivers.Servers import Server
+from clusto.drivers.Datacenter import Rack, RackU, Datacenter, Colo, Cage
+from clusto.exceptions import *
 
 class RackTests(ClustoTestBase):
 
@@ -46,6 +48,16 @@ class RackTests(ClustoTestBase):
         self.assert_(contents[23].name == contents[24].name
                      == contents[25].name == 't1')
 
+        del(t1)
+        
+
+        clusto.flush()
+
+        clusto.CTX.current.clear()
+        rack = clusto.getByName(rackname)
+        contents = rack.getRackContents()
+
+        
 
     def testRackUMissingArg(self):
 
@@ -70,3 +82,25 @@ class Datacentertest(ClustoTestBase):
         z = clusto.getByName('d1')
 
         self.assert_(z.getAttr('location') == 'san francisco')
+
+    def testDatacenterThingStack(self):
+
+        d = Datacenter('d1', 'footown')
+
+        co = Colo('colo1')
+
+        ca = Cage('cage1')
+
+        ra = Rack('rack1')
+
+        s = Server('s1')
+
+        d.connect(co)
+        co.connect(ca)
+        ca.connect(ra)
+
+        clusto.flush()
+
+        # can't connect a server to a datacenter
+        self.assertRaises(ConnectionException, d.connect, s)
+        
