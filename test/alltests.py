@@ -4,8 +4,7 @@ import unittest
 import sys
 
 
-tests = ('base',
-         'drivers',)
+tests = ('base', 'drivers',)
 
 
 if __name__ == '__main__':

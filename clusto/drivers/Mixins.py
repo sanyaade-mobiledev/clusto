@@ -1,96 +1,111 @@
-import clusto
 
-class HeirarchyMixin:
+from clusto.schema import Attribute
+
+
+class AttributeListMixin:
     """
-    Give heirarchical functionality to a Thing
+    Methods that provides functionality for working with attribute lists.
     """
 
-    def setParent(self, something):
+    def addAttr(self, key, value):
+        "add a key/value to the list of attributes"
 
-        if self.hasParent():
-            self.removeParent()
-            
-        self.setAttrs('_ref_parent', [something.name])
-        self.connect(something)
+        self.entity._attrs.append(Attribute(key, value))
 
-        something.addAttr('_ref_child', self.name)
+    def delAttr(self, key, value=None):
+        "delete attribute with the given key and value optionally value also"
 
-    def removeParent(self):
-
-        if not self.hasParent():
-            return # maybe raise an exception here
-        else:
-            parent = self.getParent()
-            
-            self.delAttr('_ref_parent', parent.name)
-            self.disconnect(parent)
-
-
-    def addChild(self, something):
-
-        self.connect(something)
-        something.setAttrs('_ref_parent', [self.name])
-        self.addAttr('_ref_child', something.name)
-        
-        
-    def removeChild(self, something):
-
-        self.delAttr('_ref_child', something.name)
-        something.delAttrs('_ref_parent')
-        self.disconnect(something)
-
-    def getParent(self, allparents=False):
-
-        if self.hasParent():
-            parentname = self.getAttr('_ref_parent', justone=True)
-            parent =  clusto.getByName(parentname)
-            if not allparents:
-                return parent
+        for i in sef.entity._attrs:
+            if value:
+                if (i.key == key) and (i.value == value):
+                    i.delete()
             else:
-                ## fix here
-                l = [parent]
-                while not parent.isTopParent():
-                    parent = parent.getParent()
-                    l.insert(0, parent)
-                return l
-        else:
-            return None # maybe raise exception instead
+                if (i.key == key):
+                    i.delete()
+
+    @property
+    def attrs(self):
+        return tuple(self.entity._attrs)
+
+    def attrKeys(self):
+
+        return [x.key for x in self.attrs]
         
+    def getAttr(self, key, all=False):
+        "get all values for a given key"
 
-    def getChildren(self):
+        vals = filter(lambda x: x.key == key, self.attrs)
+        return all and tuple(vals) or vals[0]
 
-        childnames = self.getAttr('_ref_child', justone=False)
-        return [clusto.getByName(i) for i in childnames]
+    def setAttr(self, key, valuelist):
+        """
+        replaces all items in the list matching the given key with values in
+        valuelist
+        """
 
-    def isTopParent(self):
+        self.delAttr(key)
+        for val in valuelist:
+            self.addAttr(Attribute(key, val))
 
-        return not self.hasAttr('_ref_parent') and self.hasChildren()
-
-    def hasChildren(self):
-
-        return self.hasAttr('_ref_child')
-
-
-    def hasParent(self):
-        return self.hasAttr('_ref_parent')
-
-    def isChildOf(self, something):
-        parent = self.getParent()
-        return parent == something
-
-    def isParentOf(self, something):
-
-        return something.name in [x.name for x in self.getChidren()]
-
-class LocationMixin(HeirarchyMixin):
-
-    def __contains__(self, something):
-        return self.isParentOf(something)
     
-    def insert(self, something):
-        self.addChild(something)
+    def hasAttr(self, key):
+        "return True if this list has an attribute with the given key"
 
-    def remove(self, something):
-        self.removeChild(something)
+        for i in self.attrs:
+            if i.key == key:
+                return True
+
+        return False
+    
+
+
+class PoolMixin:
+    """
+    mixin so Entities can interact with pools they are in
+    """
+
+    def attrs(self, ignoreHidden=True, onlyLocal=False, attrfilter=None):
+
+        all = list(self.entity._attrs)
+
+        if ignoreHidden:
+            all = filter(lambda x: not x.key.startswith('_'), all)
+
+        if not onlyLocal:
+            for pool in self.pools():
+                all.extend(pool.attrs())
+
+        if filter:
+            all = filter(attrfilter, all)
+            
+        return all
+    
+
+
+    def getAttr(self, key, all=False, onlyLocal=False):
+        "get all values for a given key"
+
+
+        attrs = self.attrs(ignoreHidden=False, onlyLocal=onlyLocal)
+        
+        vals = filter(lambda x: x.key == key, attrs)
+        
+        return all and tuple(vals) or (vals and vals[0] or [])
+
+
+    
+    def pools(self):
+
+        pools = [self.__class__(entity=x.value) for x in self.getAttr('_inPool', all=True, onlyLocal=True)]
+
+        return pools
+
+
+    def removeFromPools(self):
+        "Remove this Entity from all pools"
+
+        for pool in self.pools:
+            pool.removeFromPool(self)
 
         
+

@@ -11,6 +11,8 @@ class Server(Thing, NICMixin):
 
 
     #required_attrs = ['serialnumber']
+
+    
         
 
 

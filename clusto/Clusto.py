@@ -1,28 +1,88 @@
 
-from clusto.drivers.Base import Thing, Attribute
-from clusto.schema import CTX, DRIVERLIST, METADATA
-from sqlalchemy import and_, or_, literal
+from clusto.drivers import DRIVERLIST, Driver
+from clusto.schema import SESSION, METADATA, Entity, Attribute
+from sqlalchemy import and_, or_, literal, create_engine
 from sqlalchemy.exceptions import InvalidRequestError
 
 
-driverlist = DRIVERLIST
-
-
 def connect(dsn):
-    METADATA.connect(dsn)
+    """
+    Connect to a given Clusto datastore.
+
+    Accepts a dsn string.
+
+    e.g. mysql://user:pass@example.com/clustodb
+    e.g. sqlite:///somefile.db
+
+    @param dsn: the clusto database URI
+    """
+    METADATA.bind = create_engine(dsn)
+
+def initclusto():
+    """
+    Initialize a clusto database.
+    """
+    METADATA.create_all(METADATA.bind)
 
 def flush():
-    CTX.current.flush()
+    """
+    Flush changes made to clusto objects to the database.
+    """
+    SESSION.flush()
+    SESSION.commit()
 
 
+def clear():
+    """
+    Clear the changes made to objects in the current session.
+    """
+    
+    SESSION.clear()
+    #SESSION.remove()
+
+
+def getDriver(entity, ignoreDriverColumn=False):
+    """
+    Return the driver to use for a given entity
+    """
+
+    if not ignoreDriverColumn:
+        if entity.driver in DRIVERLIST:
+            return DRIVERLIST[entity.driver]
+
+    return Driver
+    
 def getByName(name):
     try:
-        return Thing.selectone(Thing.c.name == name)
+        entity = SESSION.query(Entity).filter_by(name=name).one()
+
+        #klass = getDriver(entity)
+        #retval = klass(entity=entity)
+
+        retval = Driver(entity=entity)
+            
+        return retval
     except InvalidRequestError:
         raise LookupError(name + " does not exist.")
 
-def initclusto():
-    METADATA.create_all()
+
+def rename(oldname, newname):
+    """
+    Rename an Entity from oldname to newname.
+    """
+
+    old = getByName(oldname)
+
+    old.name = newname
+
+    flush()
+
+
+## unconverted functions
+def disconnect():
+    SESSION.close()
+    
+
 
 def query(attrs=(), names=(), ofTypes=(), filterArgs=()):
     """
@@ -88,34 +148,15 @@ def query(attrs=(), names=(), ofTypes=(), filterArgs=()):
                                  Attribute.c.value == attr[1]))
 
     if not queryarg:
-        retval = Thing.select()
+        retval = Thing.query()
     elif hasattrs:
-        retval = Thing.select(and_(Thing.c.name == Attribute.c.thing_name, or_(*queryarg)))
+        retval = Thing.query.filter(and_(Thing.c.name == Attribute.c.thing_name, or_(*queryarg)))
 
     else:
-        retval = Thing.select(or_(*queryarg))
+        retval = Thing.query.filter(or_(*queryarg))
 
-    return retval
+    return list(retval)
             
-
-def rename(oldname, newname):
-    """
-    Rename a Thing from oldname to newname.
-    """
-
-    old = getByName(oldname)
-
-    new = Thing(newname)
-
-    new.addAttrs(old.getAttrs())
-
-
-    cons = old.searchConnections()
-
-    for athing in cons:
-        new.connect(athing)
-        
-    old.delete()
 
     
     

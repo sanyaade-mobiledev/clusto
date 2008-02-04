@@ -1,36 +1,45 @@
-from clusto.drivers.Base import Thing, Part, Resource
-from clusto.drivers.Mixins import HeirarchyMixin
-import clusto
-    
-class Class(Resource):
-    meta_attrs = {'clustotype':'class'}
-    
-class Role(Resource):
-    meta_attrs = {'clustotype':'role'}
+from clusto.drivers.Base import Driver
 
-class Pool(Resource, HeirarchyMixin):
-    meta_attrs = {'clustotype':'pool'}
 
-    @classmethod
-    def getPools(cls, something):
+class Pool(Driver):
+    """
+    A Pool is used to group Entities into a collection that shares attributes.
+
+    Pools 
+    """
+    
+    drivername = "pool"
+
+    def addToPool(self, entity):
         """
-        Find what Pools the given Thing is contained in.
+        Add a given Entity to the pool.
 
-        Return array of Pools sorted by heirarchy with the Pool at the top of
-        the tree listed first in the array.
-
+        @param entity: the entity to be added
+        @type entity: L{Entity} or L{Driver}
         """
 
-        allpools = []
-        # get most closely connected pool
-        closepool = something.getConnectedByType(cls)
+            
+        self.addAttr('_member', entity)
+        entity.addAttr('_inPool', self)
 
-        allpools.append(closepool)
 
-        currentpool = closepool
-        while True:
-            pass #if currentpool.has
+    def removeFromPool(self, entity):
+        """
+        remove a given Entity from the pool.
 
+        @param entity: the entity to be removed
+        @type entity: L{Entity} or L{Driver}
+        """
+
+        self.delAttr('_member', entity)
+        entity.delAttr('_inPool', self)
+        
+    @property
+    def members(self):
+        """
+        Return a list of members in th pool
+        """
+
+        return [x.value for x in self.getAttr('_member', all=True)]
 
         
-

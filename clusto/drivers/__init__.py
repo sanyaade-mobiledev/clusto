@@ -1,5 +1,4 @@
 
-__all__ = ["Base",
-           "Net",
-           "Servers",]
+from Base import *
+from Categories import *
 

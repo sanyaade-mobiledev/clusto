@@ -2,31 +2,20 @@ import unittest
 #from clusto.schema import *
 import clusto
 from clusto.drivers.Servers import *
+import testbase
 
-class TestServer(unittest.TestCase):
-
-    def setUp(self):
-        
-        clusto.METADATA.connect('sqlite:///:memory:')
-        clusto.METADATA.create_all()
-
-
-
-    def tearDown(self):
-
-        clusto.CTX.current.clear()
-        clusto.METADATA.dispose()
+class TestServer(testbase.ClustoTestBase):
 
 
     def testServerObject(self):
 
         s1 = Server('serv1')
 
-        
+        print [i.name for i in Server.query()]
         clusto.flush()
 
         
-        s = Thing.selectone(Thing.c.name=='serv1')
+        s = clusto.getByName('serv1')
 
         self.assertEqual("\n".join(["serv1.clustotype server"]),
                          str(s))

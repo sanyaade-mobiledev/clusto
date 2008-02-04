@@ -1,12 +1,13 @@
 
-from testbase import *
+import clusto
+import testbase
 
 from clusto.drivers.Base import Thing
 from clusto.drivers.Servers import Server
 from clusto.drivers.Datacenter import Rack, RackU, Datacenter, Colo, Cage
 from clusto.exceptions import *
 
-class RackTests(ClustoTestBase):
+class RackTests(testbase.ClustoTestBase):
 
     def testAddToRack(self):
 
@@ -69,7 +70,7 @@ class RackTests(ClustoTestBase):
 
 
 
-class Datacentertest(ClustoTestBase):
+class Datacentertest(testbase.ClustoTestBase):
     """
     Test Datacenter Driver
     """

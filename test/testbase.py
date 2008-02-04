@@ -10,14 +10,18 @@ import clusto
 
 class ClustoTestBase(unittest.TestCase):
 
+    def data(self):
+        pass
+    
     def setUp(self):
-        
-        clusto.METADATA.connect('sqlite:///:memory:')
-        clusto.METADATA.create_all()
 
+        clusto.connect('sqlite:///:memory:')
+        clusto.initclusto()
+        self.data()
 
 
     def tearDown(self):
 
-        clusto.CTX.current.clear()
-        clusto.METADATA.dispose()
+        clusto.clear()
+        clusto.METADATA.drop_all()
+

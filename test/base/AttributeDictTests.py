@@ -2,9 +2,9 @@
 import unittest
 
 from clusto.schema import AttributeDict
+import testbase
 
-
-class TestAttributeDict(unittest.TestCase):
+class TestAttributeDict(testbase.ClustoTestBase):
 
     def testAttrDictReturnValue(self):
 

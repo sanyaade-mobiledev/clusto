@@ -3,240 +3,178 @@ Clusto schema
 
 """
 
-#from sqlalchemy import DynamicMetaData, create_session, select, and_, relation
-#from sqlalchemy import Table, Column, ForeignKey, String, Integer
 from sqlalchemy import *
 
 from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
 
-from sqlalchemy.orm import Mapper, MapperExtension
+from sqlalchemy.orm import * #Mapper, MapperExtension
+from sqlalchemy.orm.mapper import Mapper
 
-#from clusto.sqlalchemyhelpers import ClustoMapperExtension
+from sqlalchemy.orm import mapperlib
+
 
 import sys
-# session context
+import datetime
 
 
-METADATA = DynamicMetaData()
+METADATA = MetaData()
 
 
-CTX = SessionContext(create_session)
+SESSION = scoped_session(sessionmaker(autoflush=True, transactional=True)) 
 
-THING_TABLE = Table('things', METADATA,
-                    Column('name', String(128), primary_key=True),
-                    #Column('thingtype', String(128)),
+ENTITY_TABLE = Table('entities', METADATA,
+                    Column('entity_id', Integer, primary_key=True),
+                    Column('name', String(1024), unique=True, nullable=False),
+                    Column('driver', String(64)),
                     mysql_engine='InnoDB'
                     )
 
-ATTR_TABLE = Table('thing_attrs', METADATA,
+ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
-                   Column('thing_name', String(128),
-                          ForeignKey('things.name', ondelete="CASCADE",
-                                     onupdate="CASCADE")),
+                   Column('entity_id', Integer,
+                          ForeignKey('entities.entity_id'), nullable=False),
                    Column('key', String(1024)),
-                   Column('value', String),
-                   mysql_engine='InnoDB'
+                   Column('datatype', String(32)),
+
+                   Column('int_value', Integer, default=None),
+                   Column('string_value', String, default=None),
+                   Column('datetime_value', DateTime, default=None),
+                   Column('relation_id', Integer,
+                          ForeignKey('entities.entity_id'), default=None),
                    )
 
-THINGTHING_TABLE = Table('thing_thing', METADATA,
-                         Column('thing_name1', String(128),
-                                ForeignKey('things.name', ondelete="CASCADE",
-                                           onupdate="CASCADE"),
-                                primary_key=True),
-                         Column('thing_name2', String(128),
-                                ForeignKey('things.name', ondelete="CASCADE",
-                                           onupdate="CASCADE"),
-                                primary_key=True),
-                         mysql_engine='InnoDB'
-                         )
 
-class ClustoMapperExtension(MapperExtension):
-
-    def populate_instance(self, mapper, selectcontext, row, instance,
-                          identitykey, isnew):
-
-        """
-
-        called right before the mapper, after creating an instance from a row,
-        passes the row to its MapperProperty objects which are responsible for
-        populating the object's attributes.  If this method returns EXT_PASS,
-        it is assumed that the mapper should do the appending, else if this
-        method returns any other value or None, it is assumed that the append
-        was handled by this method.
-
-        Essentially, this method is used to have a different mapper populate
-        the object:
-
-            def populate_instance(self, mapper, selectcontext, instance,
-                                  row, identitykey, isnew):
-                othermapper.populate_instance(selectcontext, instance,
-                                              row, identitykey, isnew,
-                                              frommapper=mapper)
-                return True
-        """
-
-        Mapper.populate_instance(mapper, selectcontext, instance, row,
-                                 identitykey, isnew)
-        instance._setProperClass()
-        return True
-    
-    def before_delete(self, mapper, connection, instance):
-        """called before an object instance is DELETEed"""
-
-        associations = or_(THINGTHING_TABLE.c.thing_name1==instance.name,
-                           THINGTHING_TABLE.c.thing_name2==instance.name )
-        
-        connection.execute(THINGTHING_TABLE.delete(associations))
-
-
-        attributes = and_(ATTR_TABLE.c.key.like('_ref_%'),
-                          ATTR_TABLE.c.value==instance.name )
-                          
-        connection.execute(ATTR_TABLE.delete(attributes))
-
-        
-
-
-class AttributeDict(dict):
-    """
-    This is a Multi-valued Attribute Dict
-
-    This behaves much like a normal dict except that all values are lists.
-
-    When setting values the following rules apply:
-        if the key does not exist and the value is a scalar then the value is
-        put into a new list pointed to by the key.
-
-        if the key does exist and the value is a scalar then the value is
-        appended to the list of values pointed to by that key.
-
-        if the value is a list then the value gets set to the given list and
-        any old values for that key are discarded.
-    """
-
-    def __init__(self, somedict=None):
-
-        if somedict:
-
-            if isinstance(somedict, dict):
-                for i in somedict:
-                    self[i] = somedict[i]
-            elif isinstance(somedict, list):
-                for i in somedict:
-                    self[i[0]] = i[1]
-        else:
-            super(dict, self).__init__()
-        
-        
-        
-    def __iter__(self): 
-        return self.itervalues()  
-    def __setitem__(self, key, value):
-        if isinstance(value, list):
-            dict.__setitem__(self, key, value)
-        else:
-            self.setdefault(key, []).append(value)
-
-    def append(self, item):
-        """Add an item to the dictionary"""
-        self[item.key] = item 
-
-    def items(self):
-        items = []
-
-        for key in self.keys():
-            for value in self[key]:
-                items.append((key, value))
-
-        return items
-            
-    def update(self, somedict, replace=False):
-
-        for key in somedict:
-            self[key] = somedict[key]
-        
 
 class Attribute(object):
     """
     Attribute class holds key/value pair backed by DB
     """
-    def __init__(self, key, value, thing_name=None):
+    def __init__(self, key, value):
+
+        sess = create_session()
+
         self.key = key
+        
         self.value = value
 
-        if thing_name:
-            self.thing_name = thing_name
+    def __eq__(self, other):
 
-    def __repr__(self):
-        return "thingname: %s, keyname: %s, value: %s" % (self.thing_name,
-                                                          self.key,
-                                                          self.value)
-
-assign_mapper(CTX, Attribute, ATTR_TABLE)
-
-class ThingAssociation(object):
-    """
-    Relationship between two Things
-    """
-    def __init__(self, thing1, thing2):
-        self.thing_name1 = thing1.name
-        self.thing_name2 = thing2.name
-
-assign_mapper(CTX, ThingAssociation, THINGTHING_TABLE)
-
-
-DRIVERLIST = {}
-
-class ClustoThing(type):
-    """
-    Metaclass for all clusto stored objects
-    """
-    def __init__(cls, name, bases, dct):
-
-        if not cls.meta_attrs.has_key('clustotype') and not name == "Thing":
-            ## I should do something clever if it's missing
-            raise DriverException("Driver %s missing clustotype meta_attrs"
-                                  % cls.__name__)
-        
-        tempattrs = AttributeDict()
-
-        for klass in bases:
-            if hasattr(klass, 'meta_attrs'):
-                tempattrs.update(klass.meta_attrs)
-
-        tempattrs.update(cls.meta_attrs)
-
-        cls._all_meta_attrs = tempattrs
-        DRIVERLIST[cls.__name__] = cls
-
-        if name != "Thing":
-            selection = select([THING_TABLE],
-                               and_(ATTR_TABLE.c.key=='clustotype',
-                                    ATTR_TABLE.c.value==cls.meta_attrs['clustotype'],
-                                    ATTR_TABLE.c.thing_name==THING_TABLE.c.name)
-                               ).alias(cls.meta_attrs['clustotype']+'alias')
-
-        else:
-            selection = THING_TABLE
-            
-
-        # setup all_meta_attrs
-        allmeta = []
-        for i in cls.mro():
-            if hasattr(i, 'meta_attrs'):
-                allmeta.extend(i.meta_attrs.items())
-
-        cls.all_meta_attrs = allmeta
-
-        assign_mapper(CTX, cls, selection, properties={
-            '_attrs' : relation(Attribute, lazy=False,
-                                cascade='all, delete-orphan',),
-            },
-                      extension=ClustoMapperExtension())
-
-        super(ClustoThing, cls).__init__(name, bases, dct)
-
-
-
+        return ((self.key == other.key) and (self.value == other.value))
     
+    def __str__(self):
+
+        if self.datatype == 'relation':
+            value = self.relation_value.name
+        else:
+            value = self.value
+        
+        return "%s.%s.%s %s" % (self.entity.name, self.key,
+                                self.datatype, value)
+        
+    def _get_value(self):
+        return getattr(self, self.datatype + "_value")
+
+    def _set_value(self, value):
+        if isinstance(value, int):
+            self.datatype = 'int'
+        elif isinstance(value, datetime.datetime):
+            self.datatype = 'datetime'
+        elif isinstance(value, Entity):
+            self.datatype = 'relation'
+        elif hasattr(value, 'entity') and isinstance(value.entity, Entity):
+            self.datatype = 'reation'
+            value = value.entity
+        else:
+            self.datatype = 'str'
+            value = str(value)
+
+        setattr(self, self.datatype + "_value", value)
+
+    value = property(_get_value, _set_value)
+
+    def delete(self):
+        SESSION.delete(self)
+
+class Entity(object):
+    """
+    The base object that can be stored and managed in clusto.
+
+    An entity can have a name, type, and attributes.
+
+    An Entity's functionality is augmented by drivers which get included
+    as mixins.  
+    """
+    meta_attrs = {}
+
+    required_attrs = ()
+    
+    def __init__(self, name, driver=None, attrslist=None):
+        """
+        Initialize an Entity.
+
+        @param name: the name of the new Entity
+        @type name: C{str}
+        @param attrslist: the list of key/value pairs to be set as attributes
+        @type attrslist: C{list} of C{tuple}s of length 2
+        """
+        
+        self.name = name
+
+        if not driver:
+            self.driver = 'entity'
+        else:
+            self.driver = driver
+        
+    def __eq__(self, otherentity):
+        """
+        Am I the same as the Other Entity.
+
+        @param otherentity: the entity you're comparing with
+        @type otherentity: L{Entity}
+        """
+
+        ## each Thing must have a unique name so I'll just compare those
+
+        return self.name == otherentity.name
+
+    def __str__(self):
+        """
+        Output this entity in configrc format
+        """
+        out = []
+        for attr in self._attrs:
+            out.append(str(attr))
+
+        out.append("%s.clustodriver.string %s" % (self.name, self.driver))
+            
+        return '\n'.join(out)
+
+
+    def delete(self):
+        """
+        Delete self and all references to self.
+        """
+        SESSION.delete(self)
+
+        q = SESSION.query(Attribute).filter_by(relation_id=self.entity_id)
+
+        for i in q:
+            i.delete()
+    
+
+
+SESSION.mapper(Attribute, ATTR_TABLE,
+               properties = {'relation_value': relation(Entity, lazy=True, 
+                                                        primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
+                                                        uselist=False)})
+
+
+SESSION.mapper(Entity, ENTITY_TABLE,
+               properties={'_attrs' : relation(Attribute, lazy=False,
+                                               cascade="all, delete, delete-orphan",
+                                               primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
+                                               backref='entity')}
+               )
+        
+

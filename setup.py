@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name = "Clusto",
     version = "0.1",
-    packages = find_packages(),
+    packages = find_packages(exclude=["test"]),
     author = "Ron Gorodetzky",
     author_email = "ron@digg.com",
     description = "Clusto, cluster management and inventory system",

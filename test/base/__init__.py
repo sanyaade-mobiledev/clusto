@@ -1,8 +1,6 @@
 
-
-
-__all__ = ["ThingTests", "ClustoTests", "AttributeDictTests"]
-
-from ThingTests import * 
+from EntityTests import *
 from ClustoTests import *
-from AttributeDictTests import *
+
+#from ThingTests import * 
+#from AttributeDictTests import *
