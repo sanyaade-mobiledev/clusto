@@ -69,8 +69,11 @@ class Rack(Thing, LocationMixin):
         allRUs = self.getConnectedByType(RackU)
 
         for u in allRUs:
-            retval[int(u.getAttr('unumber'))] = u.getConnectedByType(Rack,
-                                                                  invert=True)[0]
+            contents = u.getConnectedByType(Rack, invert=True)
+            if not contents:
+                u.delete()
+                continue
+            retval[int(u.getAttr('unumber'))] = contents[0]
 
         return retval
             

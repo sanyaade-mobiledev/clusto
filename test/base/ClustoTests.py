@@ -36,7 +36,8 @@ class TestClusto(testbase.ClustoTestBase):
         t1.connect(t3)
 
         clusto.flush()
-
+        
+        
         clusto.rename('t1', 'newname')
 
         clusto.flush()

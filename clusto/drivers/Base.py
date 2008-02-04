@@ -129,6 +129,7 @@ class Thing(object):
             #newthing._setProperClass()
             connlist.append(newthing)
 
+
         return connlist
 
     
@@ -139,11 +140,15 @@ class Thing(object):
         Disconnect a given Thing from self
         """
 
-        conn = ThingAssociation.select(or_(ThingAssociation.c.thing_name1==self.name,
-                                           ThingAssociation.c.thing_name2==self.name))
+        conn = ThingAssociation.select(or_(and_(ThingAssociation.c.thing_name1==self.name,
+                                                ThingAssociation.c.thing_name2==thing.name),
+                                           and_(ThingAssociation.c.thing_name2==self.name,
+                                                ThingAssociation.c.thing_name1==thing.name),
+                                           ))
 
         for i in conn:
             i.delete()
+        
 
 
     def connect(self, thing, force=False):

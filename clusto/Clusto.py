@@ -114,8 +114,7 @@ def rename(oldname, newname):
 
     for athing in cons:
         new.connect(athing)
-        old.disconnect(athing)
-
+        
     old.delete()
 
     

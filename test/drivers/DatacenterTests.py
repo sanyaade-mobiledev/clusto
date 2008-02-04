@@ -48,15 +48,15 @@ class RackTests(ClustoTestBase):
         self.assert_(contents[23].name == contents[24].name
                      == contents[25].name == 't1')
 
-        del(t1)
-        
+        t1.delete()
 
         clusto.flush()
 
-        clusto.CTX.current.clear()
         rack = clusto.getByName(rackname)
         contents = rack.getRackContents()
-
+        clusto.flush()
+        
+        self.assertEqual(len(contents), 3)
         
 
     def testRackUMissingArg(self):
@@ -88,7 +88,6 @@ class Datacentertest(ClustoTestBase):
         d = Datacenter('d1', 'footown')
 
         co = Colo('colo1')
-
         ca = Cage('cage1')
 
         ra = Rack('rack1')

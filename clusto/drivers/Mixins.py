@@ -10,10 +10,10 @@ class HeirarchyMixin:
         if self.hasParent():
             self.removeParent()
             
-        self.setAttrs('_parent', [something.name])
+        self.setAttrs('_ref_parent', [something.name])
         self.connect(something)
 
-        something.addAttr('_child', self.name)
+        something.addAttr('_ref_child', self.name)
 
     def removeParent(self):
 
@@ -22,27 +22,27 @@ class HeirarchyMixin:
         else:
             parent = self.getParent()
             
-            self.delAttr('_parent', parent.name)
+            self.delAttr('_ref_parent', parent.name)
             self.disconnect(parent)
 
 
     def addChild(self, something):
 
         self.connect(something)
-        something.setAttrs('_parent', [self.name])
-        self.addAttr('_child', something.name)
+        something.setAttrs('_ref_parent', [self.name])
+        self.addAttr('_ref_child', something.name)
         
         
     def removeChild(self, something):
 
-        self.delAttr('_child', something.name)
-        something.delAttrs('_parent')
+        self.delAttr('_ref_child', something.name)
+        something.delAttrs('_ref_parent')
         self.disconnect(something)
 
     def getParent(self, allparents=False):
 
         if self.hasParent():
-            parentname = self.getAttr('_parent', justone=True)
+            parentname = self.getAttr('_ref_parent', justone=True)
             parent =  clusto.getByName(parentname)
             if not allparents:
                 return parent
@@ -59,20 +59,20 @@ class HeirarchyMixin:
 
     def getChildren(self):
 
-        childnames = self.getAttr('_child', justone=False)
+        childnames = self.getAttr('_ref_child', justone=False)
         return [clusto.getByName(i) for i in childnames]
 
     def isTopParent(self):
 
-        return not self.hasAttr('_parent') and self.hasChildren()
+        return not self.hasAttr('_ref_parent') and self.hasChildren()
 
     def hasChildren(self):
 
-        return self.hasAttr('_child')
+        return self.hasAttr('_ref_child')
 
 
     def hasParent(self):
-        return self.hasAttr('_parent')
+        return self.hasAttr('_ref_parent')
 
     def isChildOf(self, something):
         parent = self.getParent()

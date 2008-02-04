@@ -46,3 +46,23 @@ class PoolTests(ClustoTestBase):
                           [i.name for i in p.getParent(allparents=True)])
 
         self.assertFalse(p4.isTopParent())
+
+    def testHeirarchyDelete(self):
+
+        p1 = Pool('p1')
+        p2 = Pool('p2')
+
+        p1.addChild(p2)
+
+        clusto.flush()
+
+        self.assertEquals(len(p1.getAttrs('_ref_child')), 1)
+
+        p2.delete()
+
+        clusto.flush()
+
+        p1 = clusto.getByName('p1')
+        self.assertEquals(len(p1.getAttrs('_ref_child')), 0)
+
+

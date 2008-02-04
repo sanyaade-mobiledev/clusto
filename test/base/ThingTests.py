@@ -1,9 +1,11 @@
 import unittest
-from clusto.schema import METADATA, CTX, AttributeDict
+from clusto.schema import METADATA, CTX, AttributeDict, THINGTHING_TABLE
+from clusto.schema import ATTR_TABLE
 import clusto
 from clusto.drivers.Base import Thing, Part
 from clusto.drivers.Servers import Server
 from clusto.exceptions import *
+
 
 class TestThingSchema(unittest.TestCase):
 
@@ -388,4 +390,58 @@ class TestThingSchema(unittest.TestCase):
         t1 = Thing('t1')
 
         self.assertRaises(ConnectionException, t1.connect, t1)
+        
+
+    def testDisconnect(self):
+
+        t1 = Thing('t1')
+        t2 = Thing('t2')
+
+        t1.connect(t2)
+
+        clusto.flush()
+
+        self.assertEqual(len(list(THINGTHING_TABLE.select().execute())),1)
+
+        t2.disconnect(t1)
+
+        clusto.flush()
+        
+        self.assertEqual(len(list(THINGTHING_TABLE.select().execute())),0)
+
+    def testDelAttrs(self):
+
+        t1 = Thing('t1')
+
+        t1.addAttr('foo', '1')
+        t1.addAttr('bar', '2')
+
+        clusto.flush()
+
+        self.assertEqual(len(list(ATTR_TABLE.select().execute())), 2)
+
+        t1.delete()
+        clusto.flush()
+
+        self.assertEqual(len(list(ATTR_TABLE.select().execute())), 0)
+
+    def testDelete(self):
+
+        t1 = Thing('t1')
+        t2 = Thing('t2')
+
+        t1.connect(t2)
+
+        clusto.flush()
+
+        self.assertEqual(len(list(THINGTHING_TABLE.select().execute())),1)
+
+        t2.delete()
+
+        clusto.flush()
+
+        t2 = clusto.getByName('t1')
+        self.assertEqual(len(list(THINGTHING_TABLE.select().execute())),0)
+                
+
         

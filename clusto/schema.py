@@ -10,7 +10,9 @@ from sqlalchemy import *
 from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
 
-from clusto.sqlalchemyhelpers import ClustoMapperExtension
+from sqlalchemy.orm import Mapper, MapperExtension
+
+#from clusto.sqlalchemyhelpers import ClustoMapperExtension
 
 import sys
 # session context
@@ -49,24 +51,51 @@ THINGTHING_TABLE = Table('thing_thing', METADATA,
                          mysql_engine='InnoDB'
                          )
 
+class ClustoMapperExtension(MapperExtension):
 
-class Attribute(object):
-    """
-    Attribute class holds key/value pair backed by DB
-    """
-    def __init__(self, key, value, thing_name=None):
-        self.key = key
-        self.value = value
+    def populate_instance(self, mapper, selectcontext, row, instance,
+                          identitykey, isnew):
 
-        if thing_name:
-            self.thing_name = thing_name
+        """
 
-    def __repr__(self):
-        return "thingname: %s, keyname: %s, value: %s" % (self.thing_name,
-                                                          self.key,
-                                                          self.value)
+        called right before the mapper, after creating an instance from a row,
+        passes the row to its MapperProperty objects which are responsible for
+        populating the object's attributes.  If this method returns EXT_PASS,
+        it is assumed that the mapper should do the appending, else if this
+        method returns any other value or None, it is assumed that the append
+        was handled by this method.
 
-assign_mapper(CTX, Attribute, ATTR_TABLE)
+        Essentially, this method is used to have a different mapper populate
+        the object:
+
+            def populate_instance(self, mapper, selectcontext, instance,
+                                  row, identitykey, isnew):
+                othermapper.populate_instance(selectcontext, instance,
+                                              row, identitykey, isnew,
+                                              frommapper=mapper)
+                return True
+        """
+
+        Mapper.populate_instance(mapper, selectcontext, instance, row,
+                                 identitykey, isnew)
+        instance._setProperClass()
+        return True
+    
+    def before_delete(self, mapper, connection, instance):
+        """called before an object instance is DELETEed"""
+
+        associations = or_(THINGTHING_TABLE.c.thing_name1==instance.name,
+                           THINGTHING_TABLE.c.thing_name2==instance.name )
+        
+        connection.execute(THINGTHING_TABLE.delete(associations))
+
+
+        attributes = and_(ATTR_TABLE.c.key.like('_ref_%'),
+                          ATTR_TABLE.c.value==instance.name )
+                          
+        connection.execute(ATTR_TABLE.delete(attributes))
+
+        
 
 
 class AttributeDict(dict):
@@ -128,6 +157,35 @@ class AttributeDict(dict):
             self[key] = somedict[key]
         
 
+class Attribute(object):
+    """
+    Attribute class holds key/value pair backed by DB
+    """
+    def __init__(self, key, value, thing_name=None):
+        self.key = key
+        self.value = value
+
+        if thing_name:
+            self.thing_name = thing_name
+
+    def __repr__(self):
+        return "thingname: %s, keyname: %s, value: %s" % (self.thing_name,
+                                                          self.key,
+                                                          self.value)
+
+assign_mapper(CTX, Attribute, ATTR_TABLE)
+
+class ThingAssociation(object):
+    """
+    Relationship between two Things
+    """
+    def __init__(self, thing1, thing2):
+        self.thing_name1 = thing1.name
+        self.thing_name2 = thing2.name
+
+assign_mapper(CTX, ThingAssociation, THINGTHING_TABLE)
+
+
 DRIVERLIST = {}
 
 class ClustoThing(type):
@@ -173,8 +231,8 @@ class ClustoThing(type):
 
         assign_mapper(CTX, cls, selection, properties={
             '_attrs' : relation(Attribute, lazy=False,
-                                cascade='all, delete-orphan',)
-                },
+                                cascade='all, delete-orphan',),
+            },
                       extension=ClustoMapperExtension())
 
         super(ClustoThing, cls).__init__(name, bases, dct)
@@ -182,13 +240,3 @@ class ClustoThing(type):
 
 
     
-class ThingAssociation(object):
-    """
-    Relationship between two Things
-    """
-    def __init__(self, thing1, thing2):
-        self.thing_name1 = thing1.name
-        self.thing_name2 = thing2.name
-
-assign_mapper(CTX, ThingAssociation, THINGTHING_TABLE)
-

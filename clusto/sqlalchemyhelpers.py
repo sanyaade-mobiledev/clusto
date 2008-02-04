@@ -1,6 +1,8 @@
 
+import clusto
 from sqlalchemy.orm import Mapper, MapperExtension
 from sqlalchemy.ext.associationproxy import _AssociationDict
+
 
 _NotProvided = object()
 
@@ -205,3 +207,13 @@ class ClustoMapperExtension(MapperExtension):
         Mapper.populate_instance(mapper, selectcontext, instance, row, identitykey, isnew)
         instance._setProperClass()
         return True
+    
+    def before_delete(self, mapper, connection, instance):
+        """called before an object instance is DELETEed"""
+
+        connection.execute(THINGTHING_TABLE.delete(or_(THINGTHING_TABLE.c.thing_name1==instance.name,
+                                                       THINGTHING_TABLE.c.thing_name2==instance.name )))
+
+        
+                    
+
