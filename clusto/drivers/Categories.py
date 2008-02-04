@@ -1,5 +1,5 @@
 from clusto.drivers.Base import Driver
-
+from clusto.schema import *
 
 class Pool(Driver):
     """
@@ -8,7 +8,8 @@ class Pool(Driver):
     Pools 
     """
     
-    drivername = "pool"
+    _driverName = "pool"
+    _reservedAttrs = ('_member',) # '_inPool')
 
     def addToPool(self, entity):
         """
@@ -19,7 +20,7 @@ class Pool(Driver):
         """
 
             
-        self.addAttr('_member', entity)
+        self.addAttr('_member', entity, numbered=True)
         entity.addAttr('_inPool', self)
 
 
@@ -31,7 +32,7 @@ class Pool(Driver):
         @type entity: L{Entity} or L{Driver}
         """
 
-        self.delAttr('_member', entity)
+        self.delAttr('_member', entity, numbered=True)
         entity.delAttr('_inPool', self)
         
     @property
@@ -40,6 +41,36 @@ class Pool(Driver):
         Return a list of members in th pool
         """
 
-        return [x.value for x in self.getAttr('_member', all=True)]
+        return [x.value for x in self.attrs(key='_member',
+                                            numbered=True,
+                                            ignoreHidden=False)]
 
+
+
+    @classmethod
+    def getPools(cls, obj, allPools=False):
+
+        if isinstance(obj, Driver):
+            pass           
+        elif isinstance(obj, Entity):
+            obj = Driver(entity=entity)
+        else:
+            raise TypeError("obj must be either an Entity or a Driver.")
+
+
+        q = SESSION.query(Attribute).filter(and_(Entity.c.driver==cls._driverName,
+                                                 Entity.c.entity_id==Attribute.c.entity_id,
+                                                 Attribute.relation_value==obj.entity,
+                                                 Attribute.c.key.like('_member%')
+                                                 ))
+
+        
+        pools = set([Driver(entity=x.entity) for x in q])
+
+        if allPools:
+            for i in list(pools):
+                pools.update(Pool.getPools(i, allPools=True))
+
+        return pools
+            
         

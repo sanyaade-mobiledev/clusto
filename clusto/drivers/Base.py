@@ -4,6 +4,7 @@ import clusto
 from clusto.drivers.Mixins import *
 
 DRIVERLIST = {}
+RESERVEDATTRS = {}
 
 class ClustoDriver(type):
     """
@@ -11,8 +12,12 @@ class ClustoDriver(type):
     """
     def __init__(cls, name, bases, dct):
 
-        if not hasattr(cls, 'drivername'):
-            raise DriverException("Driver %s missing drivername attribute"
+        if not hasattr(cls, '_driverName'):
+            raise DriverException("Driver %s missing _driverName attribute"
+                                  % cls.__name__)
+
+        if not hasattr(cls, '_reservedAttrs'):
+            raise DriverException("Driver %s missing _reservedAttrs attribute"
                                   % cls.__name__)
 
         tempattrs = []
@@ -23,14 +28,45 @@ class ClustoDriver(type):
         tempattrs.extend(cls.meta_attrs)
         cls.all_meta_attrs = tuple(tempattrs)
         
-        if cls.drivername in DRIVERLIST:
+        if cls._driverName in DRIVERLIST:
             raise KeyError("%s trying to add '%s' to driver list but is "
                            "already claimed by %s."
                            % (cls.__name__,
-                              cls.drivername,
-                              DRIVERLIST[cls.drivername].__name__))
+                              cls._driverName,
+                              DRIVERLIST[cls._driverName].__name__))
         
-        DRIVERLIST[cls.drivername] = cls
+
+
+        for i in cls._reservedAttrs:
+            if i in RESERVEDATTRS:
+                raise DriverException("Driver %s is attempting to reserve "
+                                      "attribute %s which is already reserved "
+                                      "by driver %s"
+                                      % (cls.__name__,
+                                         i,
+                                         RESERVEDATTRS[i].__name__))
+            RESERVEDATTRS[i] = cls
+        
+            
+        DRIVERLIST[cls._driverName] = cls
+
+
+        # setup properties
+        for i in cls._properties:
+
+            def getter(self, key=i):
+                attr = self.getAttr(key)
+                if not attr:
+                    return None
+                else:
+                    return attr.value
+            def setter(self, val, key=i):
+                self.setAttr(key, (val,))
+
+
+            setattr(cls, i, property(getter, setter))
+
+
 
         super(ClustoDriver, cls).__init__(name, bases, dct)
 
@@ -49,7 +85,10 @@ class Driver(PoolMixin, AttributeListMixin, object):
 
     _mixins = set()
     
-    drivername = "entity"
+    _driverName = "entity"
+    _reservedAttrs = tuple()
+
+    _properties = tuple()
     
     def __init__(self, name=None, entity=None, *args, **kwargs):
 
@@ -59,20 +98,25 @@ class Driver(PoolMixin, AttributeListMixin, object):
             
         else:
             self.entity = Entity(name)
-            self.entity.driver = self.drivername
+            self.entity.driver = self._driverName
 
-            for attr in self.all_meta_attrs:
-                self.addItem(attr)
+            #for attr in self.all_meta_attrs:
+            #    self.addItem(attr)
 
+        
     def __eq__(self, other):
 
         if isinstance(other, Entity):
-            return self.entity == other
+            return self.entity.name == other.name
         elif isinstance(other, Driver):
-            return self.entity == other.entity
+            return self.entity.name == other.entity.name
         else:
             return False
 
+    def __cmp__(self, other):
+
+        return cmp(self.name, other.name)
+    
     def _chooseBestDriver(self):
         """
         Examine the attributes of our entity and set the best driver class and
@@ -85,6 +129,8 @@ class Driver(PoolMixin, AttributeListMixin, object):
 
     name = property(lambda x: x.entity.name,
                     lambda x,y: setattr(x.entity, 'name', y))
+
+    
 
 # class ClustoDriverMixin(type):
 

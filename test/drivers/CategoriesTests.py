@@ -42,18 +42,49 @@ class PoolTests(testbase.ClustoTestBase):
 
         q = clusto.getByName('p1')
 
-
         membernames = sorted([x.name for x in q.members])
 
         self.assertEqual(membernames, sorted(['d1','d2']))
 
-    def testPoolMixin(self):
+    def testGetPools(self):
 
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = [clusto.getByName(i) for i in ['d1', 'd2', 'p1']]
 
-        self.assertTrue(hasattr(d1, 'pools'))
+        p2 = Pool('p2')
+        
+        p1.addToPool(d1)
+        p2.addToPool(d1)
+        p1.addToPool(d2)
 
-    def testPoolAttrs(self):
+
+        self.assertEqual(sorted(Pool.getPools(d1)),
+                         sorted([p1,p2]))
+
+    def testGetPoolsMultiLevel(self):
+
+        d1, d2, p1 = [clusto.getByName(i) for i in ['d1', 'd2', 'p1']]
+
+        p2 = Pool('p2')
+        p3 = Pool('p3')
+        p4 = Pool('p4')
+        d3 = Driver('d3')
+        
+        p1.addToPool(d1)
+        p2.addToPool(d1)
+        p1.addToPool(d2)
+
+        p1.addToPool(p3)
+        p3.addToPool(p4)
+        p4.addToPool(d3)
+
+        self.assertEqual(sorted(Pool.getPools(d1, allPools=True)),
+                         sorted([p1,p2]))
+
+
+        self.assertEqual(sorted(set(Pool.getPools(d3, allPools=True))),
+                         sorted([p1, p3, p4]))
+
+    def XtestPoolAttrs(self):
 
         d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
 
@@ -79,7 +110,14 @@ class PoolTests(testbase.ClustoTestBase):
         self.assertEqual(sorted(['t1', 't2', 't3']),
                          sorted([x.key for x in d1.attrs()]))
 
-    def testMultiLevelPoolAttrs(self):
+    def XtestPoolMixin(self):
+
+        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+
+        self.assertTrue(hasattr(d1, 'pools'))
+
+
+    def XtestMultiLevelPoolAttrs(self):
 
         p2 = Pool('p2')
         p3 = Pool('p3')
@@ -104,5 +142,8 @@ class PoolTests(testbase.ClustoTestBase):
 
 
         self.assertEqual(len(d2.attrs()), 3)
+
+        
+        self.assertEqual(['t2'], [x.key for x in p2.attrs(onlyLocal=True)])
 
         

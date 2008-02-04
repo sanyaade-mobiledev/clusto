@@ -1,26 +1,23 @@
-from clusto.drivers.Base import Thing
-from clusto.drivers.Net import NICMixin
+from clusto.drivers.Base import Driver
 
 
-class Server(Thing, NICMixin):
+
+    
+class Server(Driver):
     """
     server
     """
     
-    meta_attrs = { 'clustotype': 'server' }
-
-
-    #required_attrs = ['serialnumber']
+    _driverName = "server"
 
     
+
+    
+class VirtualServer(Driver):
+    _driverName = "virtualserver"
+
+    
+    
         
-
-
-
-class ConsoleServer(Thing):
-    """
-    console server
-    """
-    meta_attrs = { 'clustotype': 'consoleserver' }
 
 

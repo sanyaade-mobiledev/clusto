@@ -127,3 +127,8 @@ clusto network setvlan server1 eth1 vlan203
 clusto rebuild server1
  - reinstall operating system onto server1
 
+Reserverd Attrs
+===============
+
+_ip
+_in

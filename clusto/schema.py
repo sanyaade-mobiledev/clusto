@@ -5,6 +5,8 @@ Clusto schema
 
 from sqlalchemy import *
 
+import sqlalchemy.exceptions
+
 from sqlalchemy.ext.sessioncontext import SessionContext
 from sqlalchemy.ext.assignmapper import assign_mapper
 
@@ -25,8 +27,8 @@ SESSION = scoped_session(sessionmaker(autoflush=True, transactional=True))
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
-                    Column('name', String(1024), unique=True, nullable=False),
-                    Column('driver', String(64)),
+                    Column('name', Unicode(1024), unique=True, nullable=False),
+                    Column('driver', Unicode(64)),
                     mysql_engine='InnoDB'
                     )
 
@@ -34,11 +36,11 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
                    Column('entity_id', Integer,
                           ForeignKey('entities.entity_id'), nullable=False),
-                   Column('key', String(1024)),
-                   Column('datatype', String(32)),
+                   Column('key', Unicode(1024)),
+                   Column('datatype', Unicode(32)),
 
                    Column('int_value', Integer, default=None),
-                   Column('string_value', String, default=None),
+                   Column('string_value', Unicode, default=None),
                    Column('datetime_value', DateTime, default=None),
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
@@ -83,7 +85,7 @@ class Attribute(object):
         elif isinstance(value, Entity):
             self.datatype = 'relation'
         elif hasattr(value, 'entity') and isinstance(value.entity, Entity):
-            self.datatype = 'reation'
+            self.datatype = 'relation'
             value = value.entity
         else:
             self.datatype = 'str'
@@ -94,7 +96,13 @@ class Attribute(object):
     value = property(_get_value, _set_value)
 
     def delete(self):
-        SESSION.delete(self)
+
+        try:
+            SESSION.delete(self)
+        except sqlalchemy.exceptions.InvalidRequestError:
+            SESSION.expunge(self)
+
+
 
 class Entity(object):
     """
@@ -119,7 +127,7 @@ class Entity(object):
         @type attrslist: C{list} of C{tuple}s of length 2
         """
         
-        self.name = name
+        self.name = unicode(name)
 
         if not driver:
             self.driver = 'entity'
@@ -138,6 +146,11 @@ class Entity(object):
 
         return self.name == otherentity.name
 
+    def __cmp__(self, other):
+
+        return cmp(self.name, other.name)
+
+
     def __str__(self):
         """
         Output this entity in configrc format
@@ -155,7 +168,12 @@ class Entity(object):
         """
         Delete self and all references to self.
         """
-        SESSION.delete(self)
+
+        try:
+            SESSION.delete(self)
+        except sqlalchemy.exceptions.InvalidRequestError:
+            SESSION.expunge(self)
+        #SESSION.delete(self)
 
         q = SESSION.query(Attribute).filter_by(relation_id=self.entity_id)
 

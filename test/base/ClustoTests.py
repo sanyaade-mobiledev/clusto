@@ -23,7 +23,8 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual(q, e1)
 
-        
+        self.assertEqual(q.name, 'e1')
+
     def testSimpleRename(self):
 
         clusto.rename('e1', 'f1')
