@@ -100,8 +100,8 @@ class AttributeListMixin:
         """
         add a key/value to the list of attributes
 
-        if num is True, append the next available int to the key name.
-        if num is an int, append that int to the key name
+        if numbered is True, append the next available int to the key name.
+        if numbered is an int, append that int to the key name
         if subkey is specified append '_subkey' to the key name
          subkeys don't get numbered
         """
@@ -148,25 +148,21 @@ class PoolMixin:
         for pool in self.pools():
             pass
 
-    
-    def Xattrs(self, key=None, numbered=None, subkey=None, ignoreHidden=True,
-              onlyLocal=False):
+    def attrs(self, key=None, value=None, numbered=None, subkey=None,
+              ignoreHidden=True, strict=False, mergedPoolAttrs=False):    
 
-        all = AttributeListMixin.attrs(self, key, num, subkey, ignoreHidden)
+        myattrs = AttributeListMixin.attrs(self, key, value, numbered, subkey,
+                                           ignoreHidden, strict)
 
-        if not onlyLocal:
-            for pool in self.pools():
-                all.extend(pool.attrs(key, num, subkey, ignoreHidden,
-                                      onlyLocal=onlyLocal))
-
+        if not mergedPoolAttrs:
+            allattrs = myattrs
             
-        return all
-    
-    
-    def Xpools(self):
+        return allattrs
 
-        pools = [self.__class__(entity=x.value) for x in self.getAttr('_in', all=True, onlyLocal=True)]
+    
+    def pools(self):
 
+        pools = Pool.getPools(self)
         return pools
 
 

@@ -1,6 +1,8 @@
 from clusto.drivers.Base import Driver
 from clusto.schema import *
 
+from itertools import imap, chain
+
 class Pool(Driver):
     """
     A Pool is used to group Entities into a collection that shares attributes.
@@ -13,7 +15,7 @@ class Pool(Driver):
 
     def addToPool(self, entity):
         """
-        Add a given Entity to the pool.
+        Add a given Entity to this pool.
 
         @param entity: the entity to be added
         @type entity: L{Entity} or L{Driver}
@@ -21,7 +23,7 @@ class Pool(Driver):
 
             
         self.addAttr('_member', entity, numbered=True)
-        entity.addAttr('_inPool', self)
+        entity.addAttr('_inPool', self, numbered=True)
 
 
     def removeFromPool(self, entity):
@@ -46,6 +48,12 @@ class Pool(Driver):
                                             ignoreHidden=False)]
 
 
+    def isParent(self, entity):
+        """
+        Is this pool the parent of the given entity
+        """
+
+        pass
 
     @classmethod
     def getPools(cls, obj, allPools=False):

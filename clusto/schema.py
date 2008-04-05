@@ -47,6 +47,15 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    )
 
 
+TRANSACTION_TABLE = Table('transactions', METADATA,
+                          Column('txn_id', Integer, primary_key=True),
+                          Column('entity_name', Unicode(1024),
+                                 nullable=False),
+                          Column('function', Unicode),
+                          Column('args', Unicode),
+                          Column('timestamp', DateTime),
+                          )
+                          
 
 class Attribute(object):
     """
@@ -117,7 +126,7 @@ class Entity(object):
 
     required_attrs = ()
     
-    def __init__(self, name, driver=None, attrslist=None):
+    def __init__(self, name, driver=None):
         """
         Initialize an Entity.
 

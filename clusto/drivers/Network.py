@@ -3,10 +3,10 @@ import IPy
 
 IPy.check_addr_prefixlen = False
 
-class IP(Driver):
+class IP(ResourceManager):
     _driverName = "ip"
 
-    _properties = ('ip', 'netmask', 'gateway', 'dns',)
+    
 
     
 class IPMixin:
