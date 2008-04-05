@@ -1,6 +1,7 @@
 
 import clusto
 import testbase 
+import itertools
 
 from clusto.drivers import *
 
@@ -84,7 +85,41 @@ class PoolTests(testbase.ClustoTestBase):
         self.assertEqual(sorted(set(Pool.getPools(d3, allPools=True))),
                          sorted([p1, p3, p4]))
 
-    def XtestPoolAttrs(self):
+    def testPoolsIterator(self):
+
+        
+        A = Pool('A')
+
+        d1, d2 = [clusto.getByName(i) for i in ['d1', 'd2']]
+
+        B = Pool('B')
+        C = Pool('C')
+        A1 = Pool('A1')
+        B2 = Pool('B2')
+        B1 = Pool('B1')
+        C1 = Pool('C1')
+
+        C1.addToPool(C)
+        B1.addToPool(B)
+        A1.addToPool(B)
+
+        A1.addToPool(A)
+        B2.addToPool(A)
+
+        A.addToPool(d1)
+        B.addToPool(d1)
+        C.addToPool(d1)
+
+        clusto.flush()
+
+        self.assertEqual([x.name for x in d1.iterPools()],
+                         [u'C', u'B', u'A', u'C1', u'A1', u'B1', u'B2', u'A1'])
+        
+        self.assertEqual([x.name for x in d1.iterPools(allPools=False)],
+                         [u'C', u'B', u'A'])
+
+
+    def testPoolAttrs(self):
 
         d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
 
@@ -101,49 +136,27 @@ class PoolTests(testbase.ClustoTestBase):
 
         d2 = clusto.getByName('d2')
 
-        self.assertEqual(sorted(d2.attrs()), sorted(p1.attrs()))
+        self.assertEqual(sorted(d2.attrs(mergedPoolAttrs=True)), sorted(p1.attrs()))
 
-        self.assertEqual(sorted(d1.attrs(onlyLocal=True)
-                               +p1.attrs(onlyLocal=True)),
-                        sorted(d1.attrs()))
+        #self.assertEqual(sorted(itertools.chain(d1.attrs(mergedPoolAttrs=True),
+        #                                        p1.attrs(mergedPoolAttrs=True))),
+        #                sorted(d1.attrs()))
 
         self.assertEqual(sorted(['t1', 't2', 't3']),
-                         sorted([x.key for x in d1.attrs()]))
-
-    def XtestPoolMixin(self):
-
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
-
-        self.assertTrue(hasattr(d1, 'pools'))
+                         sorted([x.key for x in d1.attrs(mergedPoolAttrs=True)]))
 
 
-    def XtestMultiLevelPoolAttrs(self):
-
-        p2 = Pool('p2')
-        p3 = Pool('p3')
+    def testPoolAttrsOverride(self):
 
         d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
 
         p1.addAttr('t1', 1)
-        p2.addAttr('t2', 2)
-        p3.addAttr('t3', 3)
-        p1.addToPool(p2)
-        p2.addToPool(p3)
-        p2.addToPool(d1)
-        p3.addToPool(d2)
+        p1.addAttr('t2', 2)
 
+        p1.addToPool(d1)
+        d1.addAttr('t1', 'foo')
         clusto.flush()
 
-        self.assertEqual(sorted(['t1', 't2', 't3']),
-                         sorted([x.key for x in d2.attrs()]))
-
-        self.assertEqual(sorted(p2.attrs()),
-                         sorted(d1.attrs()))
-
-
-        self.assertEqual(len(d2.attrs()), 3)
-
         
-        self.assertEqual(['t2'], [x.key for x in p2.attrs(onlyLocal=True)])
 
         
