@@ -1,79 +1,11 @@
-from clusto.schema import *
-from clusto.exceptions import *
-import clusto
-from clusto.drivers.Mixins import *
+
+import re
 import itertools
 
-DRIVERLIST = {}
-RESERVEDATTRS = {}
+from clusto.schema import *
+from clusto.exceptions import *
 
-class ClustoDriver(type):
-    """
-    Metaclass for all clusto drivers
-    """
-    def __init__(cls, name, bases, dct):
-
-        if not hasattr(cls, '_driverName'):
-            raise DriverException("Driver %s missing _driverName attribute"
-                                  % cls.__name__)
-
-        if not hasattr(cls, '_reservedAttrs'):
-            raise DriverException("Driver %s missing _reservedAttrs attribute"
-                                  % cls.__name__)
-
-        tempattrs = []
-        for klass in bases:
-            if hasattr(klass, 'meta_attrs'):
-                tempattrs.extend(klass.meta_attrs)
-
-        tempattrs.extend(cls.meta_attrs)
-        cls.all_meta_attrs = tuple(tempattrs)
-        
-        if cls._driverName in DRIVERLIST:
-            raise KeyError("class '%s' is trying to add the driverName '%s' "
-                           "to the driver list but that name is already "
-                           "claimed by the '%s' class."
-                           % (cls.__name__,
-                              cls._driverName,
-                              DRIVERLIST[cls._driverName].__name__))
-        
-
-
-        for i in cls._reservedAttrs:
-            if i in RESERVEDATTRS:
-                raise DriverException("Driver %s is attempting to reserve "
-                                      "attribute %s which is already reserved "
-                                      "by driver %s"
-                                      % (cls.__name__,
-                                         i,
-                                         RESERVEDATTRS[i].__name__))
-            RESERVEDATTRS[i] = cls
-        
-            
-        DRIVERLIST[cls._driverName] = cls
-
-
-        # setup properties
-        for i in cls._properties:
-
-            def getter(self, key=i):
-                attr = self.getAttr(key)
-                if not attr:
-                    return None
-                else:
-                    return attr.value
-            def setter(self, val, key=i):
-                self.setAttr(key, (val,))
-
-
-            setattr(cls, i, property(getter, setter))
-
-
-
-        super(ClustoDriver, cls).__init__(name, bases, dct)
-
-MIXINSFORLIST = {}
-
+from ClustoDriver import *
 
 
 class Driver(object):
@@ -180,8 +112,9 @@ class Driver(object):
 
         return len(list(attrs))
         
-    def attrs(self, key=None, value=None, numbered=None, subkey=None, ignoreHidden=True,
-              strict=False, mergedPoolAttrs=False, overrideParent=True
+    def attrs(self, key=None, value=None, numbered=None, subkey=None,
+              ignoreHidden=True, strict=False, mergedPoolAttrs=False,
+              overrideParent=True
               ):
 
 
@@ -219,8 +152,11 @@ class Driver(object):
             allattrs = vals
         else:
             allattrs = itertools.chain(vals,
-                                       *(i.attrs(key=key, value=value, numbered=numbered,
-                                                 subkey=subkey, ignoreHidden=ignoreHidden,
+                                       *(i.attrs(key=key,
+                                                 value=value,
+                                                 numbered=numbered,
+                                                 subkey=subkey,
+                                                 ignoreHidden=ignoreHidden,
                                                  strict=strict,
                                                  mergedPoolAttrs=mergedPoolAttrs)
                                          for i in self.iterPools()))
@@ -296,27 +232,30 @@ class Driver(object):
     
     def iterPools(self, allPools=True):
         """
-        Return an iterator that iterates over the pools that a given entity is a member of.
+        Return an iterator that iterates over the pools that a given entity is
+        a member of.
 
-        The first pool returned is the most recently added pool in a breadthfirst manner.
+        The first pool returned is the most recently added pool in a
+        breadthfirst manner.
 
-        So, say I have an entity that was added to pools A, B, C in that order and pool A is
-        in pools (A1, B2), pool B is in (B1, A1), pool C is in (C1).  Then the returned
-        values will be:
+        So, say I have an entity that was added to pools A, B, C in that order
+        and pool A is in pools (A1, B2), pool B is in (B1, A1), pool C is in
+        (C1).  Then the returned values will be:
 
             C, B, A, C1, A1, B1, B2, A1
 
-        In this way the attributes of more recent pools can override the attributes of
-        older pools.
+        In this way the attributes of more recent pools can override the
+        attributes of older pools.
         """
 
         def poolGenerator(entity):
 
 
-            pools = [Driver(entity=x.value) for x in sorted(entity.attrs('_inPool',
-                                                                       numbered=True),
-                                                          cmp=lambda x,y: cmp(x.key, y.key),
-                                                          reverse=True)]
+            pools = [Driver(entity=x.value)
+                     for x in sorted(entity.attrs('_inPool',
+                                                  numbered=True),
+                                     cmp=lambda x,y: cmp(x.key, y.key),
+                                     reverse=True)]
             
             while pools:
                 pool = pools.pop(0)
@@ -335,67 +274,3 @@ class Driver(object):
             pass
             
 
-        
-
-# class ClustoDriverMixin(type):
-
-#     def __init__(mixincls, name, bases, dct):
-#         """
-#         MetaClass for mixins.  Mainly keeps track of mixin class metadata.
-#         """
-
-#         for klass in mixincls._mixinFor:
-#             klass._mixins.add(mixincls)
-            
-#         super(ClustoDriverMixin, mixincls).__init__(name, bases, dct)
-
-
-
-# class DriverMixin:
-
-#     __metaclass__ = ClustoDriverMixin
-
-#     _mixinFor = tuple()
-    
-
-
-class ResourceManager(Driver):
-    """
-    The ResourceManager driver should be subclassed by a driver that will
-    manage a resource such as IP allocation, MAC Address lists, etc.
-
-    This base class just allocates unique integers.
-    
-    """
-    
-
-    _type = "resource"
-    _driverName = "resource"
-
-
-    def allocate(self, thing, resource=None):
-        """
-        allocates a resource element to the given thing.
-        """
-
-        pass
-            
-
-    def deallocate(self, thing, resource=None):
-        """
-        deallocates a resource from the given thing.
-        """
-        pass
-
-    def available(self, resource):
-        """
-        return True if resource is available, False otherwise.
-        """
-        pass
-
-    def owner(self, resource):
-        """
-        return the owner object of a given resource.
-        """
-        pass
-    

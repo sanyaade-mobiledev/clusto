@@ -10,7 +10,7 @@ class Server(Driver):
     
     _driverName = "server"
 
-    
+    _properties = ('model', 'serialnumber', )
 
     
 class VirtualServer(Driver):

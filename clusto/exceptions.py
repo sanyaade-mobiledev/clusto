@@ -12,3 +12,14 @@ class NameException(Exception):
     """exception for invalid entity or attribute names"""
     pass
 
+
+class ResourceException(Exception):
+    """exception related to resources"""
+    pass
+
+class ResourceNotAvailableException(ResourceException):
+    pass
+
+class ResourceTypeException(ResourceException):
+    pass
+
