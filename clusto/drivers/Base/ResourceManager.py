@@ -1,4 +1,6 @@
+
 from clusto.drivers.Base import Driver
+from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException
 
 class ResourceManager(Driver):
     """
@@ -13,7 +15,7 @@ class ResourceManager(Driver):
     _clustotype = "resource"
     _driverName = "resource"
 
-    
+    _entityAttrName = None
 
     def allocator(self):
         return None
@@ -38,9 +40,10 @@ class ResourceManager(Driver):
                                                 % str(resource))
             
 
-    
-        attrname = self._driverName
-        thing.addAttr(attrname, numbered=True)
+
+        # make the resource an attribute of the entity if necessary
+        if self._entityAttrName:
+            thing.addAttr(self._entityAttrName, resource, numbered=True)
 
         self.addAttr(str(resource), thing)
             

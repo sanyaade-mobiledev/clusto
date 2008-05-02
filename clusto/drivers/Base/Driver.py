@@ -114,9 +114,14 @@ class Driver(object):
         
     def attrs(self, key=None, value=None, numbered=None, subkey=None,
               ignoreHidden=True, strict=False, mergedPoolAttrs=False,
-              overrideParent=True
+              overrideParent=True, sortByKeys=True
               ):
+        """
+        Function to get and filter the attributes of an entity in many
+        different ways.
 
+        
+        """
 
         #if ignoreHidden:
         #    all = filter(lambda x: not x.key.startswith('_'), all)
@@ -179,6 +184,9 @@ class Driver(object):
         if not allattrs:
             return None
 
+        if sortByKeys:
+            return sorted(allattrs)
+        
         return allattrs
 
 

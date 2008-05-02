@@ -70,6 +70,9 @@ class Attribute(object):
         
         self.value = value
 
+    def __cmp__(self, other):
+        return cmp(self.key, other.key)
+    
     def __eq__(self, other):
 
         return ((self.key == other.key) and (self.value == other.value))

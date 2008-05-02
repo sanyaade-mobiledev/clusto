@@ -1,19 +1,23 @@
 
-class DriverException(Exception):
+class ClustoException(Exception):
+    """base clusto exception"""
+    pass
+
+class DriverException(ClustoException):
     """exception for driver errors"""
     pass
 
-class ConnectionException(Exception):
+class ConnectionException(ClustoException):
     """exception for operations related to connecting two Things together"""
     pass
 
 
-class NameException(Exception):
+class NameException(ClustoException):
     """exception for invalid entity or attribute names"""
     pass
 
 
-class ResourceException(Exception):
+class ResourceException(ClustoException):
     """exception related to resources"""
     pass
 

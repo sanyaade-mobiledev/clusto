@@ -52,11 +52,11 @@ class ClustoDriver(type):
         for i in cls._properties:
 
             def getter(self, key=i):
-                attr = self.getAttr(key)
+                attr = list(self.attrs(key))
                 if not attr:
                     return None
                 else:
-                    return attr.value
+                    return attr[0].value
             def setter(self, val, key=i):
                 self.setAttr(key, (val,))
 
