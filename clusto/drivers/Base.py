@@ -87,6 +87,7 @@ class Driver(object):
 
     _mixins = set()
     
+    _type = "generic"
     _driverName = "entity"
     _reservedAttrs = tuple()
 
@@ -101,6 +102,7 @@ class Driver(object):
         else:
             self.entity = Entity(name)
             self.entity.driver = self._driverName
+            self.entity.type = self._type
 
             #for attr in self.all_meta_attrs:
             #    self.addItem(attr)
@@ -367,6 +369,7 @@ class ResourceManager(Driver):
     """
     
 
+    _type = "resource"
     _driverName = "resource"
 
 

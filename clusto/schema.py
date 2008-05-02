@@ -28,7 +28,8 @@ SESSION = scoped_session(sessionmaker(autoflush=True, transactional=True))
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
                     Column('name', Unicode(1024), unique=True, nullable=False),
-                    Column('driver', Unicode(64)),
+                    Column('type', Unicode(64), nullable=False),
+                    Column('driver', Unicode(64), nullable=False),
                     mysql_engine='InnoDB'
                     )
 
@@ -126,7 +127,7 @@ class Entity(object):
 
     required_attrs = ()
     
-    def __init__(self, name, driver=None):
+    def __init__(self, name, driver='entity', clustotype='entity'):
         """
         Initialize an Entity.
 
@@ -138,10 +139,10 @@ class Entity(object):
         
         self.name = unicode(name)
 
-        if not driver:
-            self.driver = 'entity'
-        else:
-            self.driver = driver
+        self.driver = driver
+        self.type = clustotype
+
+
         
     def __eq__(self, otherentity):
         """
