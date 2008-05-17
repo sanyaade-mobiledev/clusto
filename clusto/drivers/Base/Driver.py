@@ -19,7 +19,7 @@ class Driver(object):
 
     _mixins = set()
     
-    _type = "generic"
+    _clustoType = "generic"
     _driverName = "entity"
     _reservedAttrs = tuple()
 
@@ -31,10 +31,12 @@ class Driver(object):
             self.entity = entity
             self._chooseBestDriver()
             
-        else:
+        elif name:
             self.entity = Entity(name)
             self.entity.driver = self._driverName
-            self.entity.type = self._type
+            self.entity.type = self._clustoType
+        else:
+            raise TypeError("neither name nor entity were specified")
 
             #for attr in self.all_meta_attrs:
             #    self.addItem(attr)
@@ -55,7 +57,7 @@ class Driver(object):
 
 
     def __contains__(self, other):
-        return False
+        return self.hasAttr(key="_contains", value=other)
     
     def _chooseBestDriver(self):
         """
@@ -111,45 +113,52 @@ class Driver(object):
         attrs = self.attrs(key=key, numbered=numbered)
 
         return len(list(attrs))
-        
-    def attrs(self, key=None, value=None, numbered=None, subkey=None,
-              ignoreHidden=True, strict=False, mergedPoolAttrs=False,
-              overrideParent=True, sortByKeys=True
-              ):
+
+    def _buildKeyRegex(self, key=None, value=None, numbered=None,
+                    subkey=None, ignoreHidden=True, strict=False):
+            regex = ["^"]
+
+            if key and key.startswith('_'):
+                ignoreHidden=False
+
+            if ignoreHidden:
+                regex.append("(?!_)")
+
+            regex.append((key and key or ".*"))
+
+            if isinstance(numbered, bool):
+                regex.append("\d+")
+            elif isinstance(numbered, int):
+                regex.append(str(numbered))
+
+            if isinstance(subkey, str):
+                regex.append("-%s" % subkey)
+            elif subkey is True:
+                regex.append("-.+")
+
+            if strict:
+                regex.append("$")
+
+            return regex
+
+    def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
+                    subkey=None, ignoreHidden=True, strict=False,
+                    mergedPoolAttrs=False, overrideParent=True,
+                    sortByKeys=True, parentType=None, parentDriver=None,
+                    regex=None
+                    ):
         """
-        Function to get and filter the attributes of an entity in many
-        different ways.
-
-        
+        This function lets you sort through various kinds of attribute lists.
         """
 
-        #if ignoreHidden:
-        #    all = filter(lambda x: not x.key.startswith('_'), all)
-
-        regex = ["^"]
-
-        if key and key.startswith('_'):
-            ignoreHidden=False
+        if not regex:
+            regex = self._buildKeyRegex(key=key, value=value,
+                                        numbered=numbered,
+                                        subkey=subkey,
+                                        ignoreHidden=ignoreHidden,
+                                        strict=strict)
             
-        if ignoreHidden:
-            regex.append("(?!_)")
-            
-        regex.append((key and key or ".*"))
-
-        if isinstance(numbered, bool):
-            regex.append("\d+")
-        elif isinstance(numbered, int):
-            regex.append(str(numbered))
-
-        if isinstance(subkey, str):
-            regex.append("-%s" % subkey)
-        elif subkey is True:
-            regex.append("-.+")
-
-        if strict:
-            regex.append("$")
-
-        vals = (x for x in self.entity._attrs if re.match(''.join(regex), x.key))
+        vals = (x for x in attrlist if re.match(''.join(regex), x.key))
         if value:
             vals = (x for x in vals if x.value == value)
 
@@ -189,8 +198,21 @@ class Driver(object):
         
         return allattrs
 
+        
+    def attrs(self, *args, **kwargs):
+        """
+        Function to get and filter the attributes of an entity in many
+        different ways.
 
+        
+        """
 
+        return self._attrFilter(self.entity._attrs, *args, **kwargs)
+                                
+
+    def references(self, *args, **kwargs):
+        return self._attrFilter(self.entity._references, *args, **kwargs)
+                   
     def attrKeys(self, *args, **kwargs):
 
         return (x.key for x in self.attrs(*args, **kwargs))
@@ -259,10 +281,10 @@ class Driver(object):
         def poolGenerator(entity):
 
 
-            pools = [Driver(entity=x.value)
-                     for x in sorted(entity.attrs('_inPool',
-                                                  numbered=True),
-                                     cmp=lambda x,y: cmp(x.key, y.key),
+            pools = [Driver(entity=x.entity)
+                     for x in sorted(entity.references('_member',
+                                                       numbered=True),
+                                     cmp=lambda x,y: cmp(x.attr_id, y.attr_id),
                                      reverse=True)]
             
             while pools:
@@ -277,8 +299,23 @@ class Driver(object):
 
 
     def insert(self, thing):
+        """
+        Insert the given Enity or Driver into this Entity.  Such that:
 
+            A.insert(B)
+
+            (B in A) == True
+
+
+        """
         if isinstance(thing, Entity):
-            pass
-            
+            d = Driver(Entity)
+        elif isinstance(thing, Driver):
+            d = thing
+        else:
+            raise TypeError("Can only insert an Entity or a Driver. "
+                            "Tried to insert %s." % str(type(thing)))
+
+        self.addAttr("_contains", d)
+        
 

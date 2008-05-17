@@ -11,7 +11,8 @@ class Pool(Driver):
     """
     
     _driverName = "pool"
-    _reservedAttrs = ('_member',) # '_inPool')
+    _clustoType = "pool"
+    
 
     def addToPool(self, entity):
         """
@@ -21,9 +22,9 @@ class Pool(Driver):
         @type entity: L{Entity} or L{Driver}
         """
 
-            
+
         self.addAttr('_member', entity, numbered=True)
-        entity.addAttr('_inPool', self, numbered=True)
+        #entity.addAttr('_inPool', self, numbered=True)
 
 
     def removeFromPool(self, entity):
@@ -35,7 +36,7 @@ class Pool(Driver):
         """
 
         self.delAttr('_member', entity, numbered=True)
-        entity.delAttr('_inPool', self)
+        #entity.delAttr('_inPool', self)
         
     @property
     def members(self):

@@ -114,7 +114,7 @@ class PoolTests(testbase.ClustoTestBase):
 
         self.assertEqual([x.name for x in d1.iterPools()],
                          [u'C', u'B', u'A', u'C1', u'A1', u'B1', u'B2', u'A1'])
-        
+
         self.assertEqual([x.name for x in d1.iterPools(allPools=False)],
                          [u'C', u'B', u'A'])
 

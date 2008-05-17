@@ -17,6 +17,8 @@ class SimpleNameManager(ResourceManager):
     _driverName = "simplenamemanager"
     _properties = ('basename', 'digits', 'next', 'leadingZeros')
 
+    _recordAllocations = False
+    
     def __init__(self, name=None, entity=None,
                  basename='',
                  digits=2,

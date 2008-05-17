@@ -12,11 +12,13 @@ class ResourceManager(Driver):
     """
     
 
-    _clustotype = "resource"
+    _clustoType = "resource"
     _driverName = "resource"
 
     _entityAttrName = None
 
+    _recordAllocations=True
+    
     def allocator(self):
         return None
 
@@ -45,7 +47,8 @@ class ResourceManager(Driver):
         if self._entityAttrName:
             thing.addAttr(self._entityAttrName, resource, numbered=True)
 
-        self.addAttr(str(resource), thing)
+        if self._recordAllocations:
+            self.addAttr(str(resource), thing)
             
 
     def deallocate(self, thing, resource=None):
@@ -58,11 +61,11 @@ class ResourceManager(Driver):
             # deallocate all managed resources from given thing
             pass
 
-        for i in resources:
+        if self.available(resource):
             attrname = self._driverName
-            thing.delAttr(attrname, i)
+            thing.delAttrs(key=attrname, value=str(resource))
 
-            self.delAttr(str(i))
+            self.delAttrs(key=str(resource), value=thing)
 
     def available(self, resource):
         """

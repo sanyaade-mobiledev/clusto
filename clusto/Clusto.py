@@ -1,8 +1,12 @@
 
-from clusto.drivers import DRIVERLIST, Driver
-from clusto.schema import SESSION, METADATA, Entity, Attribute
+from clusto.drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
+from clusto.schema import SESSION, METADATA, Entity, Attribute, VERSION
 from sqlalchemy import and_, or_, literal, create_engine
 from sqlalchemy.exceptions import InvalidRequestError
+
+import clusto.drivers
+driverlist = DRIVERLIST
+typelist = TYPELIST
 
 
 def connect(dsn):
@@ -18,11 +22,19 @@ def connect(dsn):
     """
     METADATA.bind = create_engine(dsn)
 
+def checkDBcompatibility(dbver):
+
+    if dbver == VERSION:
+        return True
+    
 def initclusto():
     """
     Initialize a clusto database.
     """
     METADATA.create_all(METADATA.bind)
+    c = ClustoMeta()
+    
+    flush()
 
 def flush():
     """
@@ -51,6 +63,9 @@ def getDriver(entity, ignoreDriverColumn=False):
             return DRIVERLIST[entity.driver]
 
     return Driver
+
+def get(name=None, type=None, attrs=None):
+    pass
     
 def getByName(name):
     try:

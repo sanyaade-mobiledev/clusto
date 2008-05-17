@@ -1,4 +1,5 @@
 
+TYPELIST = {}
 DRIVERLIST = {}
 RESERVEDATTRS = {}
 
@@ -46,7 +47,7 @@ class ClustoDriver(type):
         
             
         DRIVERLIST[cls._driverName] = cls
-
+        TYPELIST[cls._clustoType] = cls
 
         # setup properties
         for i in cls._properties:

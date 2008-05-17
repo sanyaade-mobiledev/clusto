@@ -2,7 +2,7 @@
 Clusto schema
 
 """
-
+VERSION = 0.1
 from sqlalchemy import *
 
 import sqlalchemy.exceptions
@@ -201,11 +201,17 @@ SESSION.mapper(Attribute, ATTR_TABLE,
                                                         uselist=False)})
 
 
+## might be better to make the relationships here dynamic_loaders in the long
+## term.
 SESSION.mapper(Entity, ENTITY_TABLE,
-               properties={'_attrs' : relation(Attribute, lazy=False,
+               properties={'_attrs' : relation(Attribute, lazy=True,
                                                cascade="all, delete, delete-orphan",
                                                primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
-                                               backref='entity')}
+                                               backref='entity'),
+                           '_references' : relation(Attribute, lazy=True,
+                                                    cascade="all, delete, delete-orphan",
+                                                    primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id)
+                           }
                )
         
 
