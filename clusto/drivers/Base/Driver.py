@@ -24,6 +24,7 @@ class Driver(object):
     _reservedAttrs = tuple()
 
     _properties = tuple()
+    #_defaultAttrs = tuple()
     
     def __init__(self, name=None, entity=None, *args, **kwargs):
 
@@ -35,6 +36,7 @@ class Driver(object):
             self.entity = Entity(name)
             self.entity.driver = self._driverName
             self.entity.type = self._clustoType
+
         else:
             raise TypeError("neither name nor entity were specified")
 
@@ -111,6 +113,7 @@ class Driver(object):
         For numbered attributes return the count that exist
         """
         attrs = self.attrs(key=key, numbered=numbered)
+
 
         return len(list(attrs))
 
@@ -231,6 +234,7 @@ class Driver(object):
         """
 
         keyname = self._buildKeyName(key, numbered, subkey)
+
         self.entity._attrs.append(Attribute(keyname, value))
 
     def delAttrs(self, *args, **kwargs):

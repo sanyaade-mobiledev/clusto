@@ -79,11 +79,11 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = SESSION.query(Attribute).filter_by(entity_id=e.entity_id,
-                                               key='two').one()                                               
+                                               key_name='two').one() 
         self.assertEqual(q.value, 2)
 
         q = SESSION.query(Attribute).filter_by(entity_id=e.entity_id,
-                                               key='one').one()
+                                               key_name='one').one()
 
         self.assertEqual(q.value, 1)
         
@@ -99,7 +99,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = SESSION.query(Attribute).filter_by(entity_id=e1.entity_id,
-                                               key='somedate').one()
+                                               key_name='somedate').one()
 
         self.assertEqual(q.value, d)
         
@@ -146,7 +146,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = SESSION.query(Attribute).filter_by(entity=e2,
-                                               key='somestring').one()
+                                               key_name='somestring').one()
 
         self.assertEqual(q.value, 'thestring')
 
@@ -158,7 +158,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = SESSION.query(Attribute).filter_by(entity=e4,
-                                               key='someint').one()
+                                               key_name='someint').one()
 
         self.assertEqual(q.value, 10)
 

@@ -15,7 +15,7 @@ from sqlalchemy.orm.mapper import Mapper
 
 from sqlalchemy.orm import mapperlib
 
-
+import re
 import sys
 import datetime
 
@@ -37,7 +37,11 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
                    Column('entity_id', Integer,
                           ForeignKey('entities.entity_id'), nullable=False),
-                   Column('key', Unicode(1024)),
+                   Column('key_name', Unicode(1024)),
+                   Column('subkey_name', Unicode(1024), nullable=True,
+                          default=None),
+                   Column('key_number', Integer, nullable=True,
+                          default=None),
                    Column('datatype', Unicode(32)),
 
                    Column('int_value', Integer, default=None),
@@ -45,6 +49,7 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('datetime_value', DateTime, default=None),
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
+
                    )
 
 
@@ -86,7 +91,43 @@ class Attribute(object):
         
         return "%s.%s.%s %s" % (self.entity.name, self.key,
                                 self.datatype, value)
-        
+
+    def _get_key(self):
+
+        key = self.key_name
+
+        if self.key_number is not None:
+            key += str(self.key_number)
+
+        if self.subkey_name:
+            key += '-' + self.subkey_name
+
+
+        return key
+    
+    def _set_key(self, val):
+
+        keyRegex = re.compile('^(_?[A-Za-z]+[0-9A-Za-z_]*?)([0-9]*?)(-[A-Za-z]+[0-9A-Za-z_-]*)?$')
+
+        match = keyRegex.match(val)      
+
+        if match:
+            key, num, subkey = match.groups()
+
+            self.key_name = key
+
+            if num:                
+                self.key_number = int(num)
+            if subkey:
+                self.subkey_name = subkey[1:]
+            
+        else:
+            raise NameException("Attribute name %s is invalid. "
+                                "Attribute names may not contain periods or "
+                                "comas." % val)
+
+    key = property(_get_key, _set_key)
+                   
     def _get_value(self):
         return getattr(self, self.datatype + "_value")
 
