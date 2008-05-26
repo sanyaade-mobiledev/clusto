@@ -2,23 +2,14 @@
 from clusto.drivers.Base import Driver
 from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException
 
-class ResourceManager(Driver):
-    """
-    The ResourceManager driver should be subclassed by a driver that will
-    manage a resource such as IP allocation, MAC Address lists, etc.
 
-    This base class just allocates unique integers.
-    
-    """
-    
-
-    _clustoType = "resource"
-    _driverName = "resource"
+class ResourceManagerMixin:
 
     _entityAttrName = None
 
-    _recordAllocations=True
+    _recordAllocations = True
     
+
     def allocator(self):
         return None
 
@@ -84,3 +75,17 @@ class ResourceManager(Driver):
 
         return self.attrs(str(resource))
     
+
+class ResourceManager(ResourceManagerMixin, Driver):
+    """
+    The ResourceManager driver should be subclassed by a driver that will
+    manage a resource such as IP allocation, MAC Address lists, etc.
+
+    This base class just allocates unique integers.
+    
+    """
+    
+
+    _clustoType = "resource"
+    _driverName = "resource"
+
