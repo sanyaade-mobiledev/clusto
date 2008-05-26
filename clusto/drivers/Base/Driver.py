@@ -40,8 +40,10 @@ class Driver(object):
         else:
             raise TypeError("neither name nor entity were specified")
 
-            #for attr in self.all_meta_attrs:
-            #    self.addItem(attr)
+        for key, val in kwargs.iteritems():
+            if key in self._properties:
+                setattr(self, key, val)
+                
 
         
     def __eq__(self, other):
