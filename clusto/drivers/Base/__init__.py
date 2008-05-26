@@ -1,5 +1,8 @@
 
 from ClustoDriver import *
 from Driver import *
-from ResourceManager import *
 from ClustoMeta import *
+from Device import *
+from ResourceManager import *
+
+
