@@ -1,5 +1,4 @@
 
-import RUManager
 import re
 from clusto.drivers.Base import ResourceManagerMixin, Location, Device
 
