@@ -13,7 +13,12 @@ class Pool(Driver):
     _driverName = "pool"
     _clustoType = "pool"
     
+    def __contains__(self, other):
+        return super(Pool, self).__contains__(other) or self.hasMember(other)
 
+    def hasMember(self, other):
+        self.hasAttr('_member', other, numbered=True)
+        
     def addToPool(self, entity):
         """
         Add a given Entity to this pool.
@@ -70,7 +75,7 @@ class Pool(Driver):
         q = SESSION.query(Attribute).filter(and_(Entity.c.driver==cls._driverName,
                                                  Entity.c.entity_id==Attribute.c.entity_id,
                                                  Attribute.relation_value==obj.entity,
-                                                 Attribute.c.key.like('_member%')
+                                                 Attribute.c.key_name=='_member'
                                                  ))
 
         
