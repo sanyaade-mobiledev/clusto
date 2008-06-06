@@ -8,7 +8,8 @@ class BasicServer(Device):
     _clustoType = "server"
     _driverName = "basicserver"
 
-    _properties = ('model', 'manufacturer')
+    _properties = {'model':None,
+                   'manufacturer':None}
 
     def addHD(self, size):
         """

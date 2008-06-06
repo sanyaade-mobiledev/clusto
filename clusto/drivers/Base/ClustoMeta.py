@@ -13,7 +13,7 @@ class ClustoMeta(Driver):
     Holds meta information about the clusto database
     """
 
-    _properties = ('version',)
+    _properties = {'version':None}
 
     _clustoType = "clustometa"
     _driverName = "clustometa"

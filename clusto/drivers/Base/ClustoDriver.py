@@ -50,19 +50,27 @@ class ClustoDriver(type):
         TYPELIST[cls._clustoType] = cls
 
         # setup properties
-        for i in cls._properties:
+        if not isinstance(cls._properties, dict):
+            raise TypeError('_properties of %s is not a dict type.',
+                            cls.__name__)
+        
+        for propkey, propval in cls._properties.iteritems():
 
-            def getter(self, key=i):
+            def getter(self, key=propkey, default=propval):
+                if default:
+                    if not self.hasAttr(key):
+                        return default
                 attr = list(self.attrs(key))
                 if not attr:
                     return None
                 else:
                     return attr[0].value
-            def setter(self, val, key=i):
+                
+            def setter(self, val, key=propkey):
                 self.setAttr(key, (val,))
 
 
-            setattr(cls, i, property(getter, setter))
+            setattr(cls, propkey, property(getter, setter))
 
 
 

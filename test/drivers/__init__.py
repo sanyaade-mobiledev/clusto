@@ -1,5 +1,6 @@
 
 from Devices import *
+from Locations import *
 
 #from ServerTests import *
 #from DatacenterTests import *

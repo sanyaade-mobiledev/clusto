@@ -23,7 +23,7 @@ class Driver(object):
     _driverName = "entity"
     _reservedAttrs = tuple()
 
-    _properties = tuple()
+    _properties = dict()
     #_defaultAttrs = tuple()
     
     def __init__(self, name=None, entity=None, *args, **kwargs):
@@ -216,7 +216,19 @@ class Driver(object):
                                 
 
     def references(self, *args, **kwargs):
-        return self._attrFilter(self.entity._references, *args, **kwargs)
+
+        clustotype = None
+        if 'clustotype' in kwargs:
+            clustotype = kwargs['clustotype']
+            kwargs.pop('clustotype')
+            
+        attrs = self._attrFilter(self.entity._references, *args, **kwargs)
+
+        if clustotype:
+            attrs = (x for x in attrs
+                     if x.entity.type == clustotype)
+
+        return attrs
                    
     def attrKeys(self, *args, **kwargs):
 

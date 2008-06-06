@@ -15,7 +15,10 @@ class SimpleNameManager(ResourceManager):
     """
 
     _driverName = "simplenamemanager"
-    _properties = ('basename', 'digits', 'next', 'leadingZeros')
+    _properties = {'basename':None,
+                   'digits':None,
+                   'next':None,
+                   'leadingZeros':None}
 
     _recordAllocations = False
     
