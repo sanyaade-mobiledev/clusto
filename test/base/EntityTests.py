@@ -203,6 +203,20 @@ class TestEntityAttributes(testbase.ClustoTestBase):
                                         Entity.type=='entity')).count(),
                          0)
 
+
+    def testAccessRelationAttributesMultipleTimes(self):
+        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        e2 = SESSION.query(Entity).filter_by(name='e2').one()
+
+        e1._attrs.append(Attribute('foo', 2))
+        e1._attrs.append(Attribute('foo', e2))
+
+        clusto.flush()
+        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        self.assertEqual(len(list(e1._attrs)), 2)
+        self.assertEqual(len(list(e1._attrs)), 2)
+        self.assertEqual(len(list(e1._attrs)), 2)
+
         
     
 class TestEntityReferences(testbase.ClustoTestBase):
@@ -241,16 +255,16 @@ class TestEntityReferences(testbase.ClustoTestBase):
         e3.delete()
 
 
-        self.assertEqual(len(e1._references), 0)
+        self.assertEqual(len(list(e1._references)), 0)
 
         clusto.flush()
 
         e1a = SESSION.query(Entity).filter_by(name='e1').one()
 
-        self.assertEqual(len(e1a._references), 0)
+        self.assertEqual(len(list(e1a._references)), 0)
         self.assertEqual(id(e1a), id(e1))
 
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
-        self.assertEqual(len(e2._references), 0)
+        self.assertEqual(len(list(e2._references)), 0)
 

@@ -27,9 +27,11 @@ SESSION = scoped_session(sessionmaker(autoflush=True, transactional=True))
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
-                    Column('name', Unicode(1024), unique=True, nullable=False),
-                    Column('type', Unicode(64), nullable=False),
-                    Column('driver', Unicode(64), nullable=False),
+                    Column('name', String(1024, convert_unicode=True,
+                           assert_unicode=None), unique=True,
+                           nullable=False, ),
+                    Column('type', String(64), nullable=False),
+                    Column('driver', String(64), nullable=False),
                     mysql_engine='InnoDB'
                     )
 
@@ -37,15 +39,18 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
                    Column('entity_id', Integer,
                           ForeignKey('entities.entity_id'), nullable=False),
-                   Column('key_name', Unicode(1024)),
-                   Column('subkey_name', Unicode(1024), nullable=True,
-                          default=None),
+                   Column('key_name', String(1024, convert_unicode=True,
+                           assert_unicode=None),),
+                   Column('subkey_name', String(1024, convert_unicode=True,
+                           assert_unicode=None), nullable=True,
+                          default=None, ),
                    Column('key_number', Integer, nullable=True,
                           default=None),
-                   Column('datatype', Unicode(32)),
+                   Column('datatype', String(32)),
 
                    Column('int_value', Integer, default=None),
-                   Column('string_value', Unicode, default=None),
+                   Column('string_value', Text(convert_unicode=True,
+                           assert_unicode=None), default=None,),
                    Column('datetime_value', DateTime, default=None),
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
@@ -55,10 +60,14 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
 
 TRANSACTION_TABLE = Table('transactions', METADATA,
                           Column('txn_id', Integer, primary_key=True),
-                          Column('entity_name', Unicode(1024),
-                                 nullable=False),
-                          Column('function', Unicode),
-                          Column('args', Unicode),
+                          Column('entity_name',
+                                 String(1024, convert_unicode=True,
+                                         assert_unicode=None),
+                                 nullable=False,),
+                          Column('function', Text(convert_unicode=True,
+                           assert_unicode=None),),
+                          Column('args', Text(convert_unicode=True,
+                           assert_unicode=None),),
                           Column('timestamp', DateTime),
                           )
                           
@@ -143,18 +152,19 @@ class Attribute(object):
             value = value.entity
         else:
             self.datatype = 'str'
-            value = str(value)
+            value = value
 
         setattr(self, self.datatype + "_value", value)
 
     value = property(_get_value, _set_value)
 
     def delete(self):
-
+        ### TODO this seems like a hack
+        
         try:
             SESSION.delete(self)
         except sqlalchemy.exceptions.InvalidRequestError:
-            SESSION.expunge(self)
+            pass #SESSION.expunge(self)
 
 
 
@@ -181,7 +191,7 @@ class Entity(object):
         @type attrslist: C{list} of C{tuple}s of length 2
         """
         
-        self.name = unicode(name)
+        self.name = name
 
         self.driver = driver
         self.type = clustotype
@@ -239,19 +249,24 @@ class Entity(object):
 SESSION.mapper(Attribute, ATTR_TABLE,
                properties = {'relation_value': relation(Entity, lazy=True, 
                                                         primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
-                                                        uselist=False)})
+                                                        uselist=False,
+                                                        passive_updates=False)})
 
 
 ## might be better to make the relationships here dynamic_loaders in the long
 ## term.
 SESSION.mapper(Entity, ENTITY_TABLE,
-               properties={'_attrs' : relation(Attribute, lazy=True,
+               properties={'_attrs' : relation(Attribute, lazy='dynamic',
                                                cascade="all, delete, delete-orphan",
                                                primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
-                                               backref='entity'),
-                           '_references' : relation(Attribute, lazy=True,
+                                               backref='entity',
+                                               passive_updates=False,
+                                               uselist=True),
+                           '_references' : relation(Attribute, lazy='dynamic',
                                                     cascade="all, delete, delete-orphan",
-                                                    primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id)
+                                                    primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
+                                                    passive_updates=False,
+                                                    uselist=True)
                            }
                )
         

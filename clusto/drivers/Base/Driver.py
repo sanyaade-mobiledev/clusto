@@ -25,6 +25,7 @@ class Driver(object):
 
     _properties = dict()
     #_defaultAttrs = tuple()
+
     
     def __init__(self, name=None, entity=None, *args, **kwargs):
 
@@ -194,14 +195,15 @@ class Driver(object):
                         
                 allattrs = doOverride(allattrs)
 
-    
+
         if not allattrs:
             return None
 
         if sortByKeys:
             return sorted(allattrs)
-        
-        return allattrs
+
+
+        return list(allattrs)
 
         
     def attrs(self, *args, **kwargs):
@@ -211,9 +213,7 @@ class Driver(object):
 
         
         """
-
         return self._attrFilter(self.entity._attrs, *args, **kwargs)
-                                
 
     def references(self, *args, **kwargs):
 
@@ -228,7 +228,7 @@ class Driver(object):
             attrs = (x for x in attrs
                      if x.entity.type == clustotype)
 
-        return attrs
+        return list(attrs)
                    
     def attrKeys(self, *args, **kwargs):
 

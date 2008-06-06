@@ -4,7 +4,10 @@ import unittest
 import sys
 
 
-tests = ('base', 'drivers',)
+tests = sys.argv[1:]
+
+if not tests:
+    tests = ('base', 'drivers',)
 
 
 if __name__ == '__main__':
