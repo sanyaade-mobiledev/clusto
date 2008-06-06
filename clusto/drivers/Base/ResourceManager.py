@@ -68,12 +68,12 @@ class ResourceManagerMixin:
         return True
             
 
-    def owner(self, resource):
+    def owners(self, resource):
         """
-        return the owner object of a given resource.
+        return a list of driver objects for the owners of a given resource.
         """
 
-        return self.attrs(str(resource))
+        return [x.value for x in self.attrs(str(resource))]
     
 
 class ResourceManager(ResourceManagerMixin, Driver):
