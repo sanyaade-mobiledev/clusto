@@ -70,7 +70,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         
         self.assertEqual(res['rack'].name, 'r1')
-        self.assertEqual(res['RU'], 13)
+        self.assertEqual(res['RU'], [13])
 
         res2 = BasicRack.getRackAndU(BasicServer('s2'))
         self.assertEqual(res2, None)
@@ -89,4 +89,24 @@ class BasicRackTest(testbase.ClustoTestBase):
         r1.addDevice(s1, 13)
         self.assertRaises(Exception, r2.addDevice,s1, 1)
         
+    def testCanAddADeviceToMultipleAdjacentUs(self):
+        """
+        you should be able to add a device to multiple adjacent RUs
+        """
+
+        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+
+        s1 = BasicServer('s1')
+        s2 = BasicServer('s2')
         
+        r1.addDevice(s1, [1,2,3])
+
+        clusto.flush()
+
+        s = clusto.getByName('s1')
+
+        self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
+                         [1,2,3])
+
+        self.assertRaises(TypeError, r1.addDevice, s2, [1,2,4])
+

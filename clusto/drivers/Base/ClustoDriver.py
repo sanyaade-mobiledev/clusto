@@ -57,7 +57,7 @@ class ClustoDriver(type):
         for propkey, propval in cls._properties.iteritems():
 
             def getter(self, key=propkey, default=propval):
-                if default:
+                if default != None:
                     if not self.hasAttr(key):
                         return default
                 attr = list(self.attrs(key))

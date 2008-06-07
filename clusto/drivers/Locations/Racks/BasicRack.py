@@ -39,37 +39,62 @@ class BasicRack(ResourceManagerMixin, Location):
         ## should not exceed maxU
         
         """
-        
+
         check = self.ruRegex.match(resource)
+
         if check:
             num = int(check.group(1))
             if num >= self.maxu:
-                return False
-
-            return True
+                retval = False
+                
+            else:
+                retval = True
+        else:
+            retval = False
             
-        return False
+        return retval
     
     def addDevice(self, device, rackU):
         if not isinstance(device, Device):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
 
-        if not isinstance(rackU, int):
-            raise TypeError("a rackU must be an Integer.")
+        if not isinstance(rackU, int) and not isinstance(rackU, list):
+            raise TypeError("a rackU must be an Integer or List of Integers.")
 
 
+        if isinstance(rackU, list):
+            for U in rackU:
+                if not isinstance(U, int):
+                    raise TypeError("a rackU must be an Integer or List of Integers.")
+
+        if isinstance(rackU, int):
+            rackU = [rackU]
+            
         rau = self.getRackAndU(device)
         if rau != None:
             raise Exception("%s is already in rack %s"
                             % (device.name, rau['rack'].name))
-                            
-        if rackU > self.maxu:
-            raise TypeError("the rackU must be less than %d." % self.maxu)
-        if rackU < 0:
-            raise TypeError("RackUs may not be negative.")
-        
-        self.allocate(device, self.ruName(rackU))
+
+
+        # do U checks
+        for U in rackU:
+            if U > self.maxu:
+                raise TypeError("the rackU must be less than %d." % self.maxu)
+            if U < 0:
+                raise TypeError("RackUs may not be negative.")
+
+        rackU.sort()
+        last = rackU[0]
+        for i in rackU[1:]:
+            if i == last:
+                raise TypeError("you can't list the same U twice.")
+            if (i-1) != (last):
+                raise TypeError("a device can only occupy multiple Us if they're adjacent.")
+            last = i
+
+        for U in rackU:
+            self.allocate(device, self.ruName(U))
 
         
     def getDeviceIn(self, rackU):
@@ -95,9 +120,10 @@ class BasicRack(ResourceManagerMixin, Location):
         """
 
         refs = device.references(clustotype=self._clustoType)
-        
+
         if refs:
-            return {'rack':refs[0].entity,  'RU':self.ruNum(refs[0].key)}
+            return {'rack':refs[0].entity,  'RU':[self.ruNum(x.key)
+                                                  for x in refs]}
         else:
             
             return None

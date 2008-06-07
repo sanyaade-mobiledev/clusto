@@ -270,10 +270,12 @@ class Driver(object):
             self.addAttr(key, val)
 
     
-    def hasAttr(self, strict=True, *args, **kwargs):
+    def hasAttr(self, *args, **kwargs):
         "return True if this list has an attribute with the given key"
 
-        for i in self.attrs(strict=strict, *args, **kwargs):
+        if 'strict' not in kwargs:
+            kwargs['strict'] = True
+        for i in self.attrs(*args, **kwargs):
             return True
 
         return False

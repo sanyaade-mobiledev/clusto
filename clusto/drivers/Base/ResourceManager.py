@@ -40,7 +40,8 @@ class ResourceManagerMixin:
 
         if self._recordAllocations:
             self.addAttr(str(resource), thing)
-            
+
+
 
     def deallocate(self, thing, resource=None):
         """

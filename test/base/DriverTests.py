@@ -180,5 +180,16 @@ class TestDriverAttributes(testbase.ClustoTestBase):
                          sorted([('foo0-one', 'bar1'), ('foo1-two', 'bar2')]))
 
 
+    def testAttributeGetValueAfterAdd(self):
+
+        d1 = Driver('d1')
+
+        d1.addAttr('foo', 2)
+        self.assertEqual(sorted(d1.attrItems('foo')), [('foo', 2)])
+        d1.addAttr('bar', 3)
+        self.assertEqual(sorted(d1.attrItems('foo')), [('foo', 2)])
+        self.assertEqual(sorted(d1.attrItems('bar')), [('bar', 3)])
+
+
 
         
