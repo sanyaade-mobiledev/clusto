@@ -10,14 +10,14 @@ class SimpleNameResourceTests(testbase.ClustoTestBase):
 
     def data(self):
 
-        n1 = SimpleNameManager(name='foonamegen',
+        n1 = SimpleNameManager('foonamegen',
                                basename='foo',
                                digits=4,
                                startingnum=1,
                                )
 
 
-        n2 = SimpleNameManager(name='barnamegen',
+        n2 = SimpleNameManager('barnamegen',
                                basename='bar',
                                digits=2,
                                startingnum=95,

@@ -22,7 +22,7 @@ class SimpleNameManager(ResourceManager):
 
     _recordAllocations = False
     
-    def __init__(self, name=None, entity=None,
+    def __init__(self, nameDriverEntity,
                  basename='',
                  digits=2,
                  startingnum=1,
@@ -31,7 +31,7 @@ class SimpleNameManager(ResourceManager):
                  *args, **kwargs):
 
 
-        super(ResourceManager, self).__init__(name=name, entity=entity,
+        super(ResourceManager, self).__init__(nameDriverEntity,
                                               *args, **kwargs)
         
         self.basename = basename
@@ -62,7 +62,7 @@ class SimpleNameManager(ResourceManager):
 
         name = self.allocator()
 
-        newobj = clustotype(name=name, *args, **kwargs)
+        newobj = clustotype(name, *args, **kwargs)
 
         self.allocate(newobj, name)
 

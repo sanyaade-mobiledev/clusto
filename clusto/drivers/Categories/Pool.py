@@ -79,7 +79,7 @@ class Pool(Driver):
                                                  ))
 
         
-        pools = set([Driver(entity=x.entity) for x in q])
+        pools = set([Driver(x.entity) for x in q])
 
         if allPools:
             for i in list(pools):

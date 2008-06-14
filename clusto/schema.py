@@ -46,7 +46,7 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                           default=None, ),
                    Column('key_number', Integer, nullable=True,
                           default=None),
-                   Column('datatype', String(32)),
+                   Column('datatype', String(32), default='string', nullable=False),
 
                    Column('int_value', Integer, default=None),
                    Column('string_value', Text(convert_unicode=True,
@@ -97,8 +97,9 @@ class Attribute(object):
             value = self.relation_value.name
         else:
             value = self.value
-        
-        return "%s.%s.%s %s" % (self.entity.name, self.key,
+
+        entityname = (self.entity and self.entity.name) or None
+        return "%s.%s.%s %s" % (entityname, self.key,
                                 self.datatype, value)
 
     def _get_key(self):
@@ -113,48 +114,80 @@ class Attribute(object):
 
 
         return key
-    
-    def _set_key(self, val):
 
+
+    @classmethod
+    def splitKeyName(self, keyname):
         keyRegex = re.compile('^(_?[A-Za-z]+[0-9A-Za-z_]*?)([0-9]*?)(-[A-Za-z]+[0-9A-Za-z_-]*)?$')
 
-        match = keyRegex.match(val)      
+        match = keyRegex.match(keyname)      
 
         if match:
+            splitkey = {}
             key, num, subkey = match.groups()
 
-            self.key_name = key
+            splitkey['key_name'] = key
 
-            if num:                
-                self.key_number = int(num)
-            if subkey:
-                self.subkey_name = subkey[1:]
-            
+            if not num:
+                splitkey['key_number'] =  None
+            else:
+                splitkey['key_number'] = int(num)
+            splitkey['subkey_name'] = subkey and subkey[1:] or None
+
         else:
             raise NameException("Attribute name %s is invalid. "
                                 "Attribute names may not contain periods or "
                                 "comas." % val)
 
+        return splitkey
+    
+    def _set_key(self, val):
+        splitkey = self.splitKeyName(val)
+
+        for key,value in splitkey.items():
+            setattr(self, key, value)
+
     key = property(_get_key, _set_key)
-                   
+
+
+
+    def getValueType(self, value=None):
+        if value == None:
+            if self.datatype == None:
+                valtype = "string"
+            else:
+                valtype = self.datatype
+        else:
+            valtype = self.getType(value)
+        
+        return valtype + "_value"
+
+    @classmethod
+    def getType(self, value):
+
+        if isinstance(value, int):
+            datatype = 'int'
+        elif isinstance(value, datetime.datetime):
+            datatype = 'datetime'
+        elif isinstance(value, Entity):
+            datatype = 'relation'
+        elif hasattr(value, 'entity') and isinstance(value.entity, Entity):
+            datatype = 'relation'
+        else:
+            datatype = 'string'
+
+        return datatype
+        
+        
     def _get_value(self):
-        return getattr(self, self.datatype + "_value")
+        return getattr(self, self.getValueType())
 
     def _set_value(self, value):
-        if isinstance(value, int):
-            self.datatype = 'int'
-        elif isinstance(value, datetime.datetime):
-            self.datatype = 'datetime'
-        elif isinstance(value, Entity):
-            self.datatype = 'relation'
-        elif hasattr(value, 'entity') and isinstance(value.entity, Entity):
-            self.datatype = 'relation'
-            value = value.entity
-        else:
-            self.datatype = 'str'
-            value = value
+        self.datatype = self.getType(value)
 
-        setattr(self, self.datatype + "_value", value)
+        setattr(self, self.getValueType(value), value)
+
+
 
     value = property(_get_value, _set_value)
 
@@ -190,7 +223,7 @@ class Entity(object):
         @param attrslist: the list of key/value pairs to be set as attributes
         @type attrslist: C{list} of C{tuple}s of length 2
         """
-        
+
         self.name = name
 
         self.driver = driver
@@ -207,8 +240,12 @@ class Entity(object):
         """
 
         ## each Thing must have a unique name so I'll just compare those
-
-        return self.name == otherentity.name
+        if not isinstance(otherentity, Entity):
+            retval = False
+        else:
+            retval = self.name == otherentity.name
+        
+        return retval
 
     def __cmp__(self, other):
 
@@ -217,16 +254,11 @@ class Entity(object):
 
     def __str__(self):
         """
-        Output this entity in configrc format
+        return string representing this entity
         """
-        out = []
-        for attr in self._attrs:
-            out.append(str(attr))
-
-        out.append("%s.clustodriver.string %s" % (self.name, self.driver))
             
-        return '\n'.join(out)
-
+        return "%s.clustodriver.string %s" % (self.name, self.driver)
+            
 
     def delete(self):
         """

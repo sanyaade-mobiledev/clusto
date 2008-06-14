@@ -27,24 +27,34 @@ class Driver(object):
     #_defaultAttrs = tuple()
 
     
-    def __init__(self, name=None, entity=None, *args, **kwargs):
+    def __init__(self, nameDriverEntity, *args, **kwargs):
 
-        if entity:
-            self.entity = entity
-            self._chooseBestDriver()
+        if (not isinstance(nameDriverEntity, str)
+            and not isinstance(nameDriverEntity, Entity)
+            and not isinstance(nameDriverEntity, Driver)):
+            raise TypeError("First argument must be a string, "
+                            "Driver, or Entity.")
+
+        if isinstance(nameDriverEntity, Entity):
             
-        elif name:
-            self.entity = Entity(name)
+            self.entity = nameDriverEntity
+            self._chooseBestDriver()
+
+        elif isinstance(nameDriverEntity, str):
+            
+            self.entity = Entity(nameDriverEntity)
             self.entity.driver = self._driverName
             self.entity.type = self._clustoType
 
+        elif isinstance(nameDriverEntity, Driver):
+            self = Driver(nameDriverEntity.entity)
         else:
-            raise TypeError("neither name nor entity were specified")
+            raise TypeError("Could not create driver from given arguments.")
 
         for key, val in kwargs.iteritems():
             if key in self._properties:
                 setattr(self, key, val)
-                
+            ## unsure if I should fail on bad keys
 
         
     def __eq__(self, other):
@@ -249,7 +259,10 @@ class Driver(object):
 
         keyname = self._buildKeyName(key, numbered, subkey)
 
-        self.entity._attrs.append(Attribute(keyname, value))
+        if isinstance(value, Driver):
+            self.entity._attrs.append(Attribute(keyname, value.entity))
+        else:
+            self.entity._attrs.append(Attribute(keyname, value))
 
     def delAttrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"
@@ -301,7 +314,7 @@ class Driver(object):
         def poolGenerator(entity):
 
 
-            pools = [Driver(entity=x.entity)
+            pools = [Driver(x.entity)
                      for x in sorted(entity.references('_member',
                                                        numbered=True),
                                      cmp=lambda x,y: cmp(x.attr_id, y.attr_id),
@@ -339,3 +352,21 @@ class Driver(object):
         self.addAttr("_contains", d)
         
 
+    @classmethod
+    def getByAttr(self, attrname, value):
+        """
+        Return a list of Instances that have the given attribute with the given
+        value.
+        """
+
+
+        querydict = { Attribute.getType(value)+"_value": value}
+        querydict.update(Attribute.splitKeyName(attrname))
+                     
+        attrlist = SESSION.query(Attribute).filter_by(**querydict)
+
+
+        objs = [Driver(x.entity) for x in attrlist]
+
+        return objs
+            

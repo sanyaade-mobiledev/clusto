@@ -191,5 +191,20 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(sorted(d1.attrItems('bar')), [('bar', 3)])
 
 
+    def testGetByAttr(self):
 
+        d1 = Driver('d1')
+        d1.addAttr('foo', 1)
+
+        d2 = Driver('d2')
+        d2.addAttr('foo', 2)
+
+        d3 = Driver('d3')
+        d3.addAttr('bar', 3)
+
+        clusto.flush()
+
+        result = Driver.getByAttr('foo', 2)
+        self.assertEqual(result, [d2])
+        
         

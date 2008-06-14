@@ -11,3 +11,6 @@ class Device(Driver):
     _driverName = "device"
 
 
+    @classmethod
+    def getBySerialNumber(self, serialnum):
+        pass

@@ -26,7 +26,7 @@ class ClustoMeta(Driver):
             meta = clusto.getByName(name)
             self = meta
         except LookupError:
-            super(ClustoMeta, self).__init__(name=name)
+            super(ClustoMeta, self).__init__(name)
             self.version = VERSION
             
 

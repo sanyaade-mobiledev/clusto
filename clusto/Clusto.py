@@ -74,7 +74,7 @@ def getByName(name):
         #klass = getDriver(entity)
         #retval = klass(entity=entity)
 
-        retval = Driver(entity=entity)
+        retval = Driver(entity)
             
         return retval
     except InvalidRequestError:
