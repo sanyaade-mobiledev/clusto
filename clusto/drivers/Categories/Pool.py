@@ -72,10 +72,10 @@ class Pool(Driver):
             raise TypeError("obj must be either an Entity or a Driver.")
 
 
-        q = SESSION.query(Attribute).filter(and_(Entity.c.driver==cls._driverName,
-                                                 Entity.c.entity_id==Attribute.c.entity_id,
+        q = SESSION.query(Attribute).filter(and_(Entity.driver==cls._driverName,
+                                                 Entity.entity_id==Attribute.entity_id,
                                                  Attribute.relation_value==obj.entity,
-                                                 Attribute.c.key_name=='_member'
+                                                 Attribute.key_name=='_member'
                                                  ))
 
         

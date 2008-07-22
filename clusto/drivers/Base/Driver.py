@@ -29,9 +29,7 @@ class Driver(object):
     
     def __init__(self, nameDriverEntity, *args, **kwargs):
 
-        if (not isinstance(nameDriverEntity, str)
-            and not isinstance(nameDriverEntity, Entity)
-            and not isinstance(nameDriverEntity, Driver)):
+        if not isinstance(nameDriverEntity, (str, unicode, Entity, Driver)):
             raise TypeError("First argument must be a string, "
                             "Driver, or Entity.")
 
@@ -40,7 +38,7 @@ class Driver(object):
             self.entity = nameDriverEntity
             self._chooseBestDriver()
 
-        elif isinstance(nameDriverEntity, str):
+        elif isinstance(nameDriverEntity, (str, unicode)):
             
             self.entity = Entity(nameDriverEntity)
             self.entity.driver = self._driverName

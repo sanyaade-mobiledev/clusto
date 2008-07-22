@@ -7,8 +7,8 @@ from sqlalchemy import *
 
 import sqlalchemy.exceptions
 
-from sqlalchemy.ext.sessioncontext import SessionContext
-from sqlalchemy.ext.assignmapper import assign_mapper
+#from sqlalchemy.ext.sessioncontext import SessionContext
+#from sqlalchemy.ext.assignmapper import assign_mapper
 
 from sqlalchemy.orm import * #Mapper, MapperExtension
 from sqlalchemy.orm.mapper import Mapper
@@ -23,7 +23,7 @@ import datetime
 METADATA = MetaData()
 
 
-SESSION = scoped_session(sessionmaker(autoflush=True, transactional=True)) 
+SESSION = scoped_session(sessionmaker())#autoflush=True, autocommit=True)) 
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
