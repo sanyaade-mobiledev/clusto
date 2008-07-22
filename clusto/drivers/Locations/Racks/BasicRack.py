@@ -10,7 +10,8 @@ class BasicRack(ResourceManagerMixin, Location):
     _clustoType = "rack"
     _driverName = "basicrack"
 
-    _properties = {'maxu':45}
+    _properties = {'minu':1,
+                   'maxu':45}
     
     ruRegex = re.compile('RU(\d+)')
 
@@ -44,7 +45,7 @@ class BasicRack(ResourceManagerMixin, Location):
 
         if check:
             num = int(check.group(1))
-            if num >= self.maxu:
+            if num > self.maxu or num < self.minu:
                 retval = False
                 
             else:
