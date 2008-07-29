@@ -1,41 +1,4 @@
 
-from clusto.drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
-from clusto.schema import SESSION, METADATA, Entity, Attribute, VERSION
-from sqlalchemy import and_, or_, literal, create_engine
-from sqlalchemy.exceptions import InvalidRequestError
-
-import clusto.drivers
-driverlist = DRIVERLIST
-typelist = TYPELIST
-
-
-def connect(dsn):
-    """
-    Connect to a given Clusto datastore.
-
-    Accepts a dsn string.
-
-    e.g. mysql://user:pass@example.com/clustodb
-    e.g. sqlite:///somefile.db
-
-    @param dsn: the clusto database URI
-    """
-    METADATA.bind = create_engine(dsn)
-
-def checkDBcompatibility(dbver):
-
-    if dbver == VERSION:
-        return True
-    
-def initclusto():
-    """
-    Initialize a clusto database.
-    """
-    METADATA.create_all(METADATA.bind)
-    c = ClustoMeta()
-    
-    flush()
-
 def flush():
     """
     Flush changes made to clusto objects to the database.
