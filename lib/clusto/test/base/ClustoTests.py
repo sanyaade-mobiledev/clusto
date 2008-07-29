@@ -1,5 +1,5 @@
 import unittest
-import testbase
+from clusto.test import testbase
 
 import clusto
 from clusto.schema import *

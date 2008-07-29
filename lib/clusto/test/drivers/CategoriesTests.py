@@ -1,6 +1,6 @@
 
 import clusto
-import testbase 
+from clusto.test import testbase 
 import itertools
 
 from clusto.drivers import *

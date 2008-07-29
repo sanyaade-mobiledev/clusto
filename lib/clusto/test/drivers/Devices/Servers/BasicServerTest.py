@@ -1,7 +1,7 @@
 
 import clusto
 from clusto.drivers import BasicServer
-import testbase
+from clusto.test import testbase
 
 class BasicServerTest(testbase.ClustoTestBase):
 

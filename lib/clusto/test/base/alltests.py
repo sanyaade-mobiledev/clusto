@@ -1,5 +1,5 @@
 
-import testbase
+from clusto.test import testbase
 import unittest
 
 def suite():

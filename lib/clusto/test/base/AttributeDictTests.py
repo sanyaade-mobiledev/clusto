@@ -2,7 +2,7 @@
 import unittest
 
 from clusto.schema import AttributeDict
-import testbase
+from clusto.test import testbase
 
 class TestAttributeDict(testbase.ClustoTestBase):
 

@@ -2,7 +2,7 @@ import unittest
 #from clusto.schema import *
 import clusto
 from clusto.drivers.Servers import *
-import testbase
+from clusto.test import testbase
 
 class TestServer(testbase.ClustoTestBase):
 

@@ -3,7 +3,7 @@ Test the basic Entity object
 """
 
 import unittest
-import testbase
+from clusto.test import testbase
 import datetime
 
 import clusto

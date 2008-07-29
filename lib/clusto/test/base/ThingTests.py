@@ -5,7 +5,7 @@ import clusto
 from clusto.drivers.Base import Thing, Part
 from clusto.drivers.Servers import Server
 from clusto.exceptions import *
-import testbase
+from clusto.test import testbase
 
 class TestThingSchema(testbase.ClustoTestBase):
 

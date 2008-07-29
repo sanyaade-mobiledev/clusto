@@ -1,6 +1,6 @@
 
 import clusto
-import testbase
+from clusto.test import testbase
 
 from clusto.drivers.Base import Thing
 from clusto.drivers.Servers import Server

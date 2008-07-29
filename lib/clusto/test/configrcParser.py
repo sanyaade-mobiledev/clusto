@@ -1,4 +1,4 @@
-import testbase
+from clusto.test import testbase
 import unittest
 import libDigg
 

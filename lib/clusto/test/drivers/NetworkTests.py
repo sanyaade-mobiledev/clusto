@@ -2,7 +2,7 @@ import unittest
 #from clusto.schema import *
 import clusto
 from clusto.drivers.Network import *
-import testbase
+from clusto.test import testbase
 
 class TestIP(testbase.ClustoTestBase):
 
