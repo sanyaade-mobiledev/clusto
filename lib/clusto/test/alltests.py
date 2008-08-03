@@ -5,13 +5,19 @@ import sys
 import clusto.test
 
 
-def runtests(tests=None):
-
+def gettests(tests=None):
     if not tests:
         tests = ('clusto.test.base', 'clusto.test.drivers',)
 
     suite = unittest.defaultTestLoader.loadTestsFromNames(tests)
-    runner = unittest.TextTestRunner()
+
+    return suite
+
+
+def runtests(tests=None):
+
+    suite = gettests(tests)
+    runner = unittest.TextTestRunner()    
     runner.run(suite)
 
 
