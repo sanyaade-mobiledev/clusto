@@ -3,7 +3,7 @@
 import sys
 import os
 
-import cmdln
+from clusto import cmdln
 
 import clusto
 
