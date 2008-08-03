@@ -5,7 +5,7 @@ Clusto schema
 VERSION = 0.1
 from sqlalchemy import *
 
-import sqlalchemy.exceptions
+from sqlalchemy.exceptions import InvalidRequestError
 
 #from sqlalchemy.ext.sessioncontext import SessionContext
 #from sqlalchemy.ext.assignmapper import assign_mapper
@@ -196,7 +196,7 @@ class Attribute(object):
         
         try:
             SESSION.delete(self)
-        except sqlalchemy.exceptions.InvalidRequestError:
+        except InvalidRequestError:
             pass #SESSION.expunge(self)
 
 
@@ -267,7 +267,7 @@ class Entity(object):
 
         try:
             SESSION.delete(self)
-        except sqlalchemy.exceptions.InvalidRequestError:
+        except InvalidRequestError:
             SESSION.expunge(self)
         #SESSION.delete(self)
 

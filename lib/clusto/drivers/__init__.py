@@ -1,7 +1,7 @@
 
-from Base import *
-from Categories import *
+from base import *
+from categories import *
 
-from Devices import *
-from Locations import *
-from ResourceManagers import *
+from devices import *
+from locations import *
+from resources import *

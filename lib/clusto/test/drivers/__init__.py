@@ -1,9 +1,9 @@
 
-from Devices import *
-from Locations import *
+from devices import *
+from locations import *
 
 #from ServerTests import *
 #from DatacenterTests import *
-from CategoriesTests import *
+from categoriestests import *
 #from NetworkTests import *
-from ResourceTests import *
+from resourcetests import *

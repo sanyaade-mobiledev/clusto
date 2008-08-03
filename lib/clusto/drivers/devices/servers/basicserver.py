@@ -1,0 +1,29 @@
+from clusto.drivers.base import Device
+
+class BasicServer(Device):
+    """
+    server
+    """
+
+    _clustoType = "server"
+    _driverName = "basicserver"
+
+    _properties = {'model':None,
+                   'manufacturer':None}
+
+    def addHD(self, size):
+        """
+        Add another HD to this server
+        """
+        pass
+    
+    
+class BasicVirtualServer(Device):
+    _clustoType = "server"
+    _driverName = "basicvirtualserver"
+
+    
+    
+        
+
+
