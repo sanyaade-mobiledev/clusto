@@ -7,7 +7,8 @@ import clusto.test
 
 def gettests(tests=None):
     if not tests:
-        tests = ('clusto.test.base', 'clusto.test.drivers',)
+        tests = ('clusto.test.base', 'clusto.test.drivers',
+                 'clusto.test.usage',)
 
     suite = unittest.defaultTestLoader.loadTestsFromNames(tests)
 
