@@ -8,7 +8,21 @@ import unittest
 
 import clusto
 
+
+class ClustoTestResult(unittest.TestResult):
+    def addError(self, test, err):
+        """Called when an error has occurred. 'err' is a tuple of values as
+        returned by sys.exc_info().
+        """
+        print >>sys.stderr, "ERROR HERE!"
+        clusto.rollbackTransaction()
+        self.errors.append((test, self._exc_info_to_string(err, test)))
+        
+
+
 class ClustoTestBase(unittest.TestCase):
+
+
 
     def data(self):
         pass
@@ -24,4 +38,11 @@ class ClustoTestBase(unittest.TestCase):
 
         clusto.clear()
         clusto.METADATA.drop_all()
+
+
+    def defaultTestResult(self):
+        if not hasattr(self._testresult):
+            self._testresult = ClustoTestResult()
+
+        return self._testresult
 
