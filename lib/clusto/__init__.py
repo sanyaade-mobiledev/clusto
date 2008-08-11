@@ -97,6 +97,17 @@ def rename(oldname, newname):
 
     flush()
 
+def beginTransaction():
+    """Start a transaction"""
+    SESSION.begin(subtransactions=True)
+
+def rollbackTransaction():
+    """Rollback a transaction"""
+    SESSION.rollback()
+
+def commit():
+    """Commit changes to the datastore"""
+    SESSION.commit()
 
 ## unconverted functions
 def disconnect():
