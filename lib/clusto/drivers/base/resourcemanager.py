@@ -17,8 +17,7 @@ class ResourceManagerMixin:
         return True
 
     def allocate(self, thing, resource=None):
-        """
-        allocates a resource element to the given thing.
+        """allocates a resource element to the given thing.
         """
 
         if not resource:
@@ -44,14 +43,13 @@ class ResourceManagerMixin:
 
 
     def deallocate(self, thing, resource=None):
-        """
-        deallocates a resource from the given thing.
+        """deallocates a resource from the given thing.
         """
 
-        if not resource:
-            # TODO
-            # deallocate all managed resources from given thing
-            pass
+	if resource is None:
+	    rlist = self.getResources(thing)
+	    for res in rlist:
+		self.delAttrs(key=str(res), value=thing)
 
         if self.available(resource):
             attrname = self._driverName
@@ -60,8 +58,7 @@ class ResourceManagerMixin:
             self.delAttrs(key=str(resource), value=thing)
 
     def available(self, resource):
-        """
-        return True if resource is available, False otherwise.
+        """return True if resource is available, False otherwise.
         """
         if list(self.attrs(str(resource))):
             return False
@@ -70,16 +67,22 @@ class ResourceManagerMixin:
             
 
     def owners(self, resource):
-        """
-        return a list of driver objects for the owners of a given resource.
+        """return a list of driver objects for the owners of a given resource.
         """
 
-        return [x.value for x in self.attrs(str(resource))]
+        return [Driver(x.value) for x in self.attrs(str(resource))]
     
+    def resources(self, thing):
+        """return a list of resources from the resource manager that is
+	associated with the given thing.
+        """
+	
+	return [resource.key for resource in self.attrs() 
+		if Driver(resource.value) == thing]
+
 
 class ResourceManager(ResourceManagerMixin, Driver):
-    """
-    The ResourceManager driver should be subclassed by a driver that will
+    """The ResourceManager driver should be subclassed by a driver that will
     manage a resource such as IP allocation, MAC Address lists, etc.
 
     This base class just allocates unique integers.

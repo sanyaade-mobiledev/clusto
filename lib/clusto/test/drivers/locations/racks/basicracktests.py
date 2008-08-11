@@ -110,3 +110,24 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         self.assertRaises(TypeError, r1.addDevice, s2, [1,2,4])
 
+    def testAddingToDoubleDigitLocationThenSingleDigitLocation(self):
+
+        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+
+        s1 = BasicServer('s1')
+        s2 = BasicServer('s2')
+        
+        r1.addDevice(s1, 11)
+
+        r1.addDevice(s2, 1)
+
+        clusto.flush()
+
+        s = clusto.getByName('s1')
+
+        self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
+                         [11])
+
+        self.assertEqual(sorted(BasicRack.getRackAndU(s2)['RU']),
+                         [1])
+

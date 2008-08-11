@@ -22,7 +22,7 @@ class BasicRack(ResourceManagerMixin, Location):
     @classmethod
     def ruName(self, num):
 
-        return 'RU%d' % num
+        return 'RU%02d' % num
 
     @classmethod
     def ruNum(self, ru):
@@ -60,8 +60,8 @@ class BasicRack(ResourceManagerMixin, Location):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
 
-        if not isinstance(rackU, int) and not isinstance(rackU, list):
-            raise TypeError("a rackU must be an Integer or List of Integers.")
+        if not isinstance(rackU, int) and not isinstance(rackU, (list, tuple)):
+            raise TypeError("a rackU must be an Integer or list/tuple of Integers.")
 
 
         if isinstance(rackU, list):
@@ -82,9 +82,10 @@ class BasicRack(ResourceManagerMixin, Location):
         for U in rackU:
             if U > self.maxu:
                 raise TypeError("the rackU must be less than %d." % self.maxu)
-            if U < 0:
+            if U < self.minu:
                 raise TypeError("RackUs may not be negative.")
 
+        rackU = list(rackU)
         rackU.sort()
         last = rackU[0]
         for i in rackU[1:]:
@@ -113,17 +114,17 @@ class BasicRack(ResourceManagerMixin, Location):
         return None
 
     @classmethod
-    def getRackAndU(self, device):
+    def getRackAndU(cls, device):
         """
         Get the rack and rackU for a given device.
 
         returns a tuple of (rack, u-number)
         """
 
-        refs = device.references(clustotype=self._clustoType)
+        refs = device.references(clustotype=cls._clustoType)
 
         if refs:
-            return {'rack':refs[0].entity,  'RU':[self.ruNum(x.key)
+            return {'rack':refs[0].entity,  'RU':[cls.ruNum(x.key)
                                                   for x in refs]}
         else:
             
