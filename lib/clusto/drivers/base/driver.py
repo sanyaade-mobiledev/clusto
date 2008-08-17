@@ -274,8 +274,7 @@ class Driver(object):
             i.delete()
 
     def setAttr(self, key, valuelist):
-        """
-        replaces all items in the list matching the given key with values in
+        """replaces all items in the list matching the given key with values in
         valuelist
         """
         self._checkAttrName(key)
@@ -285,7 +284,7 @@ class Driver(object):
 
     
     def hasAttr(self, *args, **kwargs):
-        "return True if this list has an attribute with the given key"
+        """return True if this list has an attribute with the given key"""
 
         if 'strict' not in kwargs:
             kwargs['strict'] = True
