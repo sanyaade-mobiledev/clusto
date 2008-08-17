@@ -2,6 +2,7 @@
 import re
 import itertools
 
+import clusto
 from clusto.schema import *
 from clusto.exceptions import *
 
@@ -26,12 +27,21 @@ class Driver(object):
     _properties = dict()
     #_defaultAttrs = tuple()
 
-    
-    def __init__(self, nameDriverEntity, *args, **kwargs):
+    def __new__(cls, nameDriverEntity, **kwargs):
+
+	if isinstance(nameDriverEntity, Driver):
+	    return nameDriverEntity
+	else:
+	    return object.__new__(cls, nameDriverEntity, **kwargs)
+
+    def __init__(self, nameDriverEntity, **kwargs):
 
         if not isinstance(nameDriverEntity, (str, unicode, Entity, Driver)):
             raise TypeError("First argument must be a string, "
                             "Driver, or Entity.")
+
+	if isinstance(nameDriverEntity, Driver):
+	    return 
 
         if isinstance(nameDriverEntity, Entity):
             
@@ -44,8 +54,6 @@ class Driver(object):
             self.entity.driver = self._driverName
             self.entity.type = self._clustoType
 
-        elif isinstance(nameDriverEntity, Driver):
-            self = Driver(nameDriverEntity.entity)
         else:
             raise TypeError("Could not create driver from given arguments.")
 

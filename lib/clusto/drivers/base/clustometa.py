@@ -19,6 +19,14 @@ class ClustoMeta(Driver):
     _driverName = "clustometa"
 
 
+    def __new__(cls):
+
+	if not hasattr(cls, '__singleton'):
+	    cls.__singleton = object.__new__(cls)
+
+	return cls.__singleton
+
+
     def __init__(self): #, name=None, entity=None, *args, **kwargs):
 
         name = 'clustometa'

@@ -18,7 +18,7 @@ from sqlalchemy.orm import mapperlib
 import re
 import sys
 import datetime
-
+import clusto
 
 METADATA = MetaData()
 
@@ -180,7 +180,11 @@ class Attribute(object):
         
         
     def _get_value(self):
-        return getattr(self, self.getValueType())
+
+	if self.getValueType() == 'relation_value':
+	    return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
+	else:
+	    return getattr(self, self.getValueType())
 
     def _set_value(self, value):
         self.datatype = self.getType(value)
