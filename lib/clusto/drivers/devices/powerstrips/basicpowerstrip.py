@@ -2,7 +2,7 @@
 from clusto.drivers.base import Device, ResourceManagerMixin
 from clusto.drivers.devices.common import PortMixin
 
-class BasicPowerStrip(PortMixin, ResourceManagerMixin, Device):
+class BasicPowerStrip(PortMixin, Device):
     """
     Basic power strip Driver.
     """
