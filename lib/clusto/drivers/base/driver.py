@@ -273,14 +273,13 @@ class Driver(object):
             self.entity._attrs.remove(i)
             i.delete()
 
-    def setAttr(self, key, valuelist):
-        """replaces all items in the list matching the given key with values in
-        valuelist
+    def setAttr(self, key, value, numbered=None, subkey=None):
+        """replaces all items in the list matching the given key with value
         """
         self._checkAttrName(key)
-        self.delAttrs(key=key)
-        for val in valuelist:
-            self.addAttr(key, val)
+        self.delAttrs(key=key, numbered=numbered, subkey=subkey)
+	self.addAttr(key, value, numbered=numbered, subkey=subkey)
+	
 
     
     def hasAttr(self, *args, **kwargs):

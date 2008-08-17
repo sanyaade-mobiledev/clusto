@@ -67,7 +67,7 @@ class ClustoDriver(type):
                     return attr[0].value
                 
             def setter(self, val, key=propkey):
-                self.setAttr(key, (val,))
+                self.setAttr(key, val)
 
 
             setattr(cls, propkey, property(getter, setter))
