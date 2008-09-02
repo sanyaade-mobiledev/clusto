@@ -46,14 +46,16 @@ class BasicRack(ResourceManagerMixin, Location):
         if check:
             num = int(check.group(1))
             if num > self.maxu or num < self.minu:
-                retval = False
+		raise TypeError("The rack U must be between %d and %d"
+				% (self.minu, self.maxu))
                 
             else:
-                retval = True
+                return resource
         else:
-            retval = False
+            raise TypeError("The given rack U is in the wrong format: %s"
+			    % resource)
             
-        return retval
+
     
     def addDevice(self, device, rackU):
         if not isinstance(device, Device):

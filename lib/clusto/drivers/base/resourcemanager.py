@@ -11,47 +11,58 @@ class ResourceManagerMixin:
     
 
     def allocator(self):
-        return None
+	"""return an unused resource from this resource manager"""
+
+	raise NotImplemented("No allocator implemented for %s you must explicitly specify a resource."
+			     % self.name)
+
 
     def checkType(self, resource):
-        return True
+	"""checks the type of a given resourece
+
+	if the resource is valid return it and optionally convert it to
+	another format.  The format it returns has to be compatible with 
+	attribute naming 
+	"""
+        return resource
 
     def allocate(self, thing, resource=None):
         """allocates a resource element to the given thing.
+
+	resource - is passed as an argument it will be checked 
+	           before assignment.  
+
+	refattr - the attribute name on the entity that will refer back
+	          this resource manager.
+
+	returns the resource that was either passed in and processed 
+	or generated.
         """
+	
+	if not isinstance(thing, Driver):
+	    raise TypeError("thing is not of type Driver")
 
         if not resource:
             # allocate a new resource
             resource = self.allocator()
-        elif not self.checkType(resource):
-            raise ResourceTypeException("The resource %s you're trying to "
-                                        "allocate is of the wrong type."
-                                        % str(resource))
-        elif not self.available(resource):
-            raise ResourceNotAvailableException("Resource %s is not available."
-                                                % str(resource))
-            
 
+	else:
+	    resource = self.checkType(resource)
 
-        # make the resource an attribute of the entity if necessary
-        if self._entityAttrName:
-            thing.addAttr(self._entityAttrName, resource, numbered=True)
+	self.setAttr(resource, thing)
+	
 
-        if self._recordAllocations:
-            self.addAttr(str(resource), thing)
-
-
+	return resource
 
     def deallocate(self, thing, resource=None):
-        """deallocates a resource from the given thing.
-        """
+        """deallocates a resource from the given thing."""
 
 	if resource is None:
-	    rlist = self.getResources(thing)
+	    rlist = self.resources(thing)
 	    for res in rlist:
 		self.delAttrs(key=str(res), value=thing)
 
-        if self.available(resource):
+        if resource and self.available(resource):
             attrname = self._driverName
             thing.delAttrs(key=attrname, value=str(resource))
 
