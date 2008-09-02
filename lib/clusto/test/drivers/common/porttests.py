@@ -94,6 +94,9 @@ class PortTests(testbase.ClustoTestBase):
 	# try to connect ports that are already connected but in the reverse order
 	self.assertRaises(ConnectionException, t2.connectPorts, 'a', 4, t1, 1)
 
+	# try to connect to a device that doesn't have ports
+	self.assertRaises(ConnectionException, t1.connectPorts, 'a', 2, p, 1)
+
     def testDisconnectPort(self):
 
  	t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
@@ -162,3 +165,4 @@ class PortTests(testbase.ClustoTestBase):
 
 	self.assertEqual(sorted(['a', 'z']),
 			 sorted(t2.portTypes))
+

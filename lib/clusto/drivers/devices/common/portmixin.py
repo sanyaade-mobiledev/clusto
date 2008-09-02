@@ -34,6 +34,9 @@ class PortMixin:
 
 
 	for dev, num in [(self, srcportnum), (dstdev, dstportnum)]:
+	    if not hasattr(dev, 'portExists'):
+		msg = "%s has no ports."
+		raise ConnectionException(msg % (dev.name))
 	    if not dev.portExists(porttype, num):
 		msg = "port %s:%d doesn't exist on %s"
 		raise ConnectionException(msg % (porttype, num, dev.name))
