@@ -10,7 +10,8 @@ class BasicNetworkSwitch(PortMixin, Device):
     _clustoType = 'networkswitch'
     _driverName = 'basicnetworkswitch'
 
-    _properties = { 'maxport': 48,
-                    'minport': 1 ,
-                    'porttype': 'eth'}
-    
+
+    _portsmeta = {'pwr' : {'numports':1},
+		  'eth' : {'numports':24}}
+
+

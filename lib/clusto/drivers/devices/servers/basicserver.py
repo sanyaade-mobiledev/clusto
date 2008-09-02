@@ -1,7 +1,7 @@
 from clusto.drivers.base import Device
 from clusto.drivers.devices import PortMixin
 
-class BasicServer(Device, PortMixin):
+class BasicServer(PortMixin, Device):
     """
     server
     """
@@ -11,6 +11,9 @@ class BasicServer(Device, PortMixin):
 
     _properties = {'model':None,
                    'manufacturer':None}
+
+    _portmeta = {'pwr': {'numports':1},
+		 'eth': {'numports':2}}
 
     def addHD(self, size):
         """

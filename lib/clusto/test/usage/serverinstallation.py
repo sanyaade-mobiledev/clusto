@@ -49,7 +49,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         s = clusto.getByName('s1')
         sw = clusto.getByName('sw1')
 
-        #sw.connectDevice(s, 'nic0_connection', 10)
+        sw.connectPorts('eth', 0, s, 0)
         
         
 	#s.connectPorts(srcporttype='eth',
