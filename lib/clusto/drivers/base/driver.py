@@ -72,6 +72,12 @@ class Driver(object):
         else:
             return False
 
+    def __repr__(self):
+
+	s = "%s(name=%s)"
+
+	return s % (self.__class__.__name__, self.name)
+
     def __cmp__(self, other):
 
         return cmp(self.name, other.name)
