@@ -233,7 +233,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 	d = clusto.getByName('d1')
 
 	self.assertEqual(d.attrItems(ignoreHidden=False),
-			 [(('_contains', None, None), d2)])
+			 [(('_contains', 0, None), d2)])
 
     def testRemove(self):
 	
