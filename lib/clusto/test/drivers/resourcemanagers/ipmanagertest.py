@@ -21,6 +21,3 @@ class IPManagerTest(testbase.ClustoTestBase):
 	ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
 
 	self.assertRaises(ResourceTypeException, ip1.allocate, s1, '10.2.3.4')
-
-
-
