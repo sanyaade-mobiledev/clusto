@@ -334,15 +334,26 @@ class Driver(object):
 
         
         """
-	#query = SESSION.query(Attribute)
-	#query = query.filter_by(entity_id=self.entity.entity_id)
 
-        #return self._attrQuery(query, *args, **kwargs)
+	if 'mergeContainerAttrs' in kwargs:
+	    mergeContainerAttrs = kwargs.pop('mergeContainerAttrs')
+	else:
+	    mergeContainerAttrs = False
 
-        return self._attrFilter(self.entity._attrs, *args, **kwargs)
+	attrs = self._attrFilter(self.entity._attrs, *args, **kwargs) 
+
+	if mergeContainerAttrs:
+	    kwargs['mergeContainerAttrs'] = mergeContainerAttrs
+	    for parent in self.parents():
+		attrs.extend(parent.attrs(*args,  **kwargs))
+
+        return attrs
 
     def references(self, *args, **kwargs):
-
+	"""
+	Return the references to this Thing.  Accepts the same arguments as attrs()
+	except for meregeContainerAttrs.
+	"""
 	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
 
 	
