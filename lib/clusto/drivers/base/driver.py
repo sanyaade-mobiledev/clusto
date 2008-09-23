@@ -451,8 +451,8 @@ class Driver(object):
                             "Tried to insert %s." % str(type(thing)))
 
 
-	parent = d.references(key="_contains", ignoreHidden=False)
-	
+	parent = thing.parents()
+
 	if parent:
 	    raise TypeError("%s is already in %s and cannot be inserted into %s."
 			    % (d.name, parent[0].entity.name, self.name))
@@ -492,9 +492,18 @@ class Driver(object):
 	[B, C]
 	
 	"""
+	
 	return [attr.value for attr in self.attrs("_contains", ignoreHidden=False)]
 
+    def parents(self):	
+	"""Return a list of Things that contain _this_ Thing. """
 
+	parents = [Driver(a.entity) for a in sorted(self.references('_contains', 
+								    ignoreHidden=False,),
+						    lambda x,y: cmp(x.attr_id, 
+								    y.attr_id),) ]
+	return parents
+		       
     @classmethod
     def getByAttr(self, *args, **kwargs):
         """
