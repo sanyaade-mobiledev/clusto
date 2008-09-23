@@ -122,7 +122,7 @@ class Driver(object):
         if not isinstance(key, basestring):
             raise TypeError("An attribute name must be a string.")
 
-        if not re.match('^[A-Za-z_]+[0-9A-Za-z_]*$', key):
+        if not re.match('^[A-Za-z_]+[0-9A-Za-z_-]*$', key):
 
             raise NameException("Attribute name %s is invalid. "
                                 "Attribute names may not contain periods or "
