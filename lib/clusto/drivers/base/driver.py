@@ -166,6 +166,63 @@ class Driver(object):
 
             return regex
 
+    def _attrQuery(self, key=None, value=None, numbered=None,
+		   subkey=None, ignoreHidden=True, 
+		   mergedPoolAttrs=False, overrideParent=True,
+		   sortByKeys=True, 
+		   glob=True, allattrs=False
+		   ):
+
+	
+	querydict = {}
+
+	query = SESSION.query(Attribute)
+
+	if not allattrs:
+	    query = query.filter_by(entity_id=self.entity_id)
+
+	if key is not None:
+	    if glob:
+		query = query.filter(Attribute.key_name.like(key.replace('*', '%')))
+	    else:
+		querydict['key_name'] = key
+
+	if subkey is not None:
+	    if glob:
+		query = query.filter(Attribute.key_name.like(subkey.replace('*', '%')))
+	    else:
+		querydict['subkey_name'] = subkey
+
+	if value is not None:
+	    typename = Attribute.getType(value)
+
+	    if typename == 'relation':
+		querydict['relation_id'] = value
+
+	if numbered is not None:
+	    if isinstance(numbered, bool):
+		if numbered == True:
+		    query.filter(key_number != None)
+		else:
+		    query.filter(key_number == None)
+	    elif isinstance(numbered, int):
+		querydict['key_number'] = numbered
+		
+
+	    else:
+		raise TypeError("num must be either a boolean or an integer.")
+
+	if ignoreHidden:
+	    query.filter(not_(Attribute.key_name.like('_%')))
+
+	for k, v in querydict.iteritems():
+	    if v == '':
+		querydict[k] = None
+
+	query = query.filter_by(*querydict)
+
+	return query.all()
+		   
     def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
                     subkey=None, ignoreHidden=True, strict=False,
                     mergedPoolAttrs=False, overrideParent=True,
