@@ -275,6 +275,12 @@ class Entity(object):
         return cmp(self.name, other.name)
 
 
+    def __repr__(self):
+	s = "%s(name=%s, driver=%s, clustotype=%s)"
+
+	return s % (self.__class__.__name__, 
+		    self.name, self.driver, self.type)
+
     def __str__(self):
         """
         return string representing this entity
