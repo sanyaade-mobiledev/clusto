@@ -487,8 +487,7 @@ class Driver(object):
         return False
     
     def insert(self, thing):
-        """
-        Insert the given Enity or Driver into this Entity.  Such that:
+        """Insert the given Enity or Driver into this Entity.  Such that:
 
 	>>> A.insert(B)
 	>>> (B in A) 
@@ -496,13 +495,10 @@ class Driver(object):
 
 
         """
-        if isinstance(thing, Entity):
-            d = Driver(Entity)
-        elif isinstance(thing, Driver):
-            d = thing
-        else:
-            raise TypeError("Can only insert an Entity or a Driver. "
-                            "Tried to insert %s." % str(type(thing)))
+	
+	d = self.ensureDriver(thing, 
+			      "Can only insert an Entity or a Driver. "
+			      "Tried to insert %s." % str(type(thing)))
 
 
 	parent = thing.parents()
@@ -514,8 +510,7 @@ class Driver(object):
         self.addAttr("_contains", d, numbered=True)
         
     def remove(self, thing):
-	"""
-	Remove the given Entity or Driver from this Entity. Such that:
+	"""Remove the given Entity or Driver from this Entity. Such that:
 	
 	>>> A.insert(B)
 	>>> B in A
