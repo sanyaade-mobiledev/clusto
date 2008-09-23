@@ -41,8 +41,7 @@ class Driver(object):
                             "Driver, or Entity.")
 
 	if isinstance(nameDriverEntity, Driver):
-	    raise TypeError("Trying to create a Driver with a Driver argument. "
-			    "Not sure how you got into the __init__ function.")
+	    return 
 
         if isinstance(nameDriverEntity, Entity):
             
@@ -85,14 +84,17 @@ class Driver(object):
 
     def __repr__(self):
 
-	s = "%s(name=%s)"
+	s = "%s(name=%s, type=%s, driver=%s)"
 
-	return s % (self.__class__.__name__, self.name)
+	return s % (self.__class__.__name__, self.entity.name, 
+		    self.entity.type, self.entity.driver)
 
     def __cmp__(self, other):
 
         return cmp(self.name, other.name)
 
+    def __hash__(self):
+	return hash(self.entity.name)
 
     def __contains__(self, other):
         return self.hasAttr(key="_contains", value=other)
@@ -152,9 +154,7 @@ class Driver(object):
         For numbered attributes return the count that exist
         """
 	
-	#import pdb
-	#pdb.set_trace()
-        attrs = self.attrs(key=key, numbered=numbered)
+        attrs = self.attrs(key=key, numbered=numbered, ignoreHidden=False)
 
         return len(list(attrs))
 
@@ -239,7 +239,7 @@ class Driver(object):
     def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
 		   subkey=None, ignoreHidden=True, 
 		   sortByKeys=True, 
-		   regex=False, 		   
+		   regex=False, 
 		   ):
         """
         This function lets you sort through various kinds of attribute lists.
@@ -290,13 +290,17 @@ class Driver(object):
         if value:
             result = (attr for attr in result if attr.value == value)
 
-	
+
+	if key and key.startswith('_'):
+	    ignoreHidden = False
+
 	if ignoreHidden:
 	    result = (attr for attr in result if not attr.key.startswith('_'))
 
 	if sortByKeys:
 	    result = sorted(result)
 
+	
         return list(result)
 
     def _itemizeAttrs(self, attrlist):

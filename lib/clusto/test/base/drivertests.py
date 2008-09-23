@@ -272,10 +272,23 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 	
 	self.assertRaises(TypeError, d3.insert, d2)
 
+    def testNumberedInserts(self):
+
+	d1 = Driver('d1')
+
+	d1.insert(Driver('d2'))
+	d1.insert(Driver('d3'))
+	d1.insert(Driver('d4'))
+	d1.insert(Driver('d5'))
+	d1.insert(Driver('d6'))
+
+	
+	self.assertEqual(range(5),
+			 [x.number for x in d1.attrs(ignoreHidden=False)])
 	
 
 
-class TestDriverCreation(testbase.ClustoTestBase):
+class TestDriver(testbase.ClustoTestBase):
     
     def testCreatingDriverWithUsedName(self):
 	
@@ -285,3 +298,11 @@ class TestDriverCreation(testbase.ClustoTestBase):
 
 	d1.attrs()
 
+    def testDriverSets(self):
+	
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+
+	s = set([d1,d1,d2])
+
+	self.assertEquals(len(s), 2)
