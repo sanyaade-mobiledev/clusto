@@ -18,26 +18,25 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         s1 = BasicServer('s1')
 
-        r1.addDevice(s1, 1)
+        r1.insert(s1, 1)
 
 
         rt = clusto.getByName('r1')
         st = clusto.getByName('s1')
 
-        a = list(st.references(key='RU', numbered=True,
-                               clustotype=BasicRack._clustoType))
+        self.assertEqual(len(r1.contents(subkey='ru')), 1)
 
-        self.assertEqual(len(a), 1)
-
-        self.assertEqual(a[0].entity.name, 'r1')
+        self.assertEqual(r1.contents(subkey='ru')[0].name, 's1')
+	
+	self.assertEqual(s1.parents(instanceOf=BasicRack)[0].name, 'r1')
 
     def testMaxRackPosition(self):
 
         r1 = clusto.getByName('r1')
 
-        self.assertRaises(TypeError, r1.addDevice, BasicServer('s1'), 400)
+        self.assertRaises(TypeError, r1.insert, BasicServer('s1'), 400)
 
-        self.assertRaises(TypeError, r1.addDevice, BasicServer('s2'), -13)
+        self.assertRaises(TypeError, r1.insert, BasicServer('s2'), -13)
 
         clusto.flush()
 
@@ -45,7 +44,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         r1 = clusto.getByName('r1')
 
-        r1.addDevice(BasicServer('s1'), 40)
+        r1.insert(BasicServer('s1'), 40)
 
         clusto.flush()
 
@@ -60,7 +59,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         s=BasicServer('s1')
         clusto.flush()
-        r1.addDevice(s, 13)
+        r1.insert(s, 13)
 
         clusto.flush()
 
@@ -86,8 +85,8 @@ class BasicRackTest(testbase.ClustoTestBase):
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
         
-        r1.addDevice(s1, 13)
-        self.assertRaises(Exception, r2.addDevice,s1, 1)
+        r1.insert(s1, 13)
+        self.assertRaises(Exception, r2.insert,s1, 1)
         
     def testCanAddADeviceToMultipleAdjacentUs(self):
         """
@@ -99,7 +98,7 @@ class BasicRackTest(testbase.ClustoTestBase):
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
         
-        r1.addDevice(s1, [1,2,3])
+        r1.insert(s1, [1,2,3])
 
         clusto.flush()
 
@@ -108,7 +107,7 @@ class BasicRackTest(testbase.ClustoTestBase):
         self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
                          [1,2,3])
 
-        self.assertRaises(TypeError, r1.addDevice, s2, [1,2,4])
+        self.assertRaises(TypeError, r1.insert, s2, [1,2,4])
 
     def testAddingToDoubleDigitLocationThenSingleDigitLocation(self):
 
@@ -117,9 +116,9 @@ class BasicRackTest(testbase.ClustoTestBase):
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
         
-        r1.addDevice(s1, 11)
+        r1.insert(s1, 11)
 
-        r1.addDevice(s2, 1)
+        r1.insert(s2, 1)
 
         clusto.flush()
 
