@@ -288,6 +288,8 @@ class Driver(object):
 
         return list(result)
 
+    def _itemizeAttrs(self, attrlist):
+        return [(x.keytuple, x.value) for x in attrlist]
         
     def attrs(self, *args, **kwargs):
         """
@@ -352,7 +354,7 @@ class Driver(object):
 	return [x.keytuple for x in self.attrs(*args, **kwargs)]
 
     def attrItems(self, *args, **kwargs):
-        return [(x.keytuple, x.value) for x in self.attrs(*args, **kwargs)]
+        return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
     def addAttr(self, key, value, numbered=None, subkey=None):
         """
