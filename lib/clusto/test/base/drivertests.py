@@ -9,7 +9,7 @@ import datetime
 import clusto
 
 from clusto.drivers.base import *
-
+from clusto.exceptions import *
 
 class TestDriverAttributes(testbase.ClustoTestBase):
 
@@ -261,3 +261,27 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 	
 	self.assertEqual(d1.contents(), [d2])
 			 
+
+    def testMultipleInserts(self):
+
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+	d3 = Driver('d3')
+
+	d1.insert(d2)
+	
+	self.assertRaises(TypeError, d3.insert, d2)
+
+	
+
+
+class TestDriverCreation(testbase.ClustoTestBase):
+    
+    def testCreatingDriverWithUsedName(self):
+	
+	d1 = Driver('d1')
+
+	self.assertRaises(NameException, Driver, 'd1')
+
+	d1.attrs()
+

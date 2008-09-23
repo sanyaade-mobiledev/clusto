@@ -41,7 +41,8 @@ class Driver(object):
                             "Driver, or Entity.")
 
 	if isinstance(nameDriverEntity, Driver):
-	    return 
+	    raise TypeError("Trying to create a Driver with a Driver argument. "
+			    "Not sure how you got into the __init__ function.")
 
         if isinstance(nameDriverEntity, Entity):
             
@@ -49,7 +50,17 @@ class Driver(object):
             self._chooseBestDriver()
 
         elif isinstance(nameDriverEntity, (str, unicode)):
-            
+
+            try:
+		existing = clusto.getByName(nameDriverEntity)
+	    except LookupError, x:
+		existing = None
+	    
+	    if existing:
+		raise NameException("Driver with the name %s already exists."
+				    % (nameDriverEntity))
+
+
             self.entity = Entity(nameDriverEntity)
             self.entity.driver = self._driverName
             self.entity.type = self._clustoType
@@ -473,7 +484,14 @@ class Driver(object):
             raise TypeError("Can only insert an Entity or a Driver. "
                             "Tried to insert %s." % str(type(thing)))
 
-        self.addAttr("_contains", d)
+
+	parent = d.references(key="_contains", ignoreHidden=False)
+	
+	if parent:
+	    raise TypeError("%s is already in %s and cannot be inserted into %s."
+			    % (d.name, parent[0].entity.name, self.name))
+
+        self.addAttr("_contains", d, numbered=True)
         
     def remove(self, thing):
 	"""
