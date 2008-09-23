@@ -218,3 +218,46 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(result, [d2])
         
         
+
+class TestDriverContainerFunctions(testbase.ClustoTestBase):
+    
+    def testInsert(self):
+
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+
+	d1.insert(d2)
+	
+	clusto.flush()
+
+	d = clusto.getByName('d1')
+
+	self.assertEqual(d.attrItems(ignoreHidden=False),
+			 [(('_contains', None, None), d2)])
+
+    def testRemove(self):
+	
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+
+	d1.insert(d2)
+	
+	clusto.flush()
+
+	d = clusto.getByName('d1')
+	d.remove(d2)
+
+	clusto.flush()
+
+	self.assertEqual(d.attrItems(ignoreHidden=False),
+			 [])
+
+    def testcontains(self):
+	
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+
+	d1.insert(d2)
+	
+	self.assertEqual(d1.contents(), [d2])
+			 
