@@ -184,6 +184,27 @@ class Driver(object):
                 regex.append("$")
 
             return regex
+    
+    @classmethod
+    def ensureDriver(self, obj, msg=None):
+	"""Ensure that the given argument is a Driver.
+
+	If the object is an Entity it will be turned into a Driver and then
+	returned.  If it's a Driver it will be returned unaffected.  Otherwise
+	a TypeError is raised with either a generic or given message.
+	"""
+	
+	if isinstance(obj, Entity):
+	    d = Driver(Entity)
+        elif isinstance(obj, Driver):
+            d = obj
+        else:
+	    if not msg:
+		msg = "Not a Driver."
+            raise TypeError(msg)
+
+	return d
+	
 
     @classmethod
     def attrQuery(self, querybase, key=None, value=None, numbered=None,
