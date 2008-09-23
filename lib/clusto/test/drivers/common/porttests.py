@@ -103,7 +103,6 @@ class PortTests(testbase.ClustoTestBase):
 
 	t1.connectPorts('a', 1, t2, 3)
 
-	
 	self.assertEqual(t2, t1.getConnected('a', 1))
 	
 	t2.disconnectPort('a', 3)

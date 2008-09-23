@@ -125,6 +125,7 @@ class PortMixin:
 		     subkey=key,
 		     value=value)
 
+
     def delPortAttr(self, key, porttype, portnum):
 	"""delete an attribute on the given port"""
 
