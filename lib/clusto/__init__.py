@@ -89,11 +89,14 @@ def getByName(name):
 def rename(oldname, newname):
     """
     Rename an Entity from oldname to newname.
+
+    THIS CAN CAUSE PROBLEMS IF NOT USED CAREFULLY AND IN ISOLATION FROM OTHER
+    ACTIONS.
     """
 
     old = getByName(oldname)
 
-    old.name = newname
+    old.entity.name = newname
 
     flush()
 
