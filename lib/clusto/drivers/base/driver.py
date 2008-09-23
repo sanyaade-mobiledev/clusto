@@ -529,3 +529,8 @@ class Driver(object):
 
         return objs
             
+
+    
+    @property
+    def name(self):
+	return self.entity.name
