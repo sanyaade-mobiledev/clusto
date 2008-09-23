@@ -360,21 +360,21 @@ class Driver(object):
 # 	query = SESSION.query(Attribute)
 # 	query = query.filter_by(relation_id=self.entity.entity_id)
 
-	clustotype = None
- 	clustodriver = None
+	clustoType = None
+ 	clustoDriver = None
 	instanceOf = None
 	if 'clustoType' in kwargs:
-	    clustotype = kwargs.pop('clustotype')
+	    clustoType = kwargs.pop('clustoType')
 
 	if 'clustoDriver' in kwargs:
-	    clustodriver = kwargs.pop('clustodriver')
+	    clustoDriver = kwargs.pop('clustoDriver')
 
 	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
 
-	if clustodriver:
-	    attrs = (attr for attr in attrs if attr.entity.driver == clustodriver)
-	if clustotype:
-	    attrs = (attr for attr in attrs if attr.entity.type == clustotype)
+	if clustoDriver:
+	    attrs = (attr for attr in attrs if attr.entity.driver == clustoDriver)
+	if clustoType:
+	    attrs = (attr for attr in attrs if attr.entity.type == clustoType)
 
 	    
 
