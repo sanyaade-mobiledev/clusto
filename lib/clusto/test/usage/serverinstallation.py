@@ -22,9 +22,9 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         
         p1 = BasicPowerStrip('p1')
 
-        r1.addDevice(p1, (10,11))
-        r1.addDevice(sw1, 12)
-        r1.addDevice(s1, 1)
+        r1.insert(p1, (10,11))
+        r1.insert(sw1, 12)
+        r1.insert(s1, 1)
 
     def testServerRackLocation(self):
 
