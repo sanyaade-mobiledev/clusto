@@ -39,12 +39,12 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
                    Column('entity_id', Integer,
                           ForeignKey('entities.entity_id'), nullable=False),
-                   Column('key_name', String(1024, convert_unicode=True,
+                   Column('key', String(1024, convert_unicode=True,
                            assert_unicode=None),),
-                   Column('subkey_name', String(1024, convert_unicode=True,
+                   Column('subkey', String(1024, convert_unicode=True,
                            assert_unicode=None), nullable=True,
                           default=None, ),
-                   Column('key_number', Integer, nullable=True,
+                   Column('number', Integer, nullable=True,
                           default=None),
                    Column('datatype', String(32), default='string', nullable=False),
 
@@ -76,7 +76,7 @@ class Attribute(object):
     """
     Attribute class holds key/value pair backed by DB
     """
-    def __init__(self, key, value):
+    def __init__(self, key, value, subkey=None, number=None):
 
         sess = create_session()
 
@@ -84,13 +84,26 @@ class Attribute(object):
         
         self.value = value
 
+	if subkey:
+	    self.subkey_name = subkey
+
+	if number:
+	    self.key_number = number
+
     def __cmp__(self, other):
         return cmp(self.key, other.key)
     
     def __eq__(self, other):
 
         return ((self.key == other.key) and (self.value == other.value))
-    
+
+    def __repr__(self):
+	
+	s = "%s(key=%s, value=%s, subkey=%s, number=%s)"
+
+	return s % (self.__class__.__name__, 
+		    self.key, self.value, self.subkey, self.number)
+
     def __str__(self):
 
         if self.datatype == 'relation':
@@ -99,7 +112,7 @@ class Attribute(object):
             value = self.value
 
         entityname = (self.entity and self.entity.name) or None
-        return "%s.%s.%s %s" % (entityname, self.key,
+        return "%s|%s|%s %s" % (entityname, self.fullkey,
                                 self.datatype, value)
 
     def _get_key(self):
@@ -141,16 +154,6 @@ class Attribute(object):
 
         return splitkey
     
-    def _set_key(self, val):
-        splitkey = self.splitKeyName(val)
-
-        for key,value in splitkey.items():
-            setattr(self, key, value)
-
-    key = property(_get_key, _set_key)
-
-
-
     def getValueType(self, value=None):
         if value == None:
             if self.datatype == None:
@@ -161,6 +164,22 @@ class Attribute(object):
             valtype = self.getType(value)
         
         return valtype + "_value"
+
+    @property
+    def keytuple(self):
+	return (self.key, self.number, self.subkey)
+
+    @property
+    def fullkey(self):
+	s = [self.key]
+	
+	for i in (self.number, self.subkey):
+	    s.append(';')
+	    if i is not None:
+		s.append(str(i))
+
+	
+	return ''.join(s)
 
     @classmethod
     def getType(self, value):

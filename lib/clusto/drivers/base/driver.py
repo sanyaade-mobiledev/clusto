@@ -103,7 +103,7 @@ class Driver(object):
         if not isinstance(key, basestring):
             raise TypeError("An attribute name must be a string.")
 
-        if not re.match('^[A-Za-z_]+[0-9A-Za-z_]*(-[A-Za-z]+[0-9A-Za-z_-]*)?$', key):
+        if not re.match('^[A-Za-z_]+[0-9A-Za-z_]*$', key):
 
             raise NameException("Attribute name %s is invalid. "
                                 "Attribute names may not contain periods or "
@@ -134,8 +134,10 @@ class Driver(object):
         """
         For numbered attributes return the count that exist
         """
+	
+	#import pdb
+	#pdb.set_trace()
         attrs = self.attrs(key=key, numbered=numbered)
-
 
         return len(list(attrs))
 
@@ -166,12 +168,9 @@ class Driver(object):
 
             return regex
 
-    def _attrQuery(self, querybase, key=None, value=None, numbered=None,
-		   subkey=None, ignoreHidden=True, 
-		   sortByKeys=True, 
-		   glob=True, 
-		   
-		   ):
+    @classmethod
+    def attrQuery(self, querybase, key=None, value=None, numbered=None,
+		  subkey=None, ignoreHidden=True, sortByKeys=True, glob=True, ):
 
 	
 	querydict = {}
@@ -181,53 +180,49 @@ class Driver(object):
 
 	if key is not None:
 	    if glob:
-		query = query.filter(Attribute.key_name.like(key.replace('*', '%')))
+		query = query.filter(Attribute.key.like(key.replace('*', '%')))
 	    else:
-		querydict['key_name'] = key
+		query = query.filter_by(key=key)
 
-	if subkey is not None:
-	    if glob:
-		query = query.filter(Attribute.key_name.like(subkey.replace('*', '%')))
-	    else:
-		querydict['subkey_name'] = subkey
+ 	if subkey is not None:
+ 	    if glob:
+ 		query = query.filter(Attribute.key.like(subkey.replace('*', '%')))
+ 	    else:
+ 		query = query.filter_by(subkey=subkey)
 
-	if value is not None:
-	    typename = Attribute.getType(value)
+ 	if value is not None:
+ 	    typename = Attribute.getType(value)
 
-	    if typename == 'relation':
-		querydict['relation_id'] = value
-
-	if numbered is not None:
-	    if isinstance(numbered, bool):
-		if numbered == True:
-		    query.filter(Attribute.key_number != None)
-		else:
-		    query.filter(Attribute.key_number == None)
-	    elif isinstance(numbered, int):
-		querydict['key_number'] = numbered
-		
+ 	    if typename == 'relation':
+ 		query = query.filter_by(relation_id=value)
 
 	    else:
-		raise TypeError("num must be either a boolean or an integer.")
+		query = query.filter_by(**{typename+'_value':value})
 
-	if ignoreHidden:
-	    query.filter(not_(Attribute.key_name.like('_%')))
+ 	if numbered is not None:
+ 	    if isinstance(numbered, bool):
+ 		if numbered == True:
+ 		    query.filter(Attribute.number != None)
+ 		else:
+ 		    query.filter(Attribute.number == None)
+ 	    elif isinstance(numbered, int):
+		query.filter_by(number=numbered)
+ 		
+ 	    else:
+ 		raise TypeError("num must be either a boolean or an integer.")
 
-	for k, v in querydict.iteritems():
-	    if v == '':
-		querydict[k] = None
+ 	if ignoreHidden:
+ 	    query.filter(not_(Attribute.key.like('_%')))
 
-	query = query.filter_by(*querydict)
-
-	#if sortByKeys:
-	#    query = query.order_by(Attribute.key_name)
+	if sortByKeys:
+	    query = query.order_by(Attribute.key)
 
 	return query.all()
-		   
+
     def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
 		   subkey=None, ignoreHidden=True, 
 		   sortByKeys=True, 
-		   glob=True, 		   
+		   regex=False, 		   
 		   ):
         """
         This function lets you sort through various kinds of attribute lists.
@@ -236,44 +231,54 @@ class Driver(object):
 
 	result = attrlist
 
-
-	for filterarg, attrname in [(key, 'key_name'), 
+	for filterarg, attrname in [(key, 'key'),
+				    (subkey, 'subkey'),
 				    (value, 'value'), 
-				    (subkey, 'subkey_name')]:
+
+				    ]:
+
 	    if filterarg is not None:
-		if glob:
-		    regex = re.compile(filterarg.replace('*', '.*'))
+		if regex:
+		    testregex = re.compile(regex)
 		
-		    result = (attr for attr in result if regex.match(getattr(attr, attrname)))
+		    result = [attr for attr in result 
+			      if testregex.match(getattr(attr, attrname))]
 		else:
-		    result = (attr for attr in result if getattr(attr, attrname) == key)
+
+		    result = [attr for attr in result 
+			      if getattr(attr, attrname) == filterarg]
+
+
+		    #result = list(result)
+		    #print result
+		    #print result, filterarg, attrname
+
+	    
 
 	
 	if numbered is not None:
 	    if isinstance(numbered, bool):
 		if numbered:
-		    result = (attr for attr in result if attr.key_number is not None)
+		    result = (attr for attr in result if attr.number is not None)
 		else:
-		    result = (attr for attr in result if attr.key_number is None)
+		    result = (attr for attr in result if attr.number is None)
 
 	    elif isinstance(numbered, int):
-		result = (attr for attr in result if attr.key_number == numbered)
+		result = (attr for attr in result if attr.number == numbered)
 	    
 	    else:
 		raise TypeError("num must be either a boolean or an integer.")
 
 		    
-
-	
         if value:
             result = (attr for attr in result if attr.value == value)
 
 	
 	if ignoreHidden:
-	    result = (attr for attr in result if not attr.key_name.startswith('_'))
+	    result = (attr for attr in result if not attr.key.startswith('_'))
 
 	if sortByKeys:
-	    result = sorted(result, cmp=lambda x,y: cmp(x.key_name, y.key_name))
+	    result = sorted(result)
 
         return list(result)
 
@@ -334,10 +339,14 @@ class Driver(object):
                    
     def attrKeys(self, *args, **kwargs):
 
-        return (x.key for x in self.attrs(*args, **kwargs))
+        return [x.key for x in self.attrs(*args, **kwargs)]
+
+    def attrKeyTuples(self, *args, **kwargs):
+
+	return [x.keytuple for x in self.attrs(*args, **kwargs)]
 
     def attrItems(self, *args, **kwargs):
-        return ((x.key, x.value) for x in self.attrs(*args, **kwargs))
+        return [(x.keytuple, x.value) for x in self.attrs(*args, **kwargs)]
 
     def addAttr(self, key, value, numbered=None, subkey=None):
         """
@@ -349,12 +358,30 @@ class Driver(object):
          subkeys don't get numbered
         """
 
-        keyname = self._buildKeyName(key, numbered, subkey)
+	self._checkAttrName(key)
+	if subkey:
+	    self._checkAttrName(subkey)
+
+	num = None
+	if numbered == True:
+	    num = self._getAttrNumCount(key, numbered)
+	elif isinstance(numbered, int):
+	    num = numbered
+
 
         if isinstance(value, Driver):
-            self.entity._attrs.append(Attribute(keyname, value.entity))
+            attr = Attribute(key, value.entity)
         else:
-            self.entity._attrs.append(Attribute(keyname, value))
+            attr = Attribute(key, value)
+
+	if subkey:
+	    attr.subkey = subkey
+
+	if num is not None:
+	    attr.number = num
+
+
+	self.entity._attrs.append(attr)
 
     def delAttrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"
@@ -376,8 +403,6 @@ class Driver(object):
     def hasAttr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
-        if 'strict' not in kwargs:
-            kwargs['strict'] = True
         for i in self.attrs(*args, **kwargs):
             return True
 
@@ -409,7 +434,7 @@ class Driver(object):
                                                        numbered=True),
                                      cmp=lambda x,y: cmp(x.attr_id, y.attr_id),
                                      reverse=True)]
-            
+
             while pools:
                 pool = pools.pop(0)
                 yield pool
@@ -443,18 +468,18 @@ class Driver(object):
         
 
     @classmethod
-    def getByAttr(self, attrname, value):
+    def getByAttr(self, *args, **kwargs):
         """
         Return a list of Instances that have the given attribute with the given
         value.
         """
 
 
-        querydict = { Attribute.getType(value)+"_value": value}
-        querydict.update(Attribute.splitKeyName(attrname))
-                     
-        attrlist = SESSION.query(Attribute).filter_by(**querydict)
+	querybase = SESSION.query(Attribute)
 
+        #attrlist = SESSION.query(Attribute).filter_by(**querydict)
+
+	attrlist = self.attrQuery(querybase, *args, **kwargs)
 
         objs = [Driver(x.entity) for x in attrlist]
 
