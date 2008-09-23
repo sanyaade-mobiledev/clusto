@@ -399,6 +399,7 @@ class Driver(object):
             self.entity._attrs.remove(i)
             i.delete()
 
+
     def setAttr(self, key, value, numbered=None, subkey=None):
         """replaces all items in the list matching the given key with value
         """
@@ -458,9 +459,9 @@ class Driver(object):
         """
         Insert the given Enity or Driver into this Entity.  Such that:
 
-            A.insert(B)
-
-            (B in A) == True
+	>>> A.insert(B)
+	>>> (B in A) 
+	True
 
 
         """
@@ -474,6 +475,41 @@ class Driver(object):
 
         self.addAttr("_contains", d)
         
+    def remove(self, thing):
+	"""
+	Remove the given Entity or Driver from this Entity. Such that:
+	
+	>>> A.insert(B)
+	>>> B in A
+	True
+	>>> A.remove(B)
+	>>> B in A
+	False
+
+	"""
+        if isinstance(thing, Entity):
+            d = Driver(Entity)
+        elif isinstance(thing, Driver):
+            d = thing
+        else:
+            raise TypeError("Can only remove an Entity or a Driver. "
+                            "Tried to remove %s." % str(type(thing)))
+
+
+	self.delAttrs("_contains", d, ignoreHidden=False)
+
+    def contents(self):
+	"""
+	Return the contents of this Entity.  Such that:
+
+	>>> A.insert(B)
+	>>> A.insert(C)
+	>>> A.contents()
+	[B, C]
+	
+	"""
+	return [attr.value for attr in self.attrs("_contains", ignoreHidden=False)]
+
 
     @classmethod
     def getByAttr(self, *args, **kwargs):
