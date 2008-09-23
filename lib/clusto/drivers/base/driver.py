@@ -350,36 +350,58 @@ class Driver(object):
         return attrs
 
     def references(self, *args, **kwargs):
-	"""
-	Return the references to this Thing.  Accepts the same arguments as attrs()
-	except for meregeContainerAttrs.
-	"""
-	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
+	"""Return the references to this Thing. The references are attributes. 
 
-	
+	Accepts the same arguments as attrs() except for meregeContainerAttrs.
+	Also adds clustotype and clustodriver filter parameters.
+	"""
+
 
 # 	query = SESSION.query(Attribute)
 # 	query = query.filter_by(relation_id=self.entity.entity_id)
 
 	clustotype = None
  	clustodriver = None
+	instanceOf = None
+	if 'clustoType' in kwargs:
+	    clustotype = kwargs.pop('clustotype')
 
-	if 'clustotype' in kwargs:
-	    clustotype = kwargs['clustotype']
-	    kwargs.pop('clustotype')
+	if 'clustoDriver' in kwargs:
+	    clustodriver = kwargs.pop('clustodriver')
 
-	if 'clustodriver' in kwargs:
-	    clustodriver = kwargs['clustodriver']
-	    kwargs.pop('clustodriver')
- 	if clustotype or clustodriver:
- 	    
- 	    if clustodriver:
- 		attrs = (attr for attr in attrs if attr.entity.driver == clustodriver)
- 	    if clustotype:
- 		attrs = (attr for attr in attrs if attr.entity.type == clustotype)
+	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
 
+	if clustodriver:
+	    attrs = (attr for attr in attrs if attr.entity.driver == clustodriver)
+	if clustotype:
+	    attrs = (attr for attr in attrs if attr.entity.type == clustotype)
+
+	    
 
 	return list(attrs)
+
+    def referencers(self, *args, **kwargs):
+	"""Return the Things that reference _this_ Thing.
+	
+	Accepts the same arguments as references() but adds an instanceOf filter
+	argument.
+	"""
+	
+	instanceOf = None
+	if 'instanceOf' in kwargs:
+	    instanceOf = kwargs.pop('instanceOf')
+	    
+	refs = [Driver(a.entity) for a in sorted(self.references(*args, **kwargs),
+						 lambda x,y: cmp(x.attr_id,
+								 y.attr_id))]
+
+	if instanceOf:
+	    refs = [x for x in refs if isinstance(x, instanceOf)]
+
+	return refs
+
+	
+
 
 # 	if clustotype or clustodriver:
 # 	    query = query.filter(Entity.entity_id == Attribute.entity_id)
@@ -527,13 +549,11 @@ class Driver(object):
 	
 	return [attr.value for attr in self.attrs("_contains", ignoreHidden=False)]
 
-    def parents(self):	
+    def parents(self, instanceOf=None):	
 	"""Return a list of Things that contain _this_ Thing. """
 
-	parents = [Driver(a.entity) for a in sorted(self.references('_contains', 
-								    ignoreHidden=False,),
-						    lambda x,y: cmp(x.attr_id, 
-								    y.attr_id),) ]
+	parents = self.referencers('_contains', instanceOf=instanceOf)
+
 	return parents
 		       
     @classmethod
