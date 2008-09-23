@@ -440,7 +440,7 @@ class Driver(object):
 	    self._checkAttrName(subkey)
 
 	num = None
-	if numbered == True:
+	if isinstance(numbered, bool) and numbered == True:
 	    num = self._getAttrNumCount(key, numbered)
 	elif isinstance(numbered, int):
 	    num = numbered
