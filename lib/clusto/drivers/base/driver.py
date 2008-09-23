@@ -428,44 +428,6 @@ class Driver(object):
 
         return False
     
-    def iterPools(self, allPools=True):
-        """
-        Return an iterator that iterates over the pools that a given entity is
-        a member of.
-
-        The first pool returned is the most recently added pool in a
-        breadthfirst manner.
-
-        So, say I have an entity that was added to pools A, B, C in that order
-        and pool A is in pools (A1, B2), pool B is in (B1, A1), pool C is in
-        (C1).  Then the returned values will be:
-
-            C, B, A, C1, A1, B1, B2, A1
-
-        In this way the attributes of more recent pools can override the
-        attributes of older pools.
-        """
-
-        def poolGenerator(entity):
-
-
-            pools = [Driver(x.entity)
-                     for x in sorted(entity.references('_member',
-                                                       numbered=True),
-                                     cmp=lambda x,y: cmp(x.attr_id, y.attr_id),
-                                     reverse=True)]
-
-            while pools:
-                pool = pools.pop(0)
-                yield pool
-
-                if allPools:
-                    pools.extend(list(poolGenerator(pool)))
-                            
-
-        return poolGenerator(self)
-
-
     def insert(self, thing):
         """
         Insert the given Enity or Driver into this Entity.  Such that:

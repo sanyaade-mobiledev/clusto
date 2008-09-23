@@ -13,53 +13,21 @@ class Pool(Driver):
     _driverName = "pool"
     _clustoType = "pool"
     
-    def __contains__(self, other):
-        return super(Pool, self).__contains__(other) or self.hasMember(other)
-
-    def hasMember(self, other):
-        self.hasAttr('_member', other, numbered=True)
-        
-    def addToPool(self, entity):
-        """
-        Add a given Entity to this pool.
-
-        @param entity: the entity to be added
-        @type entity: L{Entity} or L{Driver}
-        """
-
-
-        self.addAttr('_member', entity, numbered=True)
-        #entity.addAttr('_inPool', self, numbered=True)
-
-
-    def removeFromPool(self, entity):
-        """
-        remove a given Entity from the pool.
-
-        @param entity: the entity to be removed
-        @type entity: L{Entity} or L{Driver}
-        """
-
-        self.delAttr('_member', entity, numbered=True)
-        #entity.delAttr('_inPool', self)
-        
-    @property
-    def members(self):
-        """
-        Return a list of members in th pool
-        """
-
-        return [x.value for x in self.attrs(key='_member',
-                                            numbered=True,
-                                            ignoreHidden=False)]
-
-
-    def isParent(self, entity):
+    def isParent(self, thing):
         """
         Is this pool the parent of the given entity
         """
+	
+	if isinstance(thing, Entity):
+	    d = Driver(Entity)
+        elif isinstance(thing, Driver):
+            d = thing
+        else:
+            raise TypeError("Can only remove an Entity or a Driver. "
+                            "Tried to remove %s." % str(type(thing)))
 
-        pass
+	
+	return self in d.contents()
 
     @classmethod
     def getPools(cls, obj, allPools=False):
