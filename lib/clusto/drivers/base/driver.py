@@ -166,20 +166,18 @@ class Driver(object):
 
             return regex
 
-    def _attrQuery(self, key=None, value=None, numbered=None,
+    def _attrQuery(self, querybase, key=None, value=None, numbered=None,
 		   subkey=None, ignoreHidden=True, 
-		   mergedPoolAttrs=False, overrideParent=True,
 		   sortByKeys=True, 
-		   glob=True, allattrs=False
+		   glob=True, 
+		   
 		   ):
 
 	
 	querydict = {}
 
-	query = SESSION.query(Attribute)
+	query = querybase 
 
-	if not allattrs:
-	    query = query.filter_by(entity_id=self.entity_id)
 
 	if key is not None:
 	    if glob:
@@ -202,9 +200,9 @@ class Driver(object):
 	if numbered is not None:
 	    if isinstance(numbered, bool):
 		if numbered == True:
-		    query.filter(key_number != None)
+		    query.filter(Attribute.key_number != None)
 		else:
-		    query.filter(key_number == None)
+		    query.filter(Attribute.key_number == None)
 	    elif isinstance(numbered, int):
 		querydict['key_number'] = numbered
 		
@@ -221,65 +219,63 @@ class Driver(object):
 
 	query = query.filter_by(*querydict)
 
+	#if sortByKeys:
+	#    query = query.order_by(Attribute.key_name)
+
 	return query.all()
 		   
     def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
-                    subkey=None, ignoreHidden=True, strict=False,
-                    mergedPoolAttrs=False, overrideParent=True,
-                    sortByKeys=True, parentType=None, parentDriver=None,
-                    regex=None
-                    ):
+		   subkey=None, ignoreHidden=True, 
+		   sortByKeys=True, 
+		   glob=True, 		   
+		   ):
         """
         This function lets you sort through various kinds of attribute lists.
         """
 
-        if not regex:
-            regex = self._buildKeyRegex(key=key, value=value,
-                                        numbered=numbered,
-                                        subkey=subkey,
-                                        ignoreHidden=ignoreHidden,
-                                        strict=strict)
-            
-        vals = (x for x in attrlist if re.match(''.join(regex), x.key))
+
+	result = attrlist
+
+
+	for filterarg, attrname in [(key, 'key_name'), 
+				    (value, 'value'), 
+				    (subkey, 'subkey_name')]:
+	    if filterarg is not None:
+		if glob:
+		    regex = re.compile(filterarg.replace('*', '.*'))
+		
+		    result = (attr for attr in result if regex.match(getattr(attr, attrname)))
+		else:
+		    result = (attr for attr in result if getattr(attr, attrname) == key)
+
+	
+	if numbered is not None:
+	    if isinstance(numbered, bool):
+		if numbered:
+		    result = (attr for attr in result if attr.key_number is not None)
+		else:
+		    result = (attr for attr in result if attr.key_number is None)
+
+	    elif isinstance(numbered, int):
+		result = (attr for attr in result if attr.key_number == numbered)
+	    
+	    else:
+		raise TypeError("num must be either a boolean or an integer.")
+
+		    
+
+	
         if value:
-            vals = (x for x in vals if x.value == value)
+            result = (attr for attr in result if attr.value == value)
 
-        if not mergedPoolAttrs:
-            allattrs = vals
-        else:
-            allattrs = itertools.chain(vals,
-                                       *(i.attrs(key=key,
-                                                 value=value,
-                                                 numbered=numbered,
-                                                 subkey=subkey,
-                                                 ignoreHidden=ignoreHidden,
-                                                 strict=strict,
-                                                 mergedPoolAttrs=mergedPoolAttrs)
-                                         for i in self.iterPools()))
+	
+	if ignoreHidden:
+	    result = (attr for attr in result if not attr.key_name.startswith('_'))
 
-            if overrideParent:
-                # FIXME
-                # I don't think this will really do what I want.
-                def doOverride(attrs):
-                    skipAttrs = set()
+	if sortByKeys:
+	    result = sorted(result, cmp=lambda x,y: cmp(x.key_name, y.key_name))
 
-                    for i in attrs:
-                        if i.key in skipAttrs:
-                            continue
-                        yield i
-                        skipAttrs.add(i.key)
-                        
-                allattrs = doOverride(allattrs)
-
-
-        if not allattrs:
-            return None
-
-        if sortByKeys:
-            return sorted(allattrs)
-
-
-        return list(allattrs)
+        return list(result)
 
         
     def attrs(self, *args, **kwargs):
@@ -289,22 +285,52 @@ class Driver(object):
 
         
         """
+	#query = SESSION.query(Attribute)
+	#query = query.filter_by(entity_id=self.entity.entity_id)
+
+        #return self._attrQuery(query, *args, **kwargs)
+
         return self._attrFilter(self.entity._attrs, *args, **kwargs)
 
     def references(self, *args, **kwargs):
 
-        clustotype = None
-        if 'clustotype' in kwargs:
-            clustotype = kwargs['clustotype']
-            kwargs.pop('clustotype')
-            
-        attrs = self._attrFilter(self.entity._references, *args, **kwargs)
+	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
 
-        if clustotype:
-            attrs = (x for x in attrs
-                     if x.entity.type == clustotype)
+	
 
-        return list(attrs)
+# 	query = SESSION.query(Attribute)
+# 	query = query.filter_by(relation_id=self.entity.entity_id)
+
+	clustotype = None
+ 	clustodriver = None
+
+	if 'clustotype' in kwargs:
+	    clustotype = kwargs['clustotype']
+	    kwargs.pop('clustotype')
+
+	if 'clustodriver' in kwargs:
+	    clustodriver = kwargs['clustodriver']
+	    kwargs.pop('clustodriver')
+ 	if clustotype or clustodriver:
+ 	    
+ 	    if clustodriver:
+ 		attrs = (attr for attr in attrs if attr.entity.driver == clustodriver)
+ 	    if clustotype:
+ 		attrs = (attr for attr in attrs if attr.entity.type == clustotype)
+
+
+	return list(attrs)
+
+# 	if clustotype or clustodriver:
+# 	    query = query.filter(Entity.entity_id == Attribute.entity_id)
+# 	    if clustodriver:
+# 		query = query.filter(Entity.driver == clustodriver)
+# 	    if clustotype:
+# 		query = query.filter(Entity.typ == clustotype)
+ 
+#         attrs = self._attrQuery(query, *args, **kwargs)
+
+#        return attrs
                    
     def attrKeys(self, *args, **kwargs):
 
