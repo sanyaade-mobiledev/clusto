@@ -531,9 +531,15 @@ class Driver(object):
 
 	self.delAttrs("_contains", d, ignoreHidden=False)
 
-    def contents(self):
+    def contentAttrs(self, *args, **kwargs):
+	"""Return the attributes referring to this Thing's contents
+
 	"""
-	Return the contents of this Entity.  Such that:
+
+	return self.attrs("_contains", *args, **kwargs)
+
+    def contents(self, *args, **kwargs):
+	"""Return the contents of this Entity.  Such that:
 
 	>>> A.insert(B)
 	>>> A.insert(C)
@@ -542,7 +548,7 @@ class Driver(object):
 	
 	"""
 	
-	return [attr.value for attr in self.attrs("_contains", ignoreHidden=False)]
+	return [attr.value for attr in self.contentAttrs(*args, **kwargs)]
 
     def parents(self, instanceOf=None):	
 	"""Return a list of Things that contain _this_ Thing. """
