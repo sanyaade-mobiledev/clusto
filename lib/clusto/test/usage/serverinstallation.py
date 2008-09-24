@@ -3,6 +3,7 @@ from clusto.test import testbase
 
 from clusto.drivers import BasicServer, BasicRack
 from clusto.drivers import BasicNetworkSwitch, BasicPowerStrip
+from clusto.exceptions import ConnectionException
 import clusto
 
 class ServerInstallationTest(testbase.ClustoTestBase):
@@ -44,16 +45,23 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         
         
 
-    def testNetworkSwitchConnection(self):
+    def testPortConnections(self):
 
         s = clusto.getByName('s1')
         sw = clusto.getByName('sw1')
+	p1 = clusto.getByName('p1')
 
         sw.connectPorts('eth', 0, s, 0)
         
         
-	#s.connectPorts(srcporttype='eth',
-	#	       srcportnum=0,
-	#	       dstdev=sw,
-	#	       dstporttype='eth',
-	#	       dstportnum=1)
+	self.assertRaises(ConnectionException,
+			  s.connectPorts, 'eth', 0, sw, 1)
+
+	p1.connectPorts(porttype='pwr',
+			srcportnum=0,
+			dstdev=s,
+			dstportnum=0)
+			
+	self.assertEqual(s.getConnected('pwr', 0),
+			 p1)
+
