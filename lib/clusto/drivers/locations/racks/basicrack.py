@@ -1,6 +1,6 @@
 
 import re
-from clusto.drivers.base import Location, Device
+from clusto.drivers.base import Location, Device, Driver
 
 class BasicRack(Location):
     """
@@ -105,9 +105,9 @@ class BasicRack(Location):
 
         if rack:
 	    rack = rack.pop()
-            return {'rack':rack.entity,  'RU':[x.number
-					       for x in rack.contentAttrs(value=device,
-									  subkey='ru')]}
+            return {'rack':Driver(rack.entity),  
+		    'RU':[x.number for x in rack.contentAttrs(value=device,
+							      subkey='ru')]}
         else:
             
             return None
