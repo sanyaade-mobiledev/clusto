@@ -56,8 +56,9 @@ class SimpleNameManager(ResourceManager):
         
     
     def createEntity(self, clustotype, *args, **kwargs):
-        """
-        Create an entity with a name generated from this NameResource
+        """Create an entity with a name generated from this NameResource 
+
+	Use the given clusto Driver and arguments to create the new Thing.
         """
 
         name = self.allocator()
