@@ -65,3 +65,29 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 	self.assertEqual(s.getConnected('pwr', 0),
 			 p1)
 
+
+    def testSettingUpServer(self):
+	
+	from clusto.drivers import SimpleNameManager
+
+	servernames = SimpleNameManager('servernames',
+					basename='server',
+					digits=4
+					)
+
+	newserver = servernames.createEntity(BasicServer)
+	
+
+        sw = clusto.getByName('sw1')
+	p1 = clusto.getByName('p1')
+        r = clusto.getByName('r1')
+
+	self.assertEqual('server0001', newserver.name)
+
+
+	r.insert(newserver, 1)
+	p1.connectPorts('pwr', 0, newserver, 0)
+	sw.connectPorts('eth', 0, newserver, 0)
+
+	self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
+
