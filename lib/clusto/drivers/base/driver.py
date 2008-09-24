@@ -207,13 +207,18 @@ class Driver(object):
 	
 
     @classmethod
-    def attrQuery(self, querybase, key=None, value=None, numbered=None,
-		  subkey=None, ignoreHidden=True, sortByKeys=True, glob=True, ):
+    def attrQuery(self, key=None, value=None, numbered=None,
+		  subkey=None, ignoreHidden=True, sortByKeys=True, 
+		  glob=True, count=False, querybase=None):
 
 	
-	querydict = {}
 
-	query = querybase 
+
+	if querybase:
+	    query = querybase 
+	else:
+	    query = SESSION.query(Attribute)
+
 
 
 	if key is not None:
@@ -224,7 +229,7 @@ class Driver(object):
 
  	if subkey is not None:
  	    if glob:
- 		query = query.filter(Attribute.key.like(subkey.replace('*', '%')))
+ 		query = query.filter(Attribute.subkey.like(subkey.replace('*', '%')))
  	    else:
  		query = query.filter_by(subkey=subkey)
 
@@ -240,11 +245,11 @@ class Driver(object):
  	if numbered is not None:
  	    if isinstance(numbered, bool):
  		if numbered == True:
- 		    query.filter(Attribute.number != None)
+ 		    query = query.filter(Attribute.number != None)
  		else:
- 		    query.filter(Attribute.number == None)
+ 		    query = query.filter(Attribute.number == None)
  	    elif isinstance(numbered, int):
-		query.filter_by(number=numbered)
+		query = query.filter_by(number=numbered)
  		
  	    else:
  		raise TypeError("num must be either a boolean or an integer.")
@@ -254,6 +259,9 @@ class Driver(object):
 
 	if sortByKeys:
 	    query = query.order_by(Attribute.key)
+
+	if count:
+	    return query.count()
 
 	return query.all()
 
@@ -564,12 +572,7 @@ class Driver(object):
         value.
         """
 
-
-	querybase = SESSION.query(Attribute)
-
-        #attrlist = SESSION.query(Attribute).filter_by(**querydict)
-
-	attrlist = self.attrQuery(querybase, *args, **kwargs)
+	attrlist = self.attrQuery(*args, **kwargs)
 
         objs = [Driver(x.entity) for x in attrlist]
 

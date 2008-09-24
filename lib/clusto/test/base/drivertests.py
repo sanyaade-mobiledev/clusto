@@ -217,6 +217,24 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         self.assertEqual(result, [d2])
         
+    def testAttrCount(self):
+        
+        d1 = Driver('d1')
+
+        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+
+        self.assertEqual(d1.attrQuery(key='foo', numbered=2, count=True), 1)
+        
+        self.assertEqual(d1.attrQuery(key='foo', numbered=0, count=True), 1)
+
+        self.assertEqual(d1.attrQuery(key='foo', numbered=False, count=True), 0)
+        self.assertEqual(d1.attrQuery(key='foo', count=True), 4)
+
+        self.assertEqual(d1.attrQuery(subkey='four', count=True), 1)
+
         
 
 class TestDriverContainerFunctions(testbase.ClustoTestBase):
