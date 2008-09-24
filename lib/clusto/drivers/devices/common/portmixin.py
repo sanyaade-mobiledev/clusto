@@ -5,7 +5,6 @@ PortMixin is a basic mixin to be used with devices that have ports
 import re
 
 import clusto
-from clusto.drivers.base import ResourceManagerMixin
 from clusto.exceptions import ConnectionException
 
 class PortMixin:
