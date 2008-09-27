@@ -91,9 +91,17 @@ class Attribute(object):
 	    self.key_number = number
 
     def __cmp__(self, other):
+
+	if not isinstance(other, Attribute):
+	    raise TypeError("Can only compare equality with an Attribute. "
+			    "Got a %s instead." % (type(other).__name__))
+
         return cmp(self.key, other.key)
     
     def __eq__(self, other):
+
+	if not isinstance(other, Attribute):
+	    return False
 
         return ((self.key == other.key) and (self.value == other.value))
 
@@ -271,6 +279,11 @@ class Entity(object):
         return retval
 
     def __cmp__(self, other):
+
+        if not hasattr(otherentity, 'name'):
+	    raise TypeError("Can only compare equality with an Entity-like "
+			    "object.  Got a %s instead." 
+			    % (type(other).__name__))
 
         return cmp(self.name, other.name)
 
