@@ -103,7 +103,7 @@ class SimpleNameResourceTests(testbase.ClustoTestBase):
         self.assertEqual(s2.name, 'foo0002')
         self.assertEqual(s3.name, 'foo0003')
         self.assertEqual(s4.name, 'foo0004')
-        
+
     def testNoLeadingZeros(self):
 
         ngen = clusto.getByName('barnamegen')
