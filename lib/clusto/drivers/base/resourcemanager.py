@@ -29,16 +29,16 @@ class ResourceManager(Driver):
 			     % self.name)
 
 
-    def ensureType(self, resource, numbered=True, subkey=None):
+    def ensureType(self, resource, numbered=True):
 	"""checks the type of a given resourece
 
 	if the resource is valid return it and optionally convert it to
 	another format.  The format it returns has to be compatible with 
 	attribute naming 
 	"""
-        return (resource, numbered, subkey)
+        return (resource, numbered)
 
-    def allocate(self, thing, resource=None, numbered=True, subkey=None):
+    def allocate(self, thing, resource=None, numbered=True):
         """allocates a resource element to the given thing.
 
 	resource - is passed as an argument it will be checked 
@@ -56,19 +56,17 @@ class ResourceManager(Driver):
 
         if not resource:
             # allocate a new resource
-            resource, numbered, subkey = self.allocator()
+            resource, numbered = self.allocator()
 
 	else:
-	    resource, numbered, subkey = self.ensureType(resource, 
-							numbered, 
-							subkey)
+	    resource, numbered = self.ensureType(resource, numbered)
 
-	self.setAttr(resource, thing, numbered=numbered, subkey=subkey)
+	self.setAttr('resource', thing, numbered=numbered, subkey=resource)
 	
 
 	return resource
 
-    def deallocate(self, thing, resource=None, numbered=True, subkey=None):
+    def deallocate(self, thing, resource=None, numbered=True):
         """deallocates a resource from the given thing."""
 
 	if resource is None:
@@ -77,39 +75,43 @@ class ResourceManager(Driver):
 			      numbered=res.number, subkey=res.subkey)
 
         if resource and not self.available(resource):
-	    resource, numbered, subkey = self._ensureType(resource, numbered, subkey)
+	    resource, numbered = self.ensureType(resource, numbered)
 	    
-            self.delAttrs(resource, thing, numbered=numbered, subkey=subkey)
+            self.delAttrs('resource', thing, numbered=numbered, subkey=resource)
 
-    def available(self, resource, numbered=None, subkey=None):
+    def available(self, resource, numbered=None):
         """return True if resource is available, False otherwise.
         """
 
-	resource, numbered, subkey = self._ensureType(resource, numbered, subkey)
+	resource, numbered = self.ensureType(resource, numbered)
 
-        if self.attrs(resource, numbered=numbered, subkey=subkey):
+        if self.attrs('resource', numbered=numbered, subkey=resource):
             return False
 
         return True
             
 
-    def owners(self, resource, numbered=True, subkey=None):
+    def owners(self, resource, numbered=True):
         """return a list of driver objects for the owners of a given resource.
         """
 
+	resource, numbered = self.ensureType(resource, numbered)
 
-	resource, number, subkey = self._ensureType(resource, number, subkey)
-
-        return [Driver(x.value) for x in self.attrs(resource, 
+        return [Driver(x.value) for x in self.attrs('resource', 
 						    numbered=numbered,
-						    subkey=subkey)]
+						    subkey=resource)]
     
     def resources(self, thing):
         """return a list of resources from the resource manager that is
 	associated with the given thing.
         """
 	
-	return [resource for resource in self.attrs() 
-		if Driver(resource.value) == thing]
+	return self.attrs('resource', thing)
 
 
+
+    @property
+    def count(self):
+	"""Return the number of resources used."""
+
+	return self.attrQuery('resource', count=True)

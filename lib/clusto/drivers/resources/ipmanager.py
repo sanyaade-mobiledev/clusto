@@ -27,7 +27,7 @@ class IPManager(ResourceManager):
 
 	return self.__ipy
 
-    def ensureType(self, resource, numbered=True, subkey=None):
+    def ensureType(self, resource, numbered=True):
 
 	"""check that the given ip falls within the range managed by this manager"""
 
@@ -45,7 +45,7 @@ class IPManager(ResourceManager):
 					% (str(resource), self.baseip, self.netmask))
 
 
-	return ('ip', ip.int(), None)
+	return ('ip', ip.int())
 
 
     def allocator(self):
@@ -54,15 +54,24 @@ class IPManager(ResourceManager):
 	if self.baseip is None:
 	    raise ResourceTypeException("Cannot generate an IP for an ipManager with no baseip")
 
-	startip=self.ipy.net().int() + 1
+	lastip = self.attrs('_lastip')
+	
+	if not lastip:
+	    startip=self.ipy.net().int() + 1
 
-	if not self.attrs('ip', numbered=startip):
-	    return ('ip', startip, None)
+	    if not self.attrs('ip', numbered=startip):
+		self.setAttr('_lastip', startip)
+		return ('ip', startip, None)
+	else:
+	    startip = lastip[0]
+
 
 	ipcounter = 1 # we already know the first address is used up
 	iplen = self.ipy.len() # so I know when I've tried all IPs
-	workinip = startip
+	workingip = startip
 
+	
+	
 	raise NotImplemented("Still working on allocating free IPs")
 
 	    
