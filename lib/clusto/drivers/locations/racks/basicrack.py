@@ -63,8 +63,13 @@ class BasicRack(Location):
             raise Exception("%s is already in rack %s"
                             % (device.name, rau['rack'].name))
 
-
+	
         for U in rackU:
+	    dev = self.getDeviceIn(U)
+	    if dev:
+		raise TypeError("%s is already in RU %d" % (dev.name, U))
+
+	for U in rackU:
 	    self.addAttr("_contains", device, numbered=U, subkey='ru')
 
         
