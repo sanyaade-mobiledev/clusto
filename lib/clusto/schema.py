@@ -56,7 +56,10 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                           ForeignKey('entities.entity_id'), default=None),
 
                    )
-
+Index('key_num_subkey_idx', 
+      ATTR_TABLE.c.entity_id, ATTR_TABLE.c.key, 
+      ATTR_TABLE.c.number, ATTR_TABLE.c.subkey, 
+      unique=True)
 
 TRANSACTION_TABLE = Table('transactions', METADATA,
                           Column('txn_id', Integer, primary_key=True),
