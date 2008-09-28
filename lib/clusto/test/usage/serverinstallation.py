@@ -85,7 +85,9 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 	self.assertEqual('server0001', newserver.name)
 
 
-	r.insert(newserver, 1)
+	self.assertRaises(TypeError, r.insert, newserver, 1)
+
+	r.insert(newserver,2)
 	p1.connectPorts('pwr', 0, newserver, 0)
 	sw.connectPorts('eth', 0, newserver, 0)
 
