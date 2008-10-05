@@ -433,13 +433,14 @@ class Driver(object):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
     def addAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
-        """
-        add a key/value to the list of attributes
+        """add a key/value to the list of attributes
 
-        if numbered is True, append the next available int to the key name.
-        if numbered is an int, append that int to the key name
-        if subkey is specified append '_subkey' to the key name
-         subkeys don't get numbered
+        if numbered is True, create an attribute with the next available
+        otherwise numbered just gets passed to the Attribute constructor so it
+        can be an integer or an sqlalchemy expression
+        
+	An optional subkey can also be specified. Subkeys don't affect
+	numbering by default.
         """
 
 	self._checkAttrName(key)
@@ -469,8 +470,7 @@ class Driver(object):
 
 
     def setAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
-        """replaces all items in the list matching the given key with value
-        """
+        """replaces all attributes with the given key"""
         self._checkAttrName(key)
         self.delAttrs(key=key, numbered=numbered, subkey=subkey)
 	self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
