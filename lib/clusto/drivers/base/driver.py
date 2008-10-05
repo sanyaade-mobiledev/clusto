@@ -429,7 +429,7 @@ class Driver(object):
     def attrItems(self, *args, **kwargs):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value, numbered=None, subkey=None):
+    def addAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
         """
         add a key/value to the list of attributes
 
@@ -451,17 +451,9 @@ class Driver(object):
 
 
         if isinstance(value, Driver):
-            attr = Attribute(key, value.entity)
-        else:
-            attr = Attribute(key, value)
+	    value = value.entity
 
-	if subkey:
-	    attr.subkey = subkey
-
-	if num is not None:
-	    attr.number = num
-
-
+	attr = Attribute(key, value, subkey=subkey, number=num, uniqattr=uniqattr)
 	self.entity._attrs.append(attr)
 
     def delAttrs(self, *args, **kwargs):
@@ -473,12 +465,12 @@ class Driver(object):
             i.delete()
 
 
-    def setAttr(self, key, value, numbered=None, subkey=None):
+    def setAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
         """replaces all items in the list matching the given key with value
         """
         self._checkAttrName(key)
         self.delAttrs(key=key, numbered=numbered, subkey=subkey)
-	self.addAttr(key, value, numbered=numbered, subkey=subkey)
+	self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
 	
 
     

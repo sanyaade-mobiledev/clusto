@@ -44,10 +44,8 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('subkey', String(1024, convert_unicode=True,
                            assert_unicode=None), nullable=True,
                           default=None, ),
-                   Column('number', Integer, nullable=True,
-                          default=None),
-                   Column('uniqattr', Boolean, nullable=True,
-                          default=None),
+                   Column('number', Integer, nullable=True, default=None),
+                   Column('uniqattr', Boolean, nullable=True, default=None),
                    Column('datatype', String(32), default='string', nullable=False),
 
                    Column('int_value', Integer, default=None),
@@ -89,11 +87,9 @@ class Attribute(object):
         
         self.value = value
 
-	if subkey:
-	    self.subkey = subkey
+	self.subkey = subkey
 
-	if number:
-	    self.number = number
+	self.number = number
 
 	if not uniqattr:
 	    self.uniqattr = None
