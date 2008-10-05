@@ -46,6 +46,8 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                           default=None, ),
                    Column('number', Integer, nullable=True,
                           default=None),
+                   Column('uniqattr', Boolean, nullable=True,
+                          default=None),
                    Column('datatype', String(32), default='string', nullable=False),
 
                    Column('int_value', Integer, default=None),
@@ -58,7 +60,7 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    )
 Index('key_num_subkey_idx', 
       ATTR_TABLE.c.entity_id, ATTR_TABLE.c.key, 
-      ATTR_TABLE.c.number, ATTR_TABLE.c.subkey, 
+      ATTR_TABLE.c.number, ATTR_TABLE.c.subkey, ATTR_TABLE.c.uniqattr,
       unique=True)
 
 TRANSACTION_TABLE = Table('transactions', METADATA,
@@ -79,7 +81,7 @@ class Attribute(object):
     """
     Attribute class holds key/value pair backed by DB
     """
-    def __init__(self, key, value, subkey=None, number=None):
+    def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
 
         sess = create_session()
 
@@ -88,11 +90,16 @@ class Attribute(object):
         self.value = value
 
 	if subkey:
-	    self.subkey_name = subkey
+	    self.subkey = subkey
 
 	if number:
-	    self.key_number = number
+	    self.number = number
 
+	if not uniqattr:
+	    self.uniqattr = None
+	else:
+	    self.uniqattr = True
+	
     def __cmp__(self, other):
 
 	if not isinstance(other, Attribute):
