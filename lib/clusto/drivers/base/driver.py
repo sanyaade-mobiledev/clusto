@@ -277,29 +277,25 @@ class Driver(object):
 
 	result = attrlist
 
-	for filterarg, attrname in [(key, 'key'),
-				    (subkey, 'subkey'),
-				    (value, 'value'), 
-
-				    ]:
-
-	    if filterarg is not None:
-		if regex:
-		    testregex = re.compile(regex)
-		
-		    result = [attr for attr in result 
-			      if testregex.match(getattr(attr, attrname))]
-		else:
-
-		    result = [attr for attr in result 
-			      if getattr(attr, attrname) == filterarg]
-
-
-		    #result = list(result)
-		    #print result
-		    #print result, filterarg, attrname
-
+	def subfilter(attrs, val, name):
 	    
+	    if regex:
+		testregex = re.compile(val)
+		result = (attr for attr in attrs 
+			  if testregex.match(getattr(attr, name)))
+
+	    else:
+		result = (attr for attr in attrs
+			  if getattr(attr, name) == val)
+
+
+	    return result
+
+	parts = ((key, 'key'), (subkey, 'subkey'), (value, 'value'))
+	argattr = ((val,name) for val,name in parts if val is not None)
+
+	for v, n in argattr:
+	    result = subfilter(result, v, n)
 
 	
 	if numbered is not None:
