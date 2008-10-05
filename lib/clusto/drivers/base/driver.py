@@ -209,7 +209,7 @@ class Driver(object):
     @classmethod
     def attrQuery(self, key=None, value=None, numbered=None,
 		  subkey=None, ignoreHidden=True, sortByKeys=True, 
-		  glob=True, count=False, querybase=None):
+		  glob=True, count=False, querybase=None, returnQuery=False):
 
 	
 
@@ -262,6 +262,9 @@ class Driver(object):
 
 	if count:
 	    return query.count()
+
+	if returnQuery:
+	    return query
 
 	return query.all()
 
