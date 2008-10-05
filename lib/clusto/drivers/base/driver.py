@@ -446,15 +446,15 @@ class Driver(object):
 	if subkey:
 	    self._checkAttrName(subkey)
 
-	num = None
-	if isinstance(numbered, bool) and numbered == True:
-	    num = self._getAttrNumCount(key, numbered)
-	elif isinstance(numbered, int):
-	    num = numbered
-
-
         if isinstance(value, Driver):
 	    value = value.entity
+
+	num = numbered
+
+	if isinstance(numbered, bool) and numbered == True:
+	    num = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
+						ATTR_TABLE.c.number!=None)).as_scalar() 
+
 
 	attr = Attribute(key, value, subkey=subkey, number=num, uniqattr=uniqattr)
 	self.entity._attrs.append(attr)
