@@ -1,4 +1,5 @@
 
+import clusto
 from clusto.drivers.base import Driver
 from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException
 
@@ -38,7 +39,7 @@ class ResourceManager(Driver):
 	"""
         return (resource, numbered)
 
-    def allocate(self, thing, resource=None, numbered=True):
+    def allocate(self, thing, resource=(), numbered=True):
         """allocates a resource element to the given thing.
 
 	resource - is passed as an argument it will be checked 
@@ -51,6 +52,8 @@ class ResourceManager(Driver):
 	or generated.
         """
 	
+	clusto.beginTransaction()
+
 	if not isinstance(thing, Driver):
 	    raise TypeError("thing is not of type Driver")
 
@@ -61,15 +64,15 @@ class ResourceManager(Driver):
 	else:
 	    resource, numbered = self.ensureType(resource, numbered)
 
-	self.setAttr('resource', thing, numbered=numbered, subkey=resource)
-	
+	attr = self.addAttr('resource', thing, numbered=numbered, subkey=resource)
+	clusto.commit()
 
-	return resource
+	return attr #resource
 
-    def deallocate(self, thing, resource=None, numbered=True):
+    def deallocate(self, thing, resource=(), numbered=True):
         """deallocates a resource from the given thing."""
 
-	if resource is None:
+	if resource is ():
 	    for res in self.resources(thing):
 		self.delAttrs(res.key, value=thing, 
 			      numbered=res.number, subkey=res.subkey)
@@ -79,13 +82,14 @@ class ResourceManager(Driver):
 	    
             self.delAttrs('resource', thing, numbered=numbered, subkey=resource)
 
-    def available(self, resource, numbered=None):
+    def available(self, resource, numbered=()):
         """return True if resource is available, False otherwise.
         """
 
 	resource, numbered = self.ensureType(resource, numbered)
 
-        if self.attrs('resource', numbered=numbered, subkey=resource):
+
+        if self.hasAttr('resource', numbered=numbered, subkey=resource):
             return False
 
         return True

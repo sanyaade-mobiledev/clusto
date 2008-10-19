@@ -207,8 +207,8 @@ class Driver(object):
 	
 
     @classmethod
-    def attrQuery(self, key=None, value=None, numbered=None,
-		  subkey=None, ignoreHidden=True, sortByKeys=True, 
+    def attrQuery(self, key=(), value=(), numbered=(),
+		  subkey=(), ignoreHidden=True, sortByKeys=True, 
 		  glob=True, count=False, querybase=None, returnQuery=False):
 
 	
@@ -221,34 +221,36 @@ class Driver(object):
 
 
 
-	if key is not None:
+	if key is not ():
 	    if glob:
 		query = query.filter(Attribute.key.like(key.replace('*', '%')))
 	    else:
 		query = query.filter_by(key=key)
 
- 	if subkey is not None:
- 	    if glob:
+ 	if subkey is not ():
+	    if glob and subkey:
  		query = query.filter(Attribute.subkey.like(subkey.replace('*', '%')))
  	    else:
  		query = query.filter_by(subkey=subkey)
 
- 	if value is not None:
+ 	if value is not ():
  	    typename = Attribute.getType(value)
 
  	    if typename == 'relation':
+		if isinstance(value, Driver):
+		    value = value.entity.entity_id
  		query = query.filter_by(relation_id=value)
 
 	    else:
 		query = query.filter_by(**{typename+'_value':value})
 
- 	if numbered is not None:
+ 	if numbered is not ():
  	    if isinstance(numbered, bool):
  		if numbered == True:
  		    query = query.filter(Attribute.number != None)
  		else:
  		    query = query.filter(Attribute.number == None)
- 	    elif isinstance(numbered, int):
+ 	    elif isinstance(numbered, (int, long)):
 		query = query.filter_by(number=numbered)
  		
  	    else:
@@ -268,8 +270,8 @@ class Driver(object):
 
 	return query.all()
 
-    def _attrFilter(self, attrlist, key=None, value=None, numbered=None,
-		   subkey=None, ignoreHidden=True, 
+    def _attrFilter(self, attrlist, key=(), value=(), numbered=(),
+		   subkey=(), ignoreHidden=True, 
 		   sortByKeys=True, 
 		   regex=False, 
 		   ):
@@ -295,20 +297,20 @@ class Driver(object):
 	    return result
 
 	parts = ((key, 'key'), (subkey, 'subkey'), (value, 'value'))
-	argattr = ((val,name) for val,name in parts if val is not None)
+	argattr = ((val,name) for val,name in parts if val is not ())
 
 	for v, n in argattr:
 	    result = subfilter(result, v, n)
 
-	
-	if numbered is not None:
+
+	if numbered is not ():
 	    if isinstance(numbered, bool):
 		if numbered:
 		    result = (attr for attr in result if attr.number is not None)
 		else:
 		    result = (attr for attr in result if attr.number is None)
 
-	    elif isinstance(numbered, int):
+	    elif isinstance(numbered, (int, long)):
 		result = (attr for attr in result if attr.number == numbered)
 	    
 	    else:
@@ -432,7 +434,7 @@ class Driver(object):
     def attrItems(self, *args, **kwargs):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
+    def addAttr(self, key, value, numbered=(), subkey=(), uniqattr=False):
         """add a key/value to the list of attributes
 
         if numbered is True, create an attribute with the next available
@@ -450,37 +452,42 @@ class Driver(object):
         if isinstance(value, Driver):
 	    value = value.entity
 
-	num = numbered
+	if numbered is ():
+	    numbered = None
+	if subkey is ():
+	    subkey = None
 
 	if isinstance(numbered, bool) and numbered == True:
-	    num = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
-						ATTR_TABLE.c.number!=None)).as_scalar() 
+	    numbered = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
+						      ATTR_TABLE.c.number!=None)).as_scalar() 
 
 
-	attr = Attribute(key, value, subkey=subkey, number=num, uniqattr=uniqattr)
+	attr = Attribute(key, value, subkey=subkey, number=numbered, uniqattr=uniqattr)
 	self.entity._attrs.append(attr)
+
+	return attr
 
     def delAttrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"
 
-
-        for i in self.attrs(*args, **kwargs):
-            self.entity._attrs.remove(i)
+	clusto.flush()
+        for i in self.attrQuery(*args, **kwargs):
+	    self.entity._attrs.remove(i)
             i.delete()
 
 
-    def setAttr(self, key, value, numbered=None, subkey=None, uniqattr=False):
+    def setAttr(self, key, value, numbered=(), subkey=(), uniqattr=False):
         """replaces all attributes with the given key"""
         self._checkAttrName(key)
         self.delAttrs(key=key, numbered=numbered, subkey=subkey)
-	self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
+	return self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
 	
 
     
     def hasAttr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
-        for i in self.attrs(*args, **kwargs):
+        for i in self.attrQuery(*args, **kwargs):
             return True
 
         return False

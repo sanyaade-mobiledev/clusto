@@ -13,6 +13,29 @@ from clusto.exceptions import *
 
 class TestDriverAttributes(testbase.ClustoTestBase):
 
+    def testSetAttrs(self):
+
+	d1 = Driver('d1')
+	d1.setAttr('foo', 'bar')
+
+	self.assertEqual(d1.attrItems(),
+			 [(('foo', None, None), 'bar')])
+
+	d1.setAttr('foo', 'bar2')
+	self.assertEqual(d1.attrItems(),
+			 [(('foo', None, None), 'bar2')])
+
+	d1.addAttr('foo', 'bar3')
+
+	self.assertEqual(d1.attrItems(),
+			 [(('foo', None, None), 'bar2'),
+			  (('foo', None, None), 'bar3')])
+
+	d1.setAttr('foo', 'bar4')
+	self.assertEqual(d1.attrItems(),
+			 [(('foo', None, None), 'bar4')])
+
+
     def testGettingAttrs(self):
 
         d1 = Driver('d1')
@@ -324,3 +347,63 @@ class TestDriver(testbase.ClustoTestBase):
 	s = set([d1,d1,d2])
 
 	self.assertEquals(len(s), 2)
+
+class TestDriverQueries(testbase.ClustoTestBase):
+    
+    def data(self):
+
+	d1 = Driver('d1')
+	d2 = Driver('d2')
+	d3 = Driver('d3')
+
+	d1.addAttr('_foo', 'bar1')
+	d1.addAttr('car', 'baz')
+	d1.addAttr('car', 'baz')
+	d1.addAttr('d', 'dee', numbered=True)
+	d1.addAttr('d', 'dee', numbered=True)
+	d1.addAttr('a', 1)
+	d1.addAttr('a', 1, subkey='t')
+	d1.addAttr('a', 1, subkey='g')
+	d1.addAttr('a', 1, subkey='z', numbered=4)
+	d1.addAttr('a', 1, subkey='z', numbered=5)
+	d1.addAttr('a', 1, subkey='z', numbered=6)
+
+	d1.setAttr('d2', d2)
+	d1.setAttr('d3', d3)
+
+    def testAttrAndQueryEqual(self):
+
+	d1 = clusto.getByName('d1')
+	d2 = clusto.getByName('d2')
+	d3 = clusto.getByName('d3')
+
+	self.assertEqual(d1.attrs('a'), d1.attrQuery('a'))
+
+	self.assertEqual(d1.attrs('a', 1), d1.attrQuery('a', 1))
+
+	self.assertEqual(d1.attrs('a', 1, numbered=True), 
+			 d1.attrQuery('a', 1, numbered=True))
+
+	self.assertEqual(d1.attrs('a', 1, numbered=5), 
+			 d1.attrQuery('a', 1, numbered=5))
+
+	self.assertEqual(d1.attrs(value='dee'), 
+			 d1.attrQuery(value='dee'))
+
+
+	self.assertEqual(d1.attrs(value='_foo'), 
+			 d1.attrQuery(value='_foo'))
+
+	self.assertEqual(d1.attrs(key='_foo'), 
+			 d1.attrQuery(key='_foo'))
+
+	self.assertEqual(d1.attrs(key='a', subkey=None), 
+			 d1.attrQuery(key='a', subkey=None))
+
+	self.assertEqual(d1.attrs(value=d2), 
+			 d1.attrQuery(value=d2))
+
+
+
+
+
