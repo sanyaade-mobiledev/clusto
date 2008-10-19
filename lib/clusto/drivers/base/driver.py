@@ -133,7 +133,7 @@ class Driver(object):
 	if name in self._properties:	    	    
 	    if not self.hasAttr(name):
 		return self._properties[name]
-	    attr = list(self.attrs(name, numbered=0, subkey='property', uniqattr=True))
+	    attr = self.attrQuery(name, numbered=0, subkey='property', uniqattr=True)
 	    if not attr:
 		return None
 	    else:
