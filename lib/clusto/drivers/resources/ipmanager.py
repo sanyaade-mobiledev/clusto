@@ -57,8 +57,7 @@ class IPManager(ResourceManager):
 	    raise ResourceTypeException("Cannot generate an IP for an ipManager with no baseip")
 
 	lastip = self.attrQuery('_lastip')
-	lastip = None
-	
+		
 	if not lastip:
 	    startip=int(self.ipy.net().int() + 1)
 	else:
