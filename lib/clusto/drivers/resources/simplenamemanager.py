@@ -1,6 +1,8 @@
+import clusto
 from clusto.drivers.base import ResourceManager
 
 from clusto.exceptions import ResourceException
+from clusto.schema import ATTR_TABLE
 
 class SimpleNameManagerException(ResourceException):
     pass
@@ -20,7 +22,7 @@ class SimpleNameManager(ResourceManager):
                    'next':None,
                    'leadingZeros':None}
 
-    _recordAllocations = False
+    _recordAllocations = True
     
     def __init__(self, nameDriverEntity,
                  basename='',
@@ -40,7 +42,7 @@ class SimpleNameManager(ResourceManager):
         self.leadingZeros = leadingZeros
 
     def allocator(self):
-
+	clusto.flush()
         num = str(self.next)
 
         if self.leadingZeros:
@@ -51,22 +53,53 @@ class SimpleNameManager(ResourceManager):
                                              "Max of %d digits and we're at "
                                              "number %s." % (self.digits, num))
         nextname = self.basename + num
-        self.next += 1
+
+        self.next = ATTR_TABLE.c.int_value + 1
+
         return nextname
         
-    
-    def createEntity(self, clustotype, *args, **kwargs):
-        """Create an entity with a name generated from this NameResource 
 
-	Use the given clusto Driver and arguments to create the new Thing.
+class SimpleEntityNameManager(SimpleNameManager):    
+
+    _driverName = "simpleentitynamemanager"
+
+    _recordAllocations = False
+
+
+    def allocate(self, clustotype, resource=None, numbered=True):
+        """allocates a resource element to the given thing.
+
+	resource - is passed as an argument it will be checked 
+	           before assignment.  
+
+	refattr - the attribute name on the entity that will refer back
+	          this resource manager.
+
+	returns the resource that was either passed in and processed 
+	or generated.
         """
 
-        name = self.allocator()
+	if not isinstance(clustotype, type):
+	    raise TypeError("thing is not a Driver class")
 
-        newobj = clustotype(name, *args, **kwargs)
+	clusto.beginTransaction()
 
-        self.allocate(newobj, name)
+        if not resource:
+	    name = self.allocator()
+
+	    newobj = clustotype(name)
+
+	else:
+	    newobj = clustotype(resource)
+
+
+        super(SimpleEntityNameManager, self).allocate(newobj, name)
+
+	clusto.commit()
 
         return newobj
 
+
+    def deallocate(self, thing, resource=None, numbered=True):
+	raise Exception("can't deallocate an entity name, delete the entity instead.")
 

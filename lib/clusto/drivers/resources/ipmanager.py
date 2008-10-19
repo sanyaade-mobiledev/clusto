@@ -1,4 +1,5 @@
 from clusto.drivers import ResourceManager, ResourceTypeException
+from clusto.exceptions import ResourceNotAvailableException
 
 import IPy
 
@@ -17,6 +18,7 @@ class IPManager(ResourceManager):
 
     _attrName = "ip"
 
+    
     @property
     def ipy(self):
 	if not hasattr(self, '__ipy'):
@@ -50,28 +52,42 @@ class IPManager(ResourceManager):
 
     def allocator(self):
 	"""allocate IPs from this manager"""
-	
+
 	if self.baseip is None:
 	    raise ResourceTypeException("Cannot generate an IP for an ipManager with no baseip")
 
-	lastip = self.attrs('_lastip')
+	lastip = self.attrQuery('_lastip')
+	lastip = None
 	
 	if not lastip:
-	    startip=self.ipy.net().int() + 1
-
-	    if not self.attrs('ip', numbered=startip):
-		self.setAttr('_lastip', startip)
-		return ('ip', startip, None)
+	    startip=int(self.ipy.net().int() + 1)
 	else:
-	    startip = lastip[0]
+	    startip = lastip[0].value
 
-
-	ipcounter = 1 # we already know the first address is used up
-	iplen = self.ipy.len() # so I know when I've tried all IPs
-	workingip = startip
 
 	
-	
-	raise NotImplemented("Still working on allocating free IPs")
+	## generate new ips the slow naive way
+	nextip = long(startip)
+	gateway = IPy.IP(self.gateway).int()
+	endip = self.ipy.broadcast().int()
 
+	for i in range(2):
+	    while nextip < endip:
+
+		if nextip == gateway:
+		    nextip += 1
+		    continue
+
+		if self.available(nextip):
+		    self.setAttr('_lastip', nextip)
+		    return self.ensureType(nextip)
+		else:
+		    nextip += 1
+	    
+	    # check from the beginning again in case an earlier ip
+	    # got freed
+		    
+	    nextip = long(self.ipy.net().int() + 1)
+	    
+	raise ResourceNotAvailableException("out of available ips.")
 	    

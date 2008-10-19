@@ -68,14 +68,14 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
     def testSettingUpServer(self):
 	
-	from clusto.drivers import SimpleNameManager
+	from clusto.drivers import SimpleEntityNameManager
 
-	servernames = SimpleNameManager('servernames',
-					basename='server',
-					digits=4
-					)
+	servernames = SimpleEntityNameManager('servernames',
+					      basename='server',
+					      digits=4
+					      )
 
-	newserver = servernames.createEntity(BasicServer)
+	newserver = servernames.allocate(BasicServer)
 	
 
         sw = clusto.getByName('sw1')

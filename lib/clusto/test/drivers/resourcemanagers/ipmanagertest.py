@@ -4,6 +4,8 @@ from clusto.test import testbase
 
 from clusto.drivers import IPManager, BasicServer, ResourceTypeException
 
+import IPy
+
 class IPManagerTest(testbase.ClustoTestBase):
 
     def data(self):
@@ -21,3 +23,15 @@ class IPManagerTest(testbase.ClustoTestBase):
 	ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
 
 	self.assertRaises(ResourceTypeException, ip1.allocate, s1, '10.2.3.4')
+
+    def testNewIP(self):
+	
+	ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
+
+
+	for i in range(10):
+	    ip1.allocate(s1)
+	    
+
+	
+	#print [IPy.IP(x.number) for x in ip1.resources(s1)]
