@@ -174,21 +174,26 @@ class Driver(object):
 
 	return d
 	
-
     @classmethod
-    def attrQuery(self, key=(), value=(), numbered=(),
-		  subkey=(), ignoreHidden=True, sortByKeys=True, 
-		  glob=True, count=False, querybase=None, returnQuery=False):
+    def doAttrQuery(cls, key=(), value=(), numbered=(),
+		    subkey=(), uniqattr=(), ignoreHidden=True, sortByKeys=True, 
+		    glob=True, count=False, querybase=None, returnQuery=False,
+		    entity=None):
+	"""Does queries against all Attributes."""
 
-	
-
-
+	clusto.flush()
 	if querybase:
 	    query = querybase 
 	else:
 	    query = SESSION.query(Attribute)
 
+	if issubclass(cls, Driver):	    
+	    query = query.filter(and_(Attribute.entity_id==Entity.entity_id,
+				      Entity.driver == cls._driverName,
+				      Entity.type == cls._clustoType))
 
+	if entity:
+	    query = query.filter_by(entity_id=entity.entity_id)
 
 	if key is not ():
 	    if glob:
@@ -225,6 +230,9 @@ class Driver(object):
  	    else:
  		raise TypeError("num must be either a boolean or an integer.")
 
+	if uniqattr is not ():
+	    query = query.filter_by(uniqattr=uniqattr)
+
  	if ignoreHidden:
  	    query.filter(not_(Attribute.key.like('_%')))
 
@@ -239,11 +247,17 @@ class Driver(object):
 
 	return query.all()
 
-    def _attrFilter(self, attrlist, key=(), value=(), numbered=(),
-		   subkey=(), ignoreHidden=True, 
-		   sortByKeys=True, 
-		   regex=False, 
-		   ):
+    def attrQuery(self, *args, **kwargs):
+	
+	kwargs['entity'] = self.entity
+
+	return self.doAttrQuery(*args, **kwargs)
+
+    def _attrFilter(self, attrlist, key=(), value=(), numbered=(), 
+		    subkey=(), ignoreHidden=True, uniqattr=(),
+		    sortByKeys=True, 
+		    regex=False, 
+		    ):
         """
         This function lets you sort through various kinds of attribute lists.
         """
@@ -286,6 +300,9 @@ class Driver(object):
 		raise TypeError("num must be either a boolean or an integer.")
 
 		    
+	if uniqattr is not ():
+	    result = (attr for attr in result if attr.uniqattr == uniqattr)
+
         if value:
             result = (attr for attr in result if attr.value == value)
 
@@ -443,12 +460,14 @@ class Driver(object):
         for i in self.attrQuery(*args, **kwargs):
 	    self.entity._attrs.remove(i)
             i.delete()
+	clusto.flush()
 
 
-    def setAttr(self, key, value, numbered=(), subkey=(), uniqattr=False):
+    def setAttr(self, key, value, numbered=(), subkey=(), uniqattr=()):
         """replaces all attributes with the given key"""
         self._checkAttrName(key)
-        self.delAttrs(key=key, numbered=numbered, subkey=subkey)
+        self.delAttrs(key=key, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
+	
 	return self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
 	
 
@@ -533,13 +552,13 @@ class Driver(object):
 	return parents
 		       
     @classmethod
-    def getByAttr(self, *args, **kwargs):
+    def getByAttr(cls, *args, **kwargs):
         """
         Return a list of Instances that have the given attribute with the given
         value.
         """
-
-	attrlist = self.attrQuery(*args, **kwargs)
+	
+	attrlist = cls.doAttrQuery(*args, **kwargs)
 
         objs = [Driver(x.entity) for x in attrlist]
 

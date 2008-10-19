@@ -248,7 +248,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
         d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
         d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
-
+	
         self.assertEqual(d1.attrQuery(key='foo', numbered=2, count=True), 1)
         
         self.assertEqual(d1.attrQuery(key='foo', numbered=0, count=True), 1)
@@ -348,6 +348,50 @@ class TestDriver(testbase.ClustoTestBase):
 
 	self.assertEquals(len(s), 2)
 
+class TestDriver(Driver):
+
+    _clustoType = "tester"
+    _driverName = "testdriver"
+
+    _properties = {'propA': None,
+		   'propB': 'foo',
+		   'propC': 5 }
+
+class TestDriverProperties(testbase.ClustoTestBase):
+    
+    def testPropDefaultGetter(self):
+
+	d = TestDriver('d')
+
+	self.assertEqual(None, d.propA)
+	self.assertEqual('foo', d.propB)
+	self.assertEqual(5, d.propC)
+
+    def testPropSetter(self):
+
+	d = TestDriver('d')
+
+	self.assertEqual(None, d.propA)
+
+	d.propA = 'foo'
+	self.assertEqual('foo', d.propA)
+
+	d.propA = 'bar'
+	self.assertEqual('bar', d.propA)
+
+	d.propA = 10
+	self.assertEqual(10, d.propA)
+
+    def testPropSetterMultipleObjects(self):
+	d = TestDriver('d')
+	d2 = TestDriver('d2')
+
+	d.propB = 'bar'
+	d2.propB = 'cat'
+
+	self.assertEqual(d2.propB, 'cat')
+	self.assertEqual(d.propB, 'bar')
+
 class TestDriverQueries(testbase.ClustoTestBase):
     
     def data(self):
@@ -404,6 +448,7 @@ class TestDriverQueries(testbase.ClustoTestBase):
 			 d1.attrQuery(value=d2))
 
 
-
+	self.assertEqual(d1.attrs(subkey='z'),
+			 d1.attrQuery(subkey='z'))
 
 

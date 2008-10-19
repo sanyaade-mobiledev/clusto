@@ -14,6 +14,7 @@ from sqlalchemy.orm import * #Mapper, MapperExtension
 from sqlalchemy.orm.mapper import Mapper
 
 from sqlalchemy.orm import mapperlib
+import sqlalchemy.sql
 
 import re
 import sys
@@ -220,8 +221,8 @@ class Attribute(object):
 	    return getattr(self, self.getValueType())
 
     def _set_value(self, value):
-
-	if not self.datatype:
+	
+	if not isinstance(value, sqlalchemy.sql.ColumnElement):
 	    self.datatype = self.getType(value)
 
         setattr(self, self.getValueType(value), value)
