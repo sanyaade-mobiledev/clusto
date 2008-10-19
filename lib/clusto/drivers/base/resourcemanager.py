@@ -104,13 +104,17 @@ class ResourceManager(Driver):
         return [Driver(x.value) for x in self.attrs('resource', 
 						    numbered=numbered,
 						    subkey=resource)]
-    
+
+    @classmethod
     def resources(self, thing):
         """return a list of resources from the resource manager that is
 	associated with the given thing.
+
+	A resource is a resource attribute in a resource manager.
         """
 	
-	return self.attrs('resource', thing)
+	return [x for x in thing.references('resource', thing) 
+		if isinstance(Driver(x.entity), self)]
 
 
 
