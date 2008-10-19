@@ -54,25 +54,6 @@ class ClustoDriver(type):
             raise TypeError('_properties of %s is not a dict type.',
                             cls.__name__)
         
-        for propkey, propval in cls._properties.iteritems():
-
-            def getter(self, key=propkey, default=propval):
-                if default != None:
-                    if not self.hasAttr(key):
-                        return default
-                attr = list(self.attrs(key))
-                if not attr:
-                    return None
-                else:
-                    return attr[0].value
-                
-            def setter(self, val, key=propkey):
-                self.setAttr(key, val)
-
-
-            setattr(cls, propkey, property(getter, setter))
-
-
 
         super(ClustoDriver, cls).__init__(name, bases, dct)
 

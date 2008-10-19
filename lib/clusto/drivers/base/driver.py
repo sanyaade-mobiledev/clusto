@@ -128,63 +128,32 @@ class Driver(object):
                                 "Attribute names may not contain periods or "
                                 "comas." % key)
     
+
+    def __getattr__(self, name):
+	if name in self._properties:	    	    
+	    if not self.hasAttr(name):
+		return self._properties[name]
+	    attr = list(self.attrs(name, numbered=0, subkey='property', uniqattr=True))
+	    if not attr:
+		return None
+	    else:
+		return attr[0].value
+	else:
+	    raise AttributeError("Attribute %s does not exist." % name)
+
+
+    def __setattr__(self, name, value):
+
+	if name in self._properties:
+	    a = self.attrQuery(name)
+	    if a:
+		attr = a[0]		
+		attr.value = value
+	    else:
+		self.setAttr(name, value, numbered=0, subkey='property', uniqattr=True)
+	else:
+	    object.__setattr__(self, name, value)
         
-    def _buildKeyName(self, key, numbered=None, subkey=None):
-
-        keyname = key
-        if numbered is not None:
-            if isinstance(numbered, bool):
-                number = self._getAttrNumCount(key, numbered=numbered)
-            elif isinstance(numbered, int):
-                number = numbered
-            else:
-                raise TypeError("num must be either True, or an integer.")
-
-            keyname += str(number)
-
-        if subkey: 
-            keyname += ''.join(['-', str(subkey)])
-
-        self._checkAttrName(keyname)
-
-        return keyname
-
-    def _getAttrNumCount(self, key, numbered=None):
-        """
-        For numbered attributes return the count that exist
-        """
-	
-        attrs = self.attrs(key=key, numbered=numbered, ignoreHidden=False)
-
-        return len(list(attrs))
-
-    def _buildKeyRegex(self, key=None, value=None, numbered=None,
-                    subkey=None, ignoreHidden=True, strict=False):
-            regex = ["^"]
-
-            if key and key.startswith('_'):
-                ignoreHidden=False
-
-            if ignoreHidden:
-                regex.append("(?!_)")
-
-            regex.append((key and key or ".*"))
-
-            if isinstance(numbered, bool):
-                regex.append("\d+")
-            elif isinstance(numbered, int):
-                regex.append(str(numbered))
-
-            if isinstance(subkey, str):
-                regex.append("-%s" % subkey)
-            elif subkey is True:
-                regex.append("-.+")
-
-            if strict:
-                regex.append("$")
-
-            return regex
-    
     @classmethod
     def ensureDriver(self, obj, msg=None):
 	"""Ensure that the given argument is a Driver.
