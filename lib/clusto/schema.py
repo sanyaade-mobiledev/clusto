@@ -220,7 +220,9 @@ class Attribute(object):
 	    return getattr(self, self.getValueType())
 
     def _set_value(self, value):
-        self.datatype = self.getType(value)
+
+	if not self.datatype:
+	    self.datatype = self.getType(value)
 
         setattr(self, self.getValueType(value), value)
 
