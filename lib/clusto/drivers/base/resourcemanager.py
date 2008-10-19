@@ -106,7 +106,7 @@ class ResourceManager(Driver):
 						    subkey=resource)]
 
     @classmethod
-    def resources(self, thing):
+    def resources(cls, thing):
         """return a list of resources from the resource manager that is
 	associated with the given thing.
 
@@ -114,7 +114,7 @@ class ResourceManager(Driver):
         """
 	
 	return [x for x in thing.references('resource', thing) 
-		if isinstance(Driver(x.entity), self)]
+		if isinstance(Driver(x.entity), cls)]
 
 
 
