@@ -28,10 +28,12 @@ class IPManagerTest(testbase.ClustoTestBase):
 	
 	ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
 
-
-	for i in range(10):
+	num = 50
+	for i in range(num):
 	    ip1.allocate(s1)
-	    
 
+
+	self.assertEqual(ip1.count, num)
+	self.assertEqual(len(ip1.resources(s1)), num)
 	
-	#print [IPy.IP(x.number) for x in ip1.resources(s1)]
+	self.assertEqual(ip1.owners('192.168.1.' + str(num+1)), [s1])

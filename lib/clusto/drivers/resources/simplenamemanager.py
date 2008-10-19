@@ -52,11 +52,12 @@ class SimpleNameManager(ResourceManager):
             raise SimpleNameManagerException("Out of digits for the integer. "
                                              "Max of %d digits and we're at "
                                              "number %s." % (self.digits, num))
-        nextname = self.basename + num
+        
+	nextname = self.basename + num
 
         self.next = ATTR_TABLE.c.int_value + 1
 
-        return nextname
+        return (nextname, None)
         
 
 class SimpleEntityNameManager(SimpleNameManager):    
@@ -85,7 +86,7 @@ class SimpleEntityNameManager(SimpleNameManager):
 	clusto.beginTransaction()
 
         if not resource:
-	    name = self.allocator()
+	    name, num = self.allocator()
 
 	    newobj = clustotype(name)
 

@@ -84,3 +84,36 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
                           ngen.allocate, Driver)
 
 
+    def testAllocateManyNames(self):
+	
+	ngen = clusto.getByName('foonamegen')
+
+	for i in xrange(50):
+	    ngen.allocate(Driver)
+
+	self.assertRaises(LookupError, clusto.getByName, 'foo0051')
+	self.assertEqual(clusto.getByName('foo0050').name, 'foo0050')
+
+
+class SimpleNameManagerTests(testbase.ClustoTestBase):
+
+    def data(self):
+	n1 = SimpleNameManager('foonamegen',
+			       basename='foo',
+			       digits=4,
+			       startingnum=1,
+			       )
+
+	clusto.flush()
+
+    def testAllocateManyNames(self):
+	
+	ngen = clusto.getByName('foonamegen')
+
+	d = Driver('foo')
+
+	for i in xrange(50):
+	    ngen.allocate(d)
+	    
+	
+	self.assertEqual(ngen.attrQuery('resource', count=True), 50)
