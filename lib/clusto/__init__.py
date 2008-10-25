@@ -4,9 +4,9 @@ from schema import *
 
 
 from drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
-#from clusto.schema import SESSION, METADATA, Entity, Attribute, VERSION
-#from sqlalchemy import and_, or_, literal, create_engine
-#from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy import create_engine
+
 
 import drivers
 driverlist = DRIVERLIST

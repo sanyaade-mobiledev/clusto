@@ -21,6 +21,9 @@ import sys
 import datetime
 import clusto
 
+__all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
+	   'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
+
 METADATA = MetaData()
 
 
