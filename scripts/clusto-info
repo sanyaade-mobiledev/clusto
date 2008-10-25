@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import sys
+
+from optparse import OptionParser
+
+import clusto.scripthelpers
+
+def main(argv):
+
+    options, args = parseargs(argv)
+
+    config, logger = clusto.scripthelpers.initScript()
+
+    print
+    for cmd in args:
+	if cmd == 'driverlist':
+	    print "Driver List:"
+
+	    for key in sorted(clusto.driverlist.keys()):
+		print ' ', key
+		
+	if cmd == 'typelist':
+	    print "Type List:"
+	    for key in sorted(clusto.typelist.keys()):
+		print ' ', key
+    
+
+    print
+
+def parseargs(argv):
+    
+    parser = OptionParser()
+
+    return parser.parse_args(argv)
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

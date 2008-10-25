@@ -57,24 +57,31 @@ def getCommandHelp(cmdname):
     return commands.getoutput(fullpath + " --help-description")
     
 def getClustoConfig(filename=None):
-    """
-    Find, parse, and return the configuration data needed by clusto.
-    """
+    """Find, parse, and return the configuration data needed by clusto."""
 
     filesearchpath = ['/etc/clusto/clusto.conf']
 
-    if os.environ.has_key('CLUSTOCONFIG'):
-        filename = os.environ['CLUSTOCONFIG']
+    
+    filename = filename or os.environ.get('CLUSTOCONFIG')
 
     if not filename:
         filename = filesearchpath[0]
 
-    if not os.path.exists(os.path.realpath(filename)):
-        raise CmdLineError("no config file found.")
-                           
-    config = SafeConfigParser()
-
+    if filename:
+	if not os.path.exists(os.path.realpath(filename)):
+	    raise CmdLineError("Config file %s doesn't exist." % filename)
+	
+    config = SafeConfigParser()    
     config.read([filename])
+
+    if not config.has_section('clusto'):
+	config.add_section('clusto')
+
+    if 'CLUSTODSN' in os.environ:
+	config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
+
+    if not config.has_option('clusto', 'dsn'):
+	raise CmdLineError("No database given for clusto data.")
 
     return config
 
@@ -83,8 +90,8 @@ def initScript():
     """
     Initialize the clusto environment for clusto scripts.
     """
-    config = getClustoConfig(os.environ['CLUSTOCONFIG'])
-    clusto.connect(os.environ['CLUSTODSN'])
+    config = getClustoConfig()
+    clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     
     logger = setupLogging(config)
@@ -92,22 +99,6 @@ def initScript():
     return (config, logger)
 
 
-def runcmd(cmd, args=()):
-    env = dict(os.environ)
-    env['PYTHONPATH'] = ':'.join(sys.path)
-
-    if not os.path.exists(cmd):
-        raise CommandError("File Not Found.")
-    if not os.access(cmd, os.X_OK):
-        raise CommandError(cmd + " not Executable.")
-
-    if cmd.endswith('.py'):
-        pass
-    args = [cmd] + list(args)
-
-    return os.spawnve(os.P_WAIT, cmd, args, env)
-
-    
 def setupLogging(config=None):
 
     logging.basicConfig(level=logging.ERROR)

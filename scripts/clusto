@@ -8,38 +8,57 @@ from clusto import cmdln
 import clusto
 
 from clusto.scripthelpers import *
+from optparse import OptionParser
 
+from subprocess import Popen
 
-class ClustoCmd(cmdln.Cmdln):
-    name = "clusto"
+def main(argv):
 
-    withconfig = False
+    options, args = parseargs(argv)
+    
+    os.environ['PATH'] = ':'.join([p for p in sys.path if p.endswith('bin')]) + ':' + os.environ['PATH']
+    if args[0] != 'help':
+	config = setupClustoEnv(options)    
+    
+    try:
+	print runcmd(args)
+    except CommandError, x:
+	print x
+	return 1
 
-    def get_optparser(self):
-        parser = cmdln.Cmdln.get_optparser(self)
-        parser.set_defaults(clustodsn="sqlite:///:memory:",)
-        return parser
-            
-    def postoptparse(self):
-        cmdln.Cmdln.postoptparse(self)
+    return 0
 
-        clusto.connect(self.options.clustodsn)
-        clusto.initclusto()
-        
+def parseargs(argv):
+    parser = OptionParser()
+    parser.disable_interspersed_args()
+    parser.add_option('-c', '--config', dest="configfile", help="config file",
+		      metavar="FILE")
+    parser.add_option('-d', '--db', dest='dsn', help="databse dsn", 
+		      metavar="DSN")
+    
 
-    def do_driverlist(self, subcmd, opts):
+    return parser.parse_args(argv)
 
-        for driver in sorted(clusto.driverlist):
-            print driver
+def runcmd(args):
+    
+    args[0] = 'clusto-' + args[0]
+    cmdname = args[0]
+    paths = os.environ['PATH'].split(':')
 
-    def do_typelist(self, subcmd, opts):
+    cmd = None
+    for path in paths:
+	cmdtest = os.path.join(path, cmdname)
+	if os.path.exists(cmdtest):
+	    cmd = cmdtest
+	    break
 
-        for clustotype in sorted(clusto.typelist):
-            print clustotype
-            
+    if not cmd:
+	raise CommandError(cmdname + " is not a clusto-command.")
+
+    
+    os.execvpe(cmdname, args, env=os.environ)
 
 
 if __name__ == '__main__':
-    clustocmd = ClustoCmd()
-    sys.exit(clustocmd.main())
+    sys.exit(main(sys.argv[1:]))
         

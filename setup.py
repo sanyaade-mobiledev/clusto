@@ -9,14 +9,18 @@ srcdir = os.path.dirname(sys.argv[0])
 
 setup(
     name = "Clusto",
-    version = "0.1.1",
+    version = "0.1.3",
     packages = find_packages('lib'),
     author = "Ron Gorodetzky",
     author_email = "ron@digg.com",
     description = "Clusto, cluster management and inventory system",
-    install_requires = ['sqlalchemy>=0.5.0beta2'],
+    install_requires = ['sqlalchemy>=0.5.0beta2', 'IPy>=0.55', 'IPython'],
     package_dir = {'':'lib'},
-    scripts=glob.glob(os.path.join(srcdir, 'scripts', 'clusto')),
+    #scripts=glob.glob(os.path.join(srcdir, 'scripts', 'clusto')),
+    scripts=[os.path.join(srcdir, 'scripts', 'clusto'), 
+	     os.path.join(srcdir, 'scripts', 'clusto-shell'), 
+	     os.path.join(srcdir, 'scripts', 'clusto-info'), 
+	     ],
     test_suite = "clusto.test.alltests.gettests"
     )
 
