@@ -36,6 +36,25 @@ def listClustoScripts(path):
     
     return map(lambda x: os.path.join(path, x), available)
 
+def runcmd(args):
+    
+    args[0] = 'clusto-' + args[0]
+    cmdname = args[0]
+    paths = os.environ['PATH'].split(':')
+
+    cmd = None
+    for path in paths:
+	cmdtest = os.path.join(path, cmdname)
+	if os.path.exists(cmdtest):
+	    cmd = cmdtest
+	    break
+
+    if not cmd:
+	raise CommandError(cmdname + " is not a clusto-command.")
+
+    
+    os.execvpe(cmdname, args, env=os.environ)
+
 
 def getCommand(cmdname):
 

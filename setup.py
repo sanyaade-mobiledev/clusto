@@ -20,6 +20,7 @@ setup(
     scripts=[os.path.join(srcdir, 'scripts', 'clusto'), 
 	     os.path.join(srcdir, 'scripts', 'clusto-shell'), 
 	     os.path.join(srcdir, 'scripts', 'clusto-info'), 
+	     os.path.join(srcdir, 'scripts', 'clusto-help'), 
 	     ],
     test_suite = "clusto.test.alltests.gettests"
     )

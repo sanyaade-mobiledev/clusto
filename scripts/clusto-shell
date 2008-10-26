@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
-#import rlcompleter, readline
-#readline.parse_and_bind('tab: complete')
+import sys
+from optparse import OptionParser
+
+parser = OptionParser(usage="usage: %prog")
+(options, args) = parser.parse_args(sys.argv)
+
 
 import clusto.scripthelpers
 

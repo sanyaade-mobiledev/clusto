@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+"""
+Print the help for clusto
+"""
+
+
+import sys
+
+import clusto
+from clusto.scripthelpers import *
+
+from optparse import OptionParser
+
+def parseargs(args):
+
+    pass
+
+def main(argv):
+
+    parser = OptionParser(usage="usage: %prog COMMAND")
+    (options, args) = parser.parse_args(argv)
+
+    if len(args) == 1:
+	print 'Available Commands:'
+	for i in getCommands():
+	    print ' ', i
+
+    if len(args) == 2:
+	runcmd([args[1], '--help'])
+
+    return 0
+
+def getCommands():
+    paths = [p for p in sys.path if p.endswith('bin')]
+    paths.extend(os.environ['PATH'].split(':'))
+    
+    commands = set()
+    for path in paths:
+
+	if os.path.isfile(path):
+	    base = os.path.basename(path)
+	    if base.startswith('clusto-'):
+		commands.add(base[7:])
+
+	if os.path.isdir(path):
+
+	    cmds = [cmd for cmd in os.listdir(path) if cmd.startswith('clusto-')]
+	    commands.update((c[7:] for c in cmds))
+
+    return list(sorted(commands))
+
+def runCommandHelp(cmd):
+    pass
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

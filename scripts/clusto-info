@@ -30,7 +30,7 @@ def main(argv):
 
 def parseargs(argv):
     
-    parser = OptionParser()
+    parser = OptionParser(usage="%prog")
 
     return parser.parse_args(argv)
 
