@@ -99,6 +99,7 @@ def beginTransaction():
 def rollbackTransaction():
     """Rollback a transaction"""
     SESSION.rollback()
+    SESSION.close()
 
 def commit():
     """Commit changes to the datastore"""

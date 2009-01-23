@@ -37,3 +37,46 @@ class TestClusto(testbase.ClustoTestBase):
         
     
 
+    def testTransactionRollback(self):
+
+	clusto.beginTransaction()
+	
+	d1 = Entity('d1')
+
+	clusto.getByName('d1')
+
+	d2 = Entity('d2')
+	clusto.rollbackTransaction()
+
+
+	self.assertRaises(LookupError, clusto.getByName, 'd1')
+
+    def testTransactionRollback2(self):
+
+	try:
+	    clusto.beginTransaction()
+
+	    c1 = Entity('c1')
+	    
+	    raise Exception()
+	except Exception:
+	    
+	    clusto.rollbackTransaction()
+
+	c2 = Entity('c2')
+	
+	self.assertRaises(LookupError, clusto.getByName, 'c1')
+	clusto.getByName('c2')
+
+    def testTransactionCommit(self):
+
+	try:
+	    clusto.beginTransaction()
+	    
+	    c1 = Entity('c1')
+	    clusto.commit()
+	except Exception:
+	    clusto.rollbackTransaction()
+
+	clusto.getByName('c1')
+
