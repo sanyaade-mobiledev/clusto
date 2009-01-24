@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""
+Get info about clusto and the clusto database.
+
+"""
+
 
 import sys
 
@@ -6,27 +11,67 @@ from optparse import OptionParser
 
 import clusto.scripthelpers
 
+cmds = {'driverlist':None,
+	'typelist':None}
+
+class Info:
+    
+    @staticmethod
+    def driverlist():
+	"Driver List"
+
+	for key in sorted(clusto.driverlist.keys()):
+	    print ' ', key
+	
+    @staticmethod
+    def typelist():
+	"Type List"
+	for key in sorted(clusto.typelist.keys()):
+	    print ' ', key
+
+	
+
+def printhelp():
+    
+    infos = [x for x in dir(Info) if not x.startswith('__')]
+
+    print "Available info commands:"
+    
+    print '  ', 'all', '\t - ', 'print all info'
+    for cmd in infos:
+	func = getattr(Info, cmd)
+	print '  ', cmd, '\t - ', func.__doc__
+
+    
 def main(argv):
 
     options, args = parseargs(argv)
 
     config, logger = clusto.scripthelpers.initScript()
 
-    print
+    args = args[1:]
+    print 
+    if not args:
+	printhelp()
+	return 0
+
+    if 'all' in args:
+	args = [x for x in dir(Info) if not x.startswith('__')]
+	
+	
     for cmd in args:
-	if cmd == 'driverlist':
-	    print "Driver List:"
+	if not hasattr(Info, cmd):
+	    printhelp()
+	    return 0
 
-	    for key in sorted(clusto.driverlist.keys()):
-		print ' ', key
-		
-	if cmd == 'typelist':
-	    print "Type List:"
-	    for key in sorted(clusto.typelist.keys()):
-		print ' ', key
-    
-
-    print
+    for cmd in args:
+	if hasattr(Info, cmd):
+	    func = getattr(Info, cmd)
+	    print func.__doc__, ':'
+	    func()
+	    print
+	    
+    return 0
 
 def parseargs(argv):
     
