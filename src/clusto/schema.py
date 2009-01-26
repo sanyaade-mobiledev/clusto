@@ -186,9 +186,6 @@ class Entity(object):
     An Entity's functionality is augmented by drivers which get included
     as mixins.  
     """
-    meta_attrs = {}
-
-    required_attrs = ()
     
     def __init__(self, name, driver='entity', clustotype='entity'):
         """
