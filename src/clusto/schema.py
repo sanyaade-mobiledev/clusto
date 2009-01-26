@@ -65,20 +65,6 @@ Index('key_num_subkey_idx',
       ATTR_TABLE.c.number, ATTR_TABLE.c.subkey, ATTR_TABLE.c.uniqattr,
       unique=True)
 
-TRANSACTION_TABLE = Table('transactions', METADATA,
-                          Column('txn_id', Integer, primary_key=True),
-                          Column('entity_name',
-                                 String(1024, convert_unicode=True,
-                                         assert_unicode=None),
-                                 nullable=False,),
-                          Column('function', Text(convert_unicode=True,
-                           assert_unicode=None),),
-                          Column('args', Text(convert_unicode=True,
-                           assert_unicode=None),),
-                          Column('timestamp', DateTime),
-                          )
-                          
-
 class Attribute(object):
     """
     Attribute class holds key/value pair backed by DB
