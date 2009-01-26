@@ -131,20 +131,6 @@ class Attribute(object):
         return "%s|%s|%s %s" % (entityname, self.fullkey,
                                 self.datatype, value)
 
-    def _get_key(self):
-
-        key = self.key_name
-
-        if self.key_number is not None:
-            key += str(self.key_number)
-
-        if self.subkey_name:
-            key += '-' + self.subkey_name
-
-
-        return key
-
-
     def getValueType(self, value=None):
         if value == None:
             if self.datatype == None:
