@@ -13,18 +13,6 @@ class ClustoDriver(type):
             raise DriverException("Driver %s missing _driverName attribute"
                                   % cls.__name__)
 
-        if not hasattr(cls, '_reservedAttrs'):
-            raise DriverException("Driver %s missing _reservedAttrs attribute"
-                                  % cls.__name__)
-
-        tempattrs = []
-        for klass in bases:
-            if hasattr(klass, 'meta_attrs'):
-                tempattrs.extend(klass.meta_attrs)
-
-        tempattrs.extend(cls.meta_attrs)
-        cls.all_meta_attrs = tuple(tempattrs)
-        
         if cls._driverName in DRIVERLIST:
             raise KeyError("class '%s' is trying to add the driverName '%s' "
                            "to the driver list but that name is already "
@@ -34,18 +22,6 @@ class ClustoDriver(type):
                               DRIVERLIST[cls._driverName].__name__))
         
 
-
-        for i in cls._reservedAttrs:
-            if i in RESERVEDATTRS:
-                raise DriverException("Driver %s is attempting to reserve "
-                                      "attribute %s which is already reserved "
-                                      "by driver %s"
-                                      % (cls.__name__,
-                                         i,
-                                         RESERVEDATTRS[i].__name__))
-            RESERVEDATTRS[i] = cls
-        
-            
         DRIVERLIST[cls._driverName] = cls
         TYPELIST[cls._clustoType] = cls
 

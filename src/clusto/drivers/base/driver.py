@@ -14,16 +14,10 @@ class Driver(object):
     
     __metaclass__ = ClustoDriver
 
-    meta_attrs = () # a tuple of (key, value) tuples
-
-    _mixins = set()
-    
     _clustoType = "generic"
     _driverName = "entity"
-    _reservedAttrs = tuple()
 
     _properties = dict()
-    #_defaultAttrs = tuple()
 
     def __new__(cls, nameDriverEntity, **kwargs):
 
