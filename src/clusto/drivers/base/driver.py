@@ -10,9 +10,7 @@ from clustodriver import *
 
 
 class Driver(object):
-    """
-    Base Driver.
-    """
+    """Base Driver."""
     
     __metaclass__ = ClustoDriver
 
@@ -258,9 +256,7 @@ class Driver(object):
 		    sortByKeys=True, 
 		    regex=False, 
 		    ):
-        """
-        This function lets you sort through various kinds of attribute lists.
-        """
+        "Filter various kinds of attribute lists."
 
 
 	result = attrlist
@@ -323,12 +319,7 @@ class Driver(object):
         return [(x.keytuple, x.value) for x in attrlist]
         
     def attrs(self, *args, **kwargs):
-        """
-        Function to get and filter the attributes of an entity in many
-        different ways.
-
-        
-        """
+        """Return attributes for this entity. """
 
 	if 'mergeContainerAttrs' in kwargs:
 	    mergeContainerAttrs = kwargs.pop('mergeContainerAttrs')
@@ -553,10 +544,7 @@ class Driver(object):
 		       
     @classmethod
     def getByAttr(cls, *args, **kwargs):
-        """
-        Return a list of Instances that have the given attribute with the given
-        value.
-        """
+        """Get list of Drivers that have by attributes search """
 	
 	attrlist = cls.doAttrQuery(*args, **kwargs)
 
