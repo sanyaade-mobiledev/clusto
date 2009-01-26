@@ -145,31 +145,6 @@ class Attribute(object):
         return key
 
 
-    @classmethod
-    def splitKeyName(self, keyname):
-        keyRegex = re.compile('^(_?[A-Za-z]+[0-9A-Za-z_]*?)([0-9]*?)(-[A-Za-z]+[0-9A-Za-z_-]*)?$')
-
-        match = keyRegex.match(keyname)      
-
-        if match:
-            splitkey = {}
-            key, num, subkey = match.groups()
-
-            splitkey['key_name'] = key
-
-            if not num:
-                splitkey['key_number'] =  None
-            else:
-                splitkey['key_number'] = int(num)
-            splitkey['subkey_name'] = subkey and subkey[1:] or None
-
-        else:
-            raise NameException("Attribute name %s is invalid. "
-                                "Attribute names may not contain periods or "
-                                "comas." % val)
-
-        return splitkey
-    
     def getValueType(self, value=None):
         if value == None:
             if self.datatype == None:
