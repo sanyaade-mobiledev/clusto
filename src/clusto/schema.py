@@ -66,9 +66,8 @@ Index('key_num_subkey_idx',
       unique=True)
 
 class Attribute(object):
-    """
-    Attribute class holds key/value pair backed by DB
-    """
+    "Attribute class holds key/value pair backed by DB"
+
     def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
 
         self.key = key
@@ -188,8 +187,7 @@ class Entity(object):
     """
     
     def __init__(self, name, driver='entity', clustotype='entity'):
-        """
-        Initialize an Entity.
+        """Initialize an Entity.
 
         @param name: the name of the new Entity
         @type name: C{str}
@@ -205,8 +203,7 @@ class Entity(object):
 
         
     def __eq__(self, otherentity):
-        """
-        Am I the same as the Other Entity.
+        """Am I the same as the Other Entity.
 
         @param otherentity: the entity you're comparing with
         @type otherentity: L{Entity}
@@ -237,17 +234,13 @@ class Entity(object):
 		    self.name, self.driver, self.type)
 
     def __str__(self):
-        """
-        return string representing this entity
-        """
+        "Return string representing this entity"
             
         return "%s.clustodriver.string %s" % (self.name, self.driver)
             
 
     def delete(self):
-        """
-        Delete self and all references to self.
-        """
+        "Delete self and all references to self."
 
         try:
             SESSION.delete(self)
