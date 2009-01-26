@@ -85,8 +85,6 @@ class Attribute(object):
     """
     def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
 
-        sess = create_session()
-
         self.key = key
         
         self.value = value
