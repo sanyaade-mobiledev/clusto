@@ -160,18 +160,6 @@ class Attribute(object):
     def keytuple(self):
 	return (self.key, self.number, self.subkey)
 
-    @property
-    def fullkey(self):
-	s = [self.key]
-	
-	for i in (self.number, self.subkey):
-	    s.append(';')
-	    if i is not None:
-		s.append(str(i))
-
-	
-	return ''.join(s)
-
     @classmethod
     def getType(self, value):
 
