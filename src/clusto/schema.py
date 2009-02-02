@@ -31,7 +31,7 @@ SESSION = scoped_session(sessionmaker())#autoflush=True, autocommit=True))
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
-                    Column('name', String(1024, convert_unicode=True,
+                    Column('name', String(512, convert_unicode=True,
                            assert_unicode=None), unique=True,
                            nullable=False, ),
                     Column('type', String(64), nullable=False),
