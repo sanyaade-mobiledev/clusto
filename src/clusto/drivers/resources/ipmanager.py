@@ -35,9 +35,9 @@ class IPManager(ResourceManager):
 
 	try:
 	    if not isinstance(numbered, bool) and isinstance(numbered, int):
-		ip = IPy.IP(numbered)
+		ip = IPy.IP(numbered+2147483648)
 	    else:
-		ip = IPy.IP(resource)
+		ip = IPy.IP(resource)		
 	except ValueError:
 	    raise ResourceTypeException("%s is not a valid ip."
 					% resource)
@@ -47,7 +47,7 @@ class IPManager(ResourceManager):
 					% (str(resource), self.baseip, self.netmask))
 
 
-	return ('ip', ip.int())
+	return ('ip', ip.int()-2147483648)
 
 
     def allocator(self):
@@ -59,16 +59,17 @@ class IPManager(ResourceManager):
 	lastip = self.attrQuery('_lastip')
 		
 	if not lastip:
-	    startip=int(self.ipy.net().int() + 1)
+	    # I subtract 2147483648 to keep in int range
+	    startip=int(self.ipy.net().int() + 1) - 2147483648 
 	else:
 	    startip = lastip[0].value
 
 
 	
 	## generate new ips the slow naive way
-	nextip = long(startip)
-	gateway = IPy.IP(self.gateway).int()
-	endip = self.ipy.broadcast().int()
+	nextip = int(startip)
+	gateway = IPy.IP(self.gateway).int() - 2147483648
+	endip = self.ipy.broadcast().int() - 2147483648
 
 	for i in range(2):
 	    while nextip < endip:
@@ -77,9 +78,9 @@ class IPManager(ResourceManager):
 		    nextip += 1
 		    continue
 
-		if self.available(nextip):
+		if self.available('ip', nextip):
 		    self.setAttr('_lastip', nextip)
-		    return self.ensureType(nextip)
+		    return self.ensureType('ip', nextip)
 		else:
 		    nextip += 1
 	    
