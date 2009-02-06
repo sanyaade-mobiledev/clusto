@@ -28,8 +28,7 @@ class SimpleNameManager(ResourceManager):
                  basename='',
                  digits=2,
                  startingnum=1,
-                 incrementForever=True,
-                 leadingZeros=True,
+                 leadingZeros=int(True),
                  *args, **kwargs):
 
 
