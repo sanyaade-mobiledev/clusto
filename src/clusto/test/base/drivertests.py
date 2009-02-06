@@ -27,9 +27,10 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
 	d1.addAttr('foo', 'bar3')
 
-	self.assertEqual(d1.attrItems(),
+	self.assertEqual(sorted(d1.attrItems()),
+			 sorted(
 			 [(('foo', None, None), 'bar2'),
-			  (('foo', None, None), 'bar3')])
+			  (('foo', None, None), 'bar3')]))
 
 	d1.setAttr('foo', 'bar4')
 	self.assertEqual(d1.attrItems(),
@@ -81,14 +82,14 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(d1.attrItems(),
-                         [(('foo', None, None), 'bar'), 
+        self.assertEqual(sorted(d1.attrItems()),
+                         sorted([(('foo', None, None), 'bar'), 
 			  (('foo', 5, None), 'bar1'), 
-			  (('foo', 6, None), 'bar2')])
+			  (('foo', 6, None), 'bar2')]))
 
-        self.assertEqual(d1.attrItems(numbered=True),
-			 [(('foo', 5, None), 'bar1'), 
-			  (('foo', 6, None), 'bar2')])
+        self.assertEqual(sorted(d1.attrItems(numbered=True)),
+			 sorted([(('foo', 5, None), 'bar1'), 
+			  (('foo', 6, None), 'bar2')]))
 
 
     def testAutoNumberedAttrs(self):
@@ -101,14 +102,14 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(d1.attrItems(),
-                         [(('foo', None, None), 'bar'),
-			  (('foo', 0, None), 'bar1'),
-			  (('foo', 1, None), 'bar2')])
+        self.assertEqual(sorted(d1.attrItems()),
+                         sorted([(('foo', None, None), 'bar'),
+				 (('foo', 0, None), 'bar1'),
+				 (('foo', 1, None), 'bar2')]))
 
-        self.assertEqual(d1.attrItems(numbered=True),
-                         [(('foo', 0, None), 'bar1'),
-			  (('foo', 1, None), 'bar2')])
+        self.assertEqual(sorted(d1.attrItems(numbered=True)),
+                         sorted([(('foo', 0, None), 'bar1'),
+				 (('foo', 1, None), 'bar2')]))
 
         
     def testSubKeyAttrs(self):
