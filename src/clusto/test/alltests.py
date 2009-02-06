@@ -22,8 +22,9 @@ def gettests(tests=None):
     return suite
 
 
-def runtests(tests=None):
+def runtests(tests=None, db='sqlite:///:memory:'):
 
+    clusto.test.testbase.DB=db
     suite = gettests(tests)
     runner = unittest.TextTestRunner()    
     runner.run(suite)
@@ -33,4 +34,12 @@ def runtests(tests=None):
 
 if __name__ == '__main__':
 
-    runtests(sys.argv[1:])
+    import optparse
+
+    parser = optparse.OptionParser()
+    parser.add_option('--db', dest='dsn', 
+		      help='specifies which db to test against',
+		      default='sqlite:///:memory:')
+    
+    (options, args) = parser.parse_args()
+    runtests(args, options.dsn)

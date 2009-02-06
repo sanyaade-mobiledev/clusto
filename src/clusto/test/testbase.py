@@ -8,6 +8,7 @@ import unittest
 
 import clusto
 
+DB='sqlite:///:memory:'
 
 class ClustoTestResult(unittest.TestResult):
     def addError(self, test, err):
@@ -29,7 +30,7 @@ class ClustoTestBase(unittest.TestCase):
     
     def setUp(self):
 
-        clusto.connect('sqlite:///:memory:')
+        clusto.connect(DB)
         clusto.initclusto()
         self.data()
 
@@ -37,7 +38,9 @@ class ClustoTestBase(unittest.TestCase):
     def tearDown(self):
 
         clusto.clear()
+	clusto.disconnect()
         clusto.METADATA.drop_all()
+
 
 
     def defaultTestResult(self):
