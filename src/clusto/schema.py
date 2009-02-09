@@ -66,7 +66,10 @@ Index('key_num_subkey_idx',
       unique=True)
 
 class Attribute(object):
-    "Attribute class holds key/value pair backed by DB"
+    """Attribute class holds key/value pair
+
+    NOT backed by DB
+    """
 
     def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
 
@@ -174,7 +177,36 @@ class Attribute(object):
         except InvalidRequestError:
             pass #SESSION.expunge(self)
 
+    @classmethod
+    def queryarg(cls, key=None, value=(), subkey=(), number=(), uniqattr=False):
 
+	args = []
+	
+	if key:
+	    args.append(Attribute.key==key)
+	    
+	if number is not ():
+	    args.append(Attribute.number==number)
+
+	if subkey is not ():
+	    args.append(Attribute.subkey==subkey)
+
+	if value is not ():
+	    valtype = Attribute.getType(value) + '_value'
+	    if valtype == 'relation_value':
+
+		# get entity_id from Drivers too
+		if hasattr(value, 'entity'):
+		    e = value.entity
+		else:
+		    e = value
+		    
+		args.append(getattr(Attribute, 'relation_id') == e.entity_id)
+		
+	    else:
+		args.append(getattr(Attribute, valtype) == value)
+
+	return and_(*args)
 
 class Entity(object):
     """

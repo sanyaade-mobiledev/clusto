@@ -125,7 +125,7 @@ class Driver(object):
 	if name in self._properties:	    	    
 	    if not self.hasAttr(name):
 		return self._properties[name]
-	    attr = self.attrQuery(name, numbered=0, subkey='property', uniqattr=True)
+	    attr = self.attrQuery(name, subkey='property', uniqattr=True)
 	    if not attr:
 		return None
 	    else:
@@ -142,7 +142,7 @@ class Driver(object):
 		attr = a[0]		
 		attr.value = value
 	    else:
-		self.setAttr(name, value, numbered=0, subkey='property', uniqattr=True)
+		self.setAttr(name, value, subkey='property', uniqattr=True)
 	else:
 	    object.__setattr__(self, name, value)
         

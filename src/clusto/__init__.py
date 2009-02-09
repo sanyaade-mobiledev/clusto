@@ -62,8 +62,47 @@ def getDriver(entity, ignoreDriverColumn=False):
 
     return Driver
 
-def get(name=None, type=None, attrs=None):
-    pass
+def getEntities(names=(), clustotypes=(), clustodrivers=(), attrs=()):
+    """Get entities matching the given criteria
+
+    @param names: list of names to match
+    @type names: list of strings
+    
+    @param clustotypes: list of clustotypes to match
+    @param clustotypes: list of strings or Drivers
+
+    @param clustodrivers: list of clustodrives to get
+    @type clustodrives: list of strings or Drivers
+
+    @param attrs: list of attribute parameters
+    @type attrs: list of dictionaries with the following 
+                 valid keys: key, numbered, subkey, value
+    """
+    
+    query = SESSION.query(Entity)
+
+    if names:
+	query = query.filter(Entity.name.in_(names))
+
+    if clustotypes:
+	ct = [(issubclass(i, Driver) and i._clustoType or i) 
+	      for i in clustotypes]
+	query = query.filter(Entity.type.in_(ct))
+
+    if clustodrivers:
+	cd = [(issubclass(i, Driver) and i._driverName or i) 
+	      for i in clustodrivers]
+	query = query.filter(Entity.driver.in_(cd))
+
+    if attrs:
+	query = query.filter(Attribute.entity_id==Entity.entity_id)
+
+	query = query.filter(or_(*[Attribute.queryarg(**args) 
+				   for args in attrs]))
+	
+
+    return [Driver(entity) for entity in query.all()]
+
     
 def getByName(name):
     try:
