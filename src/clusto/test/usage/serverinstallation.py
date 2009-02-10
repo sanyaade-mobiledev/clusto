@@ -90,6 +90,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 	r.insert(newserver,2)
 	p1.connectPorts('pwr', 0, newserver, 0)
 	sw.connectPorts('eth', 0, newserver, 0)
+	sw.connectPorts('eth', 2, p1, 0)
 
 	self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
 
