@@ -30,15 +30,13 @@ class PortMixin:
 
 	if not isinstance(num, int):
 
-	    portmap = self._portmeta[porttype].get('map')
-	    	    
-	    if not portmap:
+	    if hasattr(self, '_portmap'):
+		num = self._portmap(porttype, num)
+	    else:
 		msg = "passed in %s but %s has no port map to translate " \
 		      "into an integer" % (num, self.name)
 		    
 		raise ConnectionException(msg)
-	    else:
-		num = portmap[num]
 		
 	return num
 
