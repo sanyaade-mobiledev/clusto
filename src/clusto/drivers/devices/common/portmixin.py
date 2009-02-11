@@ -17,27 +17,23 @@ class PortMixin:
 		  }
 
 
-    def _checkPort(self, porttype, portnum):
-	if not self.portExists(porttype, portnum):
-	    raise TypeError("No port %s:%d exists on %s."
-			    % (porttype, portnum, self.name))
-
     def _portKey(self, porttype):
 	
 	return '_port-' + porttype
     
     def _ensurePortNum(self, porttype, num):
 
-	if not isinstance(num, int):
 
-	    if hasattr(self, '_portmap'):
-		num = self._portmap(porttype, num)
-	    else:
-		msg = "passed in %s but %s has no port map to translate " \
-		      "into an integer" % (num, self.name)
+	if not isinstance(num, int) \
+		or not self._portmeta.has_key(porttype) \
+		or num < 0 \
+		or num >= self._portmeta[porttype]['numports']:
+
+	    msg = "No port %s:%s exists on %s." % (porttype, str(num), self.name)
 		    
-		raise ConnectionException(msg)
+	    raise ConnectionException(msg)
 		
+
 	return num
 
     def connectPorts(self, porttype, srcportnum, dstdev, dstportnum):
@@ -117,10 +113,11 @@ class PortMixin:
 	"""return true if the given port exists on this device"""
 	
   	if ((porttype in self._portmeta)):
-	    portnum = self._ensurePortNum(porttype, portnum)
-
-	    if portnum >= 0 and portnum < self._portmeta[porttype]['numports']:
+	    try:
+		portnum = self._ensurePortNum(porttype, portnum)
 		return True
+	    except ConnectionException:
+		return False
 	else:
 	    return False
 
@@ -142,8 +139,6 @@ class PortMixin:
 
 	portnum = self._ensurePortNum(porttype, portnum)
 
-	self._checkPort(porttype, portnum)
-
 	self.setAttr(key=self._portKey(porttype),
 		     numbered=portnum,
 		     subkey=key,
@@ -155,8 +150,6 @@ class PortMixin:
 
 	portnum = self._ensurePortNum(porttype, portnum)
 
-	self._checkPort(porttype, portnum)
-
 	self.delAttrs(key=self._portKey(porttype),
 		      numbered=portnum,
 		      subkey=key)
@@ -164,7 +157,7 @@ class PortMixin:
     def getPortAttr(self, key, porttype, portnum):
 	"""get an attribute on the given port"""
 
-	self._checkPort(porttype, portnum)
+	portnum = self._ensurePortNum(porttype, portnum)
 
 	attr = self.attrs(key=self._portKey(porttype),
 			  numbered=portnum,
