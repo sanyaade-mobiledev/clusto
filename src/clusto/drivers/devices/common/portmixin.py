@@ -24,8 +24,8 @@ class PortMixin:
     def _ensurePortNum(self, porttype, num):
 
 
-	if not isinstance(num, int) \
-		or not self._portmeta.has_key(porttype) \
+	if not self._portmeta.has_key(porttype) \
+		or not isinstance(num, int) \
 		or num < 0 \
 		or num >= self._portmeta[porttype]['numports']:
 
