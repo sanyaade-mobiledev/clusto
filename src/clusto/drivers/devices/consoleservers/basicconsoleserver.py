@@ -1,7 +1,8 @@
 
-from clusto.drivers.base import Device
+from clusto.drivers import Device
+from clusto.drivers.devices import PortMixin
 
-class BasicConsoleServer(Device):
+class BasicConsoleServer(PortMixin, Device):
     """
     Basic console server Driver
     """
@@ -10,3 +11,8 @@ class BasicConsoleServer(Device):
     _driverName = 'basicconsoleserver'
 
     
+    _portmeta = { 'pwr' : { 'numports':1, },
+		  'eth' : { 'numports':1, },
+		  'ser' : { 'numports':24, },
+		  }
+
