@@ -11,6 +11,4 @@ class BasicPowerStrip(PortMixin, Device):
     _driverName = "basicpowerstrip"
     
 
-    _properties = { 'maxport': 20,
-                    'minport': 1 }
     
