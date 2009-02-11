@@ -100,7 +100,8 @@ class BasicRack(Location):
         returns a tuple of (rack, u-number)
         """
 
-	rack = set(device.parents(instanceOf=BasicRack))
+	rack = set(device.parents(clustoTypes=[cls]))
+
 
 	if len(rack) > 1:
 	    raise Exception("%s is somehow in more than one rack, this will "

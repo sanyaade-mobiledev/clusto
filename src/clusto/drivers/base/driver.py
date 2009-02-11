@@ -19,6 +19,15 @@ class Driver(object):
 
     _properties = dict()
 
+
+    @property
+    def type(self):
+	return self.entity.type
+
+    @property
+    def driver(self):
+	return self.entity.driver
+
     def __new__(cls, nameDriverEntity, **kwargs):
 
 	if isinstance(nameDriverEntity, Driver):
@@ -249,6 +258,8 @@ class Driver(object):
 		    subkey=(), ignoreHidden=True, uniqattr=(),
 		    sortByKeys=True, 
 		    regex=False, 
+		    clustoTypes=None,
+		    clustoDrivers=None,
 		    ):
         "Filter various kinds of attribute lists."
 
@@ -303,6 +314,14 @@ class Driver(object):
 	if ignoreHidden:
 	    result = (attr for attr in result if not attr.key.startswith('_'))
 
+	if clustoDrivers:
+	    cdl = [clusto.getDriverName(n) for n in clustoDrivers]
+	    result = (attr for attr in result if attr.entity.driver in cdl)
+
+	if clustoTypes:
+	    ctl = [clusto.getTypeName(n) for n in clustoTypes]
+	    result = (attr for attr in result if attr.entity.type in ctl)
+	    
 	if sortByKeys:
 	    result = sorted(result)
 
@@ -337,26 +356,7 @@ class Driver(object):
 	"""
 
 
-# 	query = SESSION.query(Attribute)
-# 	query = query.filter_by(relation_id=self.entity.entity_id)
-
-	clustoType = None
- 	clustoDriver = None
-	instanceOf = None
-	if 'clustoType' in kwargs:
-	    clustoType = kwargs.pop('clustoType')
-
-	if 'clustoDriver' in kwargs:
-	    clustoDriver = kwargs.pop('clustoDriver')
-
 	attrs = self._attrFilter(self.entity._references, *args, **kwargs)
-
-	if clustoDriver:
-	    attrs = (attr for attr in attrs if attr.entity.driver == clustoDriver)
-	if clustoType:
-	    attrs = (attr for attr in attrs if attr.entity.type == clustoType)
-
-	    
 
 	return list(attrs)
 
@@ -367,16 +367,9 @@ class Driver(object):
 	argument.
 	"""
 	
-	instanceOf = None
-	if 'instanceOf' in kwargs:
-	    instanceOf = kwargs.pop('instanceOf')
-	    
 	refs = [Driver(a.entity) for a in sorted(self.references(*args, **kwargs),
 						 lambda x,y: cmp(x.attr_id,
 								 y.attr_id))]
-
-	if instanceOf:
-	    refs = [x for x in refs if isinstance(x, instanceOf)]
 
 	return refs
 
@@ -515,7 +508,9 @@ class Driver(object):
 
 	"""
 
-	return self.attrs("_contains", *args, **kwargs)
+	attrs = self.attrs("_contains", *args, **kwargs) 
+
+	return attrs
 
     def contents(self, *args, **kwargs):
 	"""Return the contents of this Entity.  Such that:
@@ -529,10 +524,10 @@ class Driver(object):
 	
 	return [attr.value for attr in self.contentAttrs(*args, **kwargs)]
 
-    def parents(self, instanceOf=None):	
+    def parents(self, **kwargs):	
 	"""Return a list of Things that contain _this_ Thing. """
 
-	parents = self.referencers('_contains', instanceOf=instanceOf)
+	parents = self.referencers('_contains', **kwargs)
 
 	return parents
 		       

@@ -53,6 +53,33 @@ def clear():
     #SESSION.remove()
 
 
+def getDriverName(name):
+    "Return driver name given a name, Driver class, or Driver/Entity instance."
+
+    if isinstance(name, str):
+	if name in DRIVERLIST:
+	    return name
+	else:
+	    raise NameError("driver name %s doesn't exist." % name)
+    elif isinstance(name, type):
+	return name._driverName
+    else:
+	return name.driver
+
+def getTypeName(name):
+
+    if isinstance(name, str):
+	if name in TYPELIST:
+	    return name
+	else:
+	    raise NameError("driver name %s doesn't exist." % name)
+
+    elif isinstance(name, type):
+	return name._clustoType
+    else:
+	return name.type
+	
+
 def getDriver(entity, ignoreDriverColumn=False):
     """Return the driver to use for a given entity """
 

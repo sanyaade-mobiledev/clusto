@@ -9,7 +9,7 @@ srcdir = os.path.join(os.path.dirname(sys.argv[0]), 'src')
 
 setup(
     name = "clusto",
-    version = "0.1.12",
+    version = "0.1.13",
     packages = find_packages('src'),
     author = "Ron Gorodetzky",
     author_email = "ron@digg.com",
