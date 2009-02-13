@@ -11,8 +11,8 @@ class BasicConsoleServer(PortMixin, Device):
     _driverName = 'basicconsoleserver'
 
     
-    _portmeta = { 'pwr' : { 'numports':1, },
-		  'eth' : { 'numports':1, },
-		  'ser' : { 'numports':24, },
+    _portmeta = { 'pwr-nema-5' : { 'numports':1, },
+		  'nic-eth' : { 'numports':1, },
+		  'console-serial' : { 'numports':24, },
 		  }
 

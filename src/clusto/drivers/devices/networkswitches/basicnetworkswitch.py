@@ -11,7 +11,7 @@ class BasicNetworkSwitch(PortMixin, Device):
     _driverName = 'basicnetworkswitch'
 
 
-    _portmeta = {'pwr' : {'numports':1},
-		 'eth' : {'numports':24}}
+    _portmeta = {'pwr-nema-5' : {'numports':1},
+		 'nic-eth' : {'numports':24}}
 
 

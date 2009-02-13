@@ -51,18 +51,18 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         sw = clusto.getByName('sw1')
 	p1 = clusto.getByName('p1')
 
-        sw.connectPorts('eth', 0, s, 0)
+        sw.connectPorts('nic-eth', 0, s, 0)
         
         
 	self.assertRaises(ConnectionException,
-			  s.connectPorts, 'eth', 0, sw, 1)
+			  s.connectPorts, 'nic-eth', 0, sw, 1)
 
-	p1.connectPorts(porttype='pwr',
+	p1.connectPorts(porttype='pwr-nema-5',
 			srcportnum=0,
 			dstdev=s,
 			dstportnum=0)
 			
-	self.assertEqual(s.getConnected('pwr', 0),
+	self.assertEqual(s.getConnected('pwr-nema-5', 0),
 			 p1)
 
 
@@ -88,9 +88,9 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 	self.assertRaises(TypeError, r.insert, newserver, 1)
 
 	r.insert(newserver,2)
-	p1.connectPorts('pwr', 0, newserver, 0)
-	sw.connectPorts('eth', 0, newserver, 0)
-	sw.connectPorts('eth', 2, p1, 0)
+	p1.connectPorts('pwr-nema-5', 0, newserver, 0)
+	sw.connectPorts('nic-eth', 0, newserver, 0)
+	sw.connectPorts('nic-eth', 2, p1, 0)
 
 	self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
 

@@ -12,8 +12,8 @@ class PortMixin:
     
     # _portmeta = { 'porttype' : {'numports': 10 }}
 
-    _portmeta = { 'pwr' : { 'numports':1, },
-		  'eth' : { 'numports':2, },
+    _portmeta = { 'pwr-nema-5' : { 'numports':1, },
+		  'nic-eth' : { 'numports':2, },
 		  }
 
 

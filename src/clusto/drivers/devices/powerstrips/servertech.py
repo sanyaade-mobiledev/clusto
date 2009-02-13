@@ -19,9 +19,10 @@ class PowerTowerXM(BasicPowerStrip):
     _properties = {'withslave':0}
 
 
-    _portmeta = { 'mains': { 'numports':2 },
-		  'pwr' : { 'numports':16, },
-		  'eth' : { 'numports':1, },
+    _portmeta = { 'pwr-nema-L5': { 'numports':2 },
+		  'pwr-nema-5' : { 'numports':16, },
+		  'nic-eth' : { 'numports':1, },
+		  'console-serial' : { 'numports':1, },
 		  }
 
 
