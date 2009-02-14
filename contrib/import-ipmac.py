@@ -86,6 +86,9 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
 
     try:
         hostname = socket.gethostbyaddr(ipaddr)[0]
+        hostname = hostname.split('.', 1)
+        if len(hostname) > 1:
+            hostname = hostname[0]
     except socket.herror:
         print 'Unable to find a hostname. You must add this server manually: %s' % ' '.join(name, macaddr, ipaddr, portnum)
         return

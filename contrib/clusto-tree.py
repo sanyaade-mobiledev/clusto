@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from clusto.scripthelpers import getClustoConfig
 import clusto
 import sys
@@ -14,6 +15,7 @@ def print_tree(root, indent=0, attrs=['name']):
 def main():
     if len(sys.argv) < 2:
         print 'Usage: %s <object name> [attributes...]' % sys.argv[0]
+        sys.exit(0)
 
     if len(sys.argv) > 2:
         attrs = sys.argv[2:]
