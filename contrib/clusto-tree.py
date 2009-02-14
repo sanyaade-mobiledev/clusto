@@ -7,7 +7,8 @@ def print_tree(root, indent=0, attrs=['name']):
     for x in root.contents():
         txt = ''
         for attr in attrs:
-            txt += '%s: %s\t' % (attr, getattr(x, attr, 'None'))
+            value = getattr(x, attr, 'None')
+            txt += '%s: %s\t' % (attr, value)
 
         print '\t' * indent, txt
         print_tree(x, indent=(indent + 1), attrs=attrs)
