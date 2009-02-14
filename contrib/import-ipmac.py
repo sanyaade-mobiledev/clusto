@@ -125,11 +125,12 @@ def main():
 
     for line in fd.readlines():
         switch, macaddr, ipaddr, port = line.rstrip('\n').split(';', 3)
-        load_ipmac(switch, macaddr, ipaddr, port)
+        import_ipmac(switch, macaddr, ipaddr, port)
     #pprint(clusto.getEntities())
 
 if __name__ == '__main__':
     config = getClustoConfig()
+    print config.get('clusto', 'dsn')
     clusto.connect(config.get('clusto', 'dsn'))
     #clusto.initclusto()
     main()
