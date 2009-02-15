@@ -100,6 +100,8 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         ifnum = 1
 
     server.setPortAttr('MACAddress', macaddr, 'nic-eth', ifnum)
+    # TODO: Add the ip address to the server/port
+
     if not server.portFree('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
