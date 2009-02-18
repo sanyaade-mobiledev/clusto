@@ -1,8 +1,12 @@
-from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicNetworkSwitch, PowerTowerXM
+from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
+from traceback import format_exc
+from subprocess import Popen, PIPE
+from xml.etree import ElementTree
 from pprint import pprint
+import yaml
 import socket
 import sys
 
@@ -58,12 +62,21 @@ def get_or_create(objtype, name):
     except LookupError:
         return objtype(name)
 
+def get_snmp_hostname(ipaddr, community='digg1t'):
+    proc = Popen(['scli', '-c', 'show system info', '-x', ipaddr, community], stdout=PIPE)
+    xmldata = proc.stdout.read()
+    xmltree = ElementTree.fromstring(xmldata)
+    hostname = list(xmltree.getiterator('name'))
+    if len(hostname) > 0:
+        hostname = hostname[0].text
+    else:
+        hostname = None
+    return hostname
+
 def import_ipmac(name, macaddr, ipaddr, portnum):
     '''
     Insert or update a server in clusto
     '''
-
-    # Query clusto for a device matching the mac address.
 
     # Get the basic datacenter, rack, and switch objects
     portnum = int(portnum)
@@ -84,13 +97,21 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if not pwr in rack:
         rack.insert(pwr, (28, 29))
 
-    try:
-        hostname = socket.gethostbyaddr(ipaddr)[0]
-    except socket.herror:
-        print 'Unable to find a hostname. You must add this server manually: %s' % ' '.join(name, macaddr, ipaddr, portnum)
-        return
+    # Query clusto for a device matching the mac address.
+    server = None
+    for dev in rack.contents():
+        ru = rack.getRackAndU(dev)['RU'][0]
+        if ru == SWITCHPORT_TO_RU[portnum]:
+            server = dev
+            break
 
-    server = get_or_create(BasicServer, hostname)
+    if not server:
+        try:
+            namemgr = clusto.getByName('servernames')
+        except:
+            namemgr = SimpleEntityNameManager('servernames', basename='id', digits=5)
+        server = namemgr.allocate(BasicServer)
+
     if not server in rack:
         rack.insert(server, SWITCHPORT_TO_RU[portnum])
 
@@ -100,8 +121,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         ifnum = 1
 
     server.setPortAttr('MACAddress', macaddr, 'nic-eth', ifnum)
-    # TODO: Add the ip address to the server/port
-
     if not server.portFree('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
@@ -112,6 +131,26 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if server.portFree('pwr-nema-5', 0):
         ru = rack.getRackAndU(server)['RU'][0]
         server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
+    
+    iplist = [x.value for x in server.attrs('ip-address')]
+    if not ipaddr in iplist:
+        server.addAttr('ip-address', ipaddr)
+
+    names = []
+    try:
+        names = getfqdn(ipaddr)
+    except: pass
+
+    try:
+        names.append(get_snmp_hostname(ipaddr))
+    except: pass
+
+    namelist = [x.value for x in server.attrs('hostname')]
+    for hostname in names:
+        if not hostname in namelist:
+            server.addAttr('hostname', hostname)
+
+    #ipnet = IPManager('sjc1-internal-network', gateway='10.2.128.1', netmask='255.255.252.0', baseip='
 
     clusto.commit()
     pprint(server)
@@ -127,12 +166,14 @@ def main():
 
     for line in fd.readlines():
         switch, macaddr, ipaddr, port = line.rstrip('\n').split(';', 3)
-        import_ipmac(switch, macaddr, ipaddr, port)
+        try:
+            import_ipmac(switch, macaddr, ipaddr, port)
+        except:
+            print format_exc()
     #pprint(clusto.getEntities())
 
 if __name__ == '__main__':
     config = getClustoConfig()
-    print config.get('clusto', 'dsn')
     clusto.connect(config.get('clusto', 'dsn'))
-    #clusto.initclusto()
+    clusto.initclusto()
     main()
