@@ -43,7 +43,7 @@ def flush():
 
     SESSION.flush()
     SESSION.commit()
-	
+        
 
 
 def clear():
@@ -57,28 +57,28 @@ def getDriverName(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
 
     if isinstance(name, str):
-	if name in DRIVERLIST:
-	    return name
-	else:
-	    raise NameError("driver name %s doesn't exist." % name)
+        if name in DRIVERLIST:
+            return name
+        else:
+            raise NameError("driver name %s doesn't exist." % name)
     elif isinstance(name, type):
-	return name._driverName
+        return name._driverName
     else:
-	return name.driver
+        return name.driver
 
 def getTypeName(name):
 
     if isinstance(name, str):
-	if name in TYPELIST:
-	    return name
-	else:
-	    raise NameError("driver name %s doesn't exist." % name)
+        if name in TYPELIST:
+            return name
+        else:
+            raise NameError("driver name %s doesn't exist." % name)
 
     elif isinstance(name, type):
-	return name._clustoType
+        return name._clustoType
     else:
-	return name.type
-	
+        return name.type
+        
 
 def getDriver(entity, ignoreDriverColumn=False):
     """Return the driver to use for a given entity """
@@ -109,24 +109,24 @@ def getEntities(names=(), clustotypes=(), clustodrivers=(), attrs=()):
     query = SESSION.query(Entity)
 
     if names:
-	query = query.filter(Entity.name.in_(names))
+        query = query.filter(Entity.name.in_(names))
 
     if clustotypes:
-	ct = [(issubclass(i, Driver) and i._clustoType or i) 
-	      for i in clustotypes]
-	query = query.filter(Entity.type.in_(ct))
+        ct = [(issubclass(i, Driver) and i._clustoType or i) 
+              for i in clustotypes]
+        query = query.filter(Entity.type.in_(ct))
 
     if clustodrivers:
-	cd = [(issubclass(i, Driver) and i._driverName or i) 
-	      for i in clustodrivers]
-	query = query.filter(Entity.driver.in_(cd))
+        cd = [(issubclass(i, Driver) and i._driverName or i) 
+              for i in clustodrivers]
+        query = query.filter(Entity.driver.in_(cd))
 
     if attrs:
-	query = query.filter(Attribute.entity_id==Entity.entity_id)
+        query = query.filter(Attribute.entity_id==Entity.entity_id)
 
-	query = query.filter(or_(*[Attribute.queryarg(**args) 
-				   for args in attrs]))
-	
+        query = query.filter(or_(*[Attribute.queryarg(**args) 
+                                   for args in attrs]))
+        
 
     return [Driver(entity) for entity in query.all()]
 

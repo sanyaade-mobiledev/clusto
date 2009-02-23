@@ -22,7 +22,7 @@ import datetime
 import clusto
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
-	   'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
+           'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
 
 METADATA = MetaData()
 
@@ -77,36 +77,36 @@ class Attribute(object):
         
         self.value = value
 
-	self.subkey = subkey
+        self.subkey = subkey
 
-	self.number = number
+        self.number = number
 
-	if not uniqattr:
-	    self.uniqattr = None
-	else:
-	    self.uniqattr = True
-	
+        if not uniqattr:
+            self.uniqattr = None
+        else:
+            self.uniqattr = True
+        
     def __cmp__(self, other):
 
-	if not isinstance(other, Attribute):
-	    raise TypeError("Can only compare equality with an Attribute. "
-			    "Got a %s instead." % (type(other).__name__))
+        if not isinstance(other, Attribute):
+            raise TypeError("Can only compare equality with an Attribute. "
+                            "Got a %s instead." % (type(other).__name__))
 
         return cmp(self.key, other.key)
     
     def __eq__(self, other):
 
-	if not isinstance(other, Attribute):
-	    return False
+        if not isinstance(other, Attribute):
+            return False
 
         return ((self.key == other.key) and (self.value == other.value))
 
     def __repr__(self):
-	
-	s = "%s(key=%s, value=%s, subkey=%s, number=%s)"
+        
+        s = "%s(key=%s, value=%s, subkey=%s, number=%s)"
 
-	return s % (self.__class__.__name__, 
-		    self.key, self.value, self.subkey, self.number)
+        return s % (self.__class__.__name__, 
+                    self.key, self.value, self.subkey, self.number)
 
     def __str__(self):
 
@@ -132,7 +132,7 @@ class Attribute(object):
 
     @property
     def keytuple(self):
-	return (self.key, self.number, self.subkey)
+        return (self.key, self.number, self.subkey)
 
     @classmethod
     def getType(self, value):
@@ -153,15 +153,15 @@ class Attribute(object):
         
     def _get_value(self):
 
-	if self.getValueType() == 'relation_value':
-	    return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
-	else:
-	    return getattr(self, self.getValueType())
+        if self.getValueType() == 'relation_value':
+            return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
+        else:
+            return getattr(self, self.getValueType())
 
     def _set_value(self, value):
-	
-	if not isinstance(value, sqlalchemy.sql.ColumnElement):
-	    self.datatype = self.getType(value)
+        
+        if not isinstance(value, sqlalchemy.sql.ColumnElement):
+            self.datatype = self.getType(value)
 
         setattr(self, self.getValueType(value), value)
 
@@ -180,33 +180,33 @@ class Attribute(object):
     @classmethod
     def queryarg(cls, key=None, value=(), subkey=(), number=(), uniqattr=False):
 
-	args = []
-	
-	if key:
-	    args.append(Attribute.key==key)
-	    
-	if number is not ():
-	    args.append(Attribute.number==number)
+        args = []
+        
+        if key:
+            args.append(Attribute.key==key)
+            
+        if number is not ():
+            args.append(Attribute.number==number)
 
-	if subkey is not ():
-	    args.append(Attribute.subkey==subkey)
+        if subkey is not ():
+            args.append(Attribute.subkey==subkey)
 
-	if value is not ():
-	    valtype = Attribute.getType(value) + '_value'
-	    if valtype == 'relation_value':
+        if value is not ():
+            valtype = Attribute.getType(value) + '_value'
+            if valtype == 'relation_value':
 
-		# get entity_id from Drivers too
-		if hasattr(value, 'entity'):
-		    e = value.entity
-		else:
-		    e = value
-		    
-		args.append(getattr(Attribute, 'relation_id') == e.entity_id)
-		
-	    else:
-		args.append(getattr(Attribute, valtype) == value)
+                # get entity_id from Drivers too
+                if hasattr(value, 'entity'):
+                    e = value.entity
+                else:
+                    e = value
+                    
+                args.append(getattr(Attribute, 'relation_id') == e.entity_id)
+                
+            else:
+                args.append(getattr(Attribute, valtype) == value)
 
-	return and_(*args)
+        return and_(*args)
 
 class Entity(object):
     """
@@ -252,18 +252,18 @@ class Entity(object):
     def __cmp__(self, other):
 
         if not hasattr(otherentity, 'name'):
-	    raise TypeError("Can only compare equality with an Entity-like "
-			    "object.  Got a %s instead." 
-			    % (type(other).__name__))
+            raise TypeError("Can only compare equality with an Entity-like "
+                            "object.  Got a %s instead." 
+                            % (type(other).__name__))
 
         return cmp(self.name, other.name)
 
 
     def __repr__(self):
-	s = "%s(name=%s, driver=%s, clustotype=%s)"
+        s = "%s(name=%s, driver=%s, clustotype=%s)"
 
-	return s % (self.__class__.__name__, 
-		    self.name, self.driver, self.type)
+        return s % (self.__class__.__name__, 
+                    self.name, self.driver, self.type)
 
     def __str__(self):
         "Return string representing this entity"

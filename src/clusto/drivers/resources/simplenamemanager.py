@@ -41,7 +41,7 @@ class SimpleNameManager(ResourceManager):
         self.leadingZeros = leadingZeros
 
     def allocator(self):
-	clusto.flush()
+        clusto.flush()
         num = str(self.next)
 
         if self.leadingZeros:
@@ -52,7 +52,7 @@ class SimpleNameManager(ResourceManager):
                                              "Max of %d digits and we're at "
                                              "number %s." % (self.digits, num))
         
-	nextname = self.basename + num
+        nextname = self.basename + num
 
         self.next = ATTR_TABLE.c.int_value + 1
 
@@ -69,37 +69,37 @@ class SimpleEntityNameManager(SimpleNameManager):
     def allocate(self, clustotype, resource=None, numbered=True):
         """allocates a resource element to the given thing.
 
-	resource - is passed as an argument it will be checked 
-	           before assignment.  
+        resource - is passed as an argument it will be checked 
+                   before assignment.  
 
-	refattr - the attribute name on the entity that will refer back
-	          this resource manager.
+        refattr - the attribute name on the entity that will refer back
+                  this resource manager.
 
-	returns the resource that was either passed in and processed 
-	or generated.
+        returns the resource that was either passed in and processed 
+        or generated.
         """
 
-	if not isinstance(clustotype, type):
-	    raise TypeError("thing is not a Driver class")
+        if not isinstance(clustotype, type):
+            raise TypeError("thing is not a Driver class")
 
-	clusto.beginTransaction()
+        clusto.beginTransaction()
 
         if not resource:
-	    name, num = self.allocator()
+            name, num = self.allocator()
 
-	    newobj = clustotype(name)
+            newobj = clustotype(name)
 
-	else:
-	    newobj = clustotype(resource)
+        else:
+            newobj = clustotype(resource)
 
 
         super(SimpleEntityNameManager, self).allocate(newobj, name)
 
-	clusto.commit()
+        clusto.commit()
 
         return newobj
 
 
     def deallocate(self, thing, resource=None, numbered=True):
-	raise Exception("can't deallocate an entity name, delete the entity instead.")
+        raise Exception("can't deallocate an entity name, delete the entity instead.")
 

@@ -49,48 +49,48 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
         s = clusto.getByName('s1')
         sw = clusto.getByName('sw1')
-	p1 = clusto.getByName('p1')
+        p1 = clusto.getByName('p1')
 
         sw.connectPorts('nic-eth', 0, s, 0)
         
         
-	self.assertRaises(ConnectionException,
-			  s.connectPorts, 'nic-eth', 0, sw, 1)
+        self.assertRaises(ConnectionException,
+                          s.connectPorts, 'nic-eth', 0, sw, 1)
 
-	p1.connectPorts(porttype='pwr-nema-5',
-			srcportnum=0,
-			dstdev=s,
-			dstportnum=0)
-			
-	self.assertEqual(s.getConnected('pwr-nema-5', 0),
-			 p1)
+        p1.connectPorts(porttype='pwr-nema-5',
+                        srcportnum=0,
+                        dstdev=s,
+                        dstportnum=0)
+                        
+        self.assertEqual(s.getConnected('pwr-nema-5', 0),
+                         p1)
 
 
     def testSettingUpServer(self):
-	
-	from clusto.drivers import SimpleEntityNameManager
+        
+        from clusto.drivers import SimpleEntityNameManager
 
-	servernames = SimpleEntityNameManager('servernames',
-					      basename='server',
-					      digits=4
-					      )
+        servernames = SimpleEntityNameManager('servernames',
+                                              basename='server',
+                                              digits=4
+                                              )
 
-	newserver = servernames.allocate(BasicServer)
-	
+        newserver = servernames.allocate(BasicServer)
+        
 
         sw = clusto.getByName('sw1')
-	p1 = clusto.getByName('p1')
+        p1 = clusto.getByName('p1')
         r = clusto.getByName('r1')
 
-	self.assertEqual('server0001', newserver.name)
+        self.assertEqual('server0001', newserver.name)
 
 
-	self.assertRaises(TypeError, r.insert, newserver, 1)
+        self.assertRaises(TypeError, r.insert, newserver, 1)
 
-	r.insert(newserver,2)
-	p1.connectPorts('pwr-nema-5', 0, newserver, 0)
-	sw.connectPorts('nic-eth', 0, newserver, 0)
-	sw.connectPorts('nic-eth', 2, p1, 0)
+        r.insert(newserver,2)
+        p1.connectPorts('pwr-nema-5', 0, newserver, 0)
+        sw.connectPorts('nic-eth', 0, newserver, 0)
+        sw.connectPorts('nic-eth', 2, p1, 0)
 
-	self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
+        self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
 

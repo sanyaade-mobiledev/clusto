@@ -21,10 +21,10 @@ class ClustoMeta(Driver):
 
     def __new__(cls):
 
-	if not hasattr(cls, '__singleton'):
-	    cls.__singleton = object.__new__(cls)
+        if not hasattr(cls, '__singleton'):
+            cls.__singleton = object.__new__(cls)
 
-	return cls.__singleton
+        return cls.__singleton
 
 
     def __init__(self): #, name=None, entity=None, *args, **kwargs):

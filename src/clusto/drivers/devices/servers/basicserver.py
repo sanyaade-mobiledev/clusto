@@ -13,9 +13,9 @@ class BasicServer(PortMixin, Device):
                    'manufacturer':None}
 
     _portmeta = {'pwr-nema-5': {'numports':1},
-		 'nic-eth': {'numports':2},
-		 'console-serial' : { 'numports':1, }
-		 }
+                 'nic-eth': {'numports':2},
+                 'console-serial' : { 'numports':1, }
+                 }
 
     def addHD(self, size):
         """

@@ -15,34 +15,34 @@ class SimpleNumManager(ResourceManager):
     _driverName = "simplenummanager"
     _properties = {'maxnum':None,
                    'next':None,
-		   }
+                   }
 
     _recordAllocations = True
     
     def __init__(self, nameDriverEntity,
                  startingnum=0,
-		 maxnum=False,
+                 maxnum=False,
                  *args, **kwargs):
 
 
         super(ResourceManager, self).__init__(nameDriverEntity,
                                               *args, **kwargs)
         
-	if maxnum:
-	    self.maxnum = maxnum
+        if maxnum:
+            self.maxnum = maxnum
 
-	self.next = startingnum
+        self.next = startingnum
 
 
     def allocator(self):
 
-	clusto.flush()
+        clusto.flush()
         num = self.next
-	
+        
         if self.maxnum and num > self.maxnum:
             raise SimpleNumManagerException("Out of numbers. "
-					    "Max of %d reached." 
-					    % (self.maxnum))
+                                            "Max of %d reached." 
+                                            % (self.maxnum))
         
         self.next = ATTR_TABLE.c.int_value + 1
 

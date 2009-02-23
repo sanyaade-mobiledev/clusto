@@ -38,7 +38,7 @@ class ClustoTestBase(unittest.TestCase):
     def tearDown(self):
 
         clusto.clear()
-	clusto.disconnect()
+        clusto.disconnect()
         clusto.METADATA.drop_all()
 
 

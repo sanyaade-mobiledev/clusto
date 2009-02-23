@@ -18,16 +18,16 @@ class Pool(Driver):
         """
         Insert the given Enity or Driver into this Entity.  Such that:
 
-	>>> A.insert(B)
-	>>> (B in A) 
-	True
+        >>> A.insert(B)
+        >>> (B in A) 
+        True
 
 
         """
-	
-	d = self.ensureDriver(thing, 
-			       "Can only insert an Entity or a Driver. "
-			       "Tried to insert %s." % str(type(thing)))
+        
+        d = self.ensureDriver(thing, 
+                               "Can only insert an Entity or a Driver. "
+                               "Tried to insert %s." % str(type(thing)))
 
 
         self.addAttr("_contains", d, numbered=True)
@@ -37,20 +37,20 @@ class Pool(Driver):
         """
         Is this pool the parent of the given entity
         """
-	
-	d = self.ensureDriver(thing, 
-			       "Can only be the parent of a Driver or Entity.")
-	
-	return self in d.contents()
+        
+        d = self.ensureDriver(thing, 
+                               "Can only be the parent of a Driver or Entity.")
+        
+        return self in d.contents()
 
     @classmethod
     def getPools(cls, obj, allPools=True):
 
-	d = cls.ensureDriver(obj, "obj must be either an Entity or a Driver.")
+        d = cls.ensureDriver(obj, "obj must be either an Entity or a Driver.")
 
 
-	pools = [Driver(a.entity) for a in d.parents()
-		 if isinstance(Driver(a.entity), Pool)]
+        pools = [Driver(a.entity) for a in d.parents()
+                 if isinstance(Driver(a.entity), Pool)]
 
         if allPools:
             for i in pools:

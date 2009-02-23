@@ -38,8 +38,8 @@ if __name__ == '__main__':
 
     parser = optparse.OptionParser()
     parser.add_option('--db', dest='dsn', 
-		      help='specifies which db to test against',
-		      default='sqlite:///:memory:')
+                      help='specifies which db to test against',
+                      default='sqlite:///:memory:')
     
     (options, args) = parser.parse_args()
     runtests(args, options.dsn)

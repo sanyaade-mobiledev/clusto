@@ -26,8 +26,8 @@ class BasicRack(Location):
 
         if isinstance(rackU, int):
             rackU = [rackU]
-	else:
-	    rackU = list(rackU)
+        else:
+            rackU = list(rackU)
 
         # do U checks
         for U in rackU:
@@ -45,17 +45,17 @@ class BasicRack(Location):
                 raise TypeError("a device can only occupy multiple Us if they're adjacent.")
             last = i
 
-	return rackU
+        return rackU
 
     def insert(self, device, rackU):
-	"""Insert a given device into the given rackU."""
+        """Insert a given device into the given rackU."""
     
-	
+        
         if not isinstance(device, Device):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
 
-	rackU = self._ensureRackU(rackU)
+        rackU = self._ensureRackU(rackU)
 
         rau = self.getRackAndU(device)
 
@@ -63,23 +63,23 @@ class BasicRack(Location):
             raise Exception("%s is already in rack %s"
                             % (device.name, rau['rack'].name))
 
-	
+        
         for U in rackU:
-	    dev = self.getDeviceIn(U)
-	    if dev:
-		raise TypeError("%s is already in RU %d" % (dev.name, U))
+            dev = self.getDeviceIn(U)
+            if dev:
+                raise TypeError("%s is already in RU %d" % (dev.name, U))
 
-	for U in rackU:
-	    self.addAttr("_contains", device, numbered=U, subkey='ru')
+        for U in rackU:
+            self.addAttr("_contains", device, numbered=U, subkey='ru')
 
         
     def getDeviceIn(self, rackU):
-	
-	if not isinstance(rackU, int):
-	    raise TypeError("RackU must be a single integer. Got: %s" % str(rackU))
+        
+        if not isinstance(rackU, int):
+            raise TypeError("RackU must be a single integer. Got: %s" % str(rackU))
 
-	rackU = self._ensureRackU(rackU)[0]
-	
+        rackU = self._ensureRackU(rackU)[0]
+        
         owners = self.contents(numbered=rackU, subkey='ru')
 
         if len(owners) > 1:
@@ -100,20 +100,20 @@ class BasicRack(Location):
         returns a tuple of (rack, u-number)
         """
 
-	rack = set(device.parents(clustoTypes=[cls]))
+        rack = set(device.parents(clustoTypes=[cls]))
 
 
-	if len(rack) > 1:
-	    raise Exception("%s is somehow in more than one rack, this will "
-			    "likely need to be rectified manually.  It currently "
-			    "appears to be in racks %s"
-			    % (device.name, str(rack)))
+        if len(rack) > 1:
+            raise Exception("%s is somehow in more than one rack, this will "
+                            "likely need to be rectified manually.  It currently "
+                            "appears to be in racks %s"
+                            % (device.name, str(rack)))
 
         if rack:
-	    rack = rack.pop()
+            rack = rack.pop()
             return {'rack':Driver(rack.entity),  
-		    'RU':[x.number for x in rack.contentAttrs(value=device,
-							      subkey='ru')]}
+                    'RU':[x.number for x in rack.contentAttrs(value=device,
+                                                              subkey='ru')]}
         else:
             
             return None

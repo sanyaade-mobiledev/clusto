@@ -167,19 +167,19 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
         e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-				   value='thestring', uniqattr=False))
+                                   value='thestring', uniqattr=False))
 
-	e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-				   value='thestring', uniqattr=False))
+        e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
+                                   value='thestring', uniqattr=False))
 
 
-	clusto.flush()
+        clusto.flush()
 
         q = SESSION.query(Attribute).filter_by(entity=e2,
                                                key='somestring').all()
 
         self.assertEqual([a.value for a in q], 
-			 ['thestring', 'thestring'])
+                         ['thestring', 'thestring'])
 
     def testEntityDeleteRelations(self):
 

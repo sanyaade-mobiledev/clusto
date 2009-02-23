@@ -13,17 +13,17 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
     def data(self):
 
         n1 = SimpleEntityNameManager('foonamegen',
-				     basename='foo',
-				     digits=4,
-				     startingnum=1,
-				     )
+                                     basename='foo',
+                                     digits=4,
+                                     startingnum=1,
+                                     )
 
 
         n2 = SimpleEntityNameManager('barnamegen',
-				     basename='bar',
-				     digits=2,
-				     startingnum=95,
-				     )
+                                     basename='bar',
+                                     digits=2,
+                                     startingnum=95,
+                                     )
         
         clusto.flush()
 
@@ -85,35 +85,35 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
 
 
     def testAllocateManyNames(self):
-	
-	ngen = clusto.getByName('foonamegen')
+        
+        ngen = clusto.getByName('foonamegen')
 
-	for i in xrange(50):
-	    ngen.allocate(Driver)
+        for i in xrange(50):
+            ngen.allocate(Driver)
 
-	self.assertRaises(LookupError, clusto.getByName, 'foo0051')
-	self.assertEqual(clusto.getByName('foo0050').name, 'foo0050')
+        self.assertRaises(LookupError, clusto.getByName, 'foo0051')
+        self.assertEqual(clusto.getByName('foo0050').name, 'foo0050')
 
 
 class SimpleNameManagerTests(testbase.ClustoTestBase):
 
     def data(self):
-	n1 = SimpleNameManager('foonamegen',
-			       basename='foo',
-			       digits=4,
-			       startingnum=1,
-			       )
+        n1 = SimpleNameManager('foonamegen',
+                               basename='foo',
+                               digits=4,
+                               startingnum=1,
+                               )
 
-	clusto.flush()
+        clusto.flush()
 
     def testAllocateManyNames(self):
-	
-	ngen = clusto.getByName('foonamegen')
+        
+        ngen = clusto.getByName('foonamegen')
 
-	d = Driver('foo')
+        d = Driver('foo')
 
-	for i in xrange(50):
-	    ngen.allocate(d)
-	    
-	
-	self.assertEqual(ngen.attrQuery('resource', count=True), 50)
+        for i in xrange(50):
+            ngen.allocate(d)
+            
+        
+        self.assertEqual(ngen.attrQuery('resource', count=True), 50)

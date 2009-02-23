@@ -12,6 +12,6 @@ class BasicNetworkSwitch(PortMixin, Device):
 
 
     _portmeta = {'pwr-nema-5' : {'numports':1},
-		 'nic-eth' : {'numports':24}}
+                 'nic-eth' : {'numports':24}}
 
 

@@ -81,7 +81,7 @@ class PoolTests(testbase.ClustoTestBase):
         self.assertEqual(sorted(Pool.getPools(d1, allPools=True)),
                          sorted([p1,p2]))
 
-		
+                
         self.assertEqual(sorted(set(Pool.getPools(d3, allPools=True))),
                          sorted([p1, p3, p4]))
 

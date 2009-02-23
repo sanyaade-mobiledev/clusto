@@ -44,13 +44,13 @@ def runcmd(args):
 
     cmd = None
     for path in paths:
-	cmdtest = os.path.join(path, cmdname)
-	if os.path.exists(cmdtest):
-	    cmd = cmdtest
-	    break
+        cmdtest = os.path.join(path, cmdname)
+        if os.path.exists(cmdtest):
+            cmd = cmdtest
+            break
 
     if not cmd:
-	raise CommandError(cmdname + " is not a clusto-command.")
+        raise CommandError(cmdname + " is not a clusto-command.")
 
     
     os.execvpe(cmdname, args, env=os.environ)
@@ -87,20 +87,20 @@ def getClustoConfig(filename=None):
         filename = filesearchpath[0]
 
     if filename:
-	if not os.path.exists(os.path.realpath(filename)):
-	    raise CmdLineError("Config file %s doesn't exist." % filename)
-	
+        if not os.path.exists(os.path.realpath(filename)):
+            raise CmdLineError("Config file %s doesn't exist." % filename)
+        
     config = SafeConfigParser()    
     config.read([filename])
 
     if not config.has_section('clusto'):
-	config.add_section('clusto')
+        config.add_section('clusto')
 
     if 'CLUSTODSN' in os.environ:
-	config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
+        config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
 
     if not config.has_option('clusto', 'dsn'):
-	raise CmdLineError("No database given for clusto data.")
+        raise CmdLineError("No database given for clusto data.")
 
     return config
 
