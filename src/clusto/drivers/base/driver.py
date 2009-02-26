@@ -348,6 +348,11 @@ class Driver(object):
 
         return attrs
 
+    def attrValues(self, *args, **kwargs):
+        """Return the values of the attributes that match the given arguments"""
+
+        return [k.value for k in self.attrs(*args, **kwargs)]
+
     def references(self, *args, **kwargs):
         """Return the references to this Thing. The references are attributes. 
 

@@ -53,6 +53,22 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(d1.attrItems(numbered=True),
                          [(('foo', 0, None), 'bar1')])
 
+    def testGettingAttrValues(self):
+        d1 = Driver('d1')
+        d2 = Driver('d2')
+        
+        d1.addAttr('foo', 'bar')
+        d1.addAttr('foo0', 'bar1')
+        d2.addAttr('d1', d1)
+
+        clusto.flush()
+
+        self.assertEqual(sorted(['bar', 'bar1']),
+                         sorted(d1.attrValues('foo.*', regex=True)))
+
+        self.assertEqual([d1], d2.attrValues())
+        
+
     def testGettingAttrsMultipleTimes(self):
         d1 = Driver('d1')
         d2 = Driver('d2')
