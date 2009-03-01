@@ -428,9 +428,15 @@ class TestDriverQueries(testbase.ClustoTestBase):
         d1.addAttr('a', 1, subkey='z', numbered=4)
         d1.addAttr('a', 1, subkey='z', numbered=5)
         d1.addAttr('a', 1, subkey='z', numbered=6)
-
+        
         d1.setAttr('d2', d2)
         d1.setAttr('d3', d3)
+
+        d2.setAttr('aaa', 1)
+        d2.setAttr('aab', 2)
+        d2.setAttr('aac', 3)
+
+        clusto.commit()
 
     def testAttrAndQueryEqual(self):
 
@@ -469,3 +475,9 @@ class TestDriverQueries(testbase.ClustoTestBase):
                          d1.attrQuery(subkey='z'))
 
 
+    def testDoAttrQuery(self):
+
+        d1 = clusto.getByName('d1')
+        d2 = clusto.getByName('d2')
+        self.assertEqual(set(Driver.getByAttr(key='a*')),
+                         set([d1,d2]))

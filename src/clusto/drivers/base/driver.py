@@ -188,7 +188,8 @@ class Driver(object):
         else:
             query = SESSION.query(Attribute)
 
-        if issubclass(cls, Driver):         
+        ### This is bunk, gotta fix it
+        if isinstance(cls, Driver):
             query = query.filter(and_(Attribute.entity_id==Entity.entity_id,
                                       Entity.driver == cls._driverName,
                                       Entity.type == cls._clustoType))
