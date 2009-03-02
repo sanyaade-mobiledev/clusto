@@ -144,3 +144,24 @@ class TestClusto(testbase.ClustoTestBase):
         self.assertEqual(clusto.getEntities(attrs=[{'subkey':'A'},
                                                    {'value':'test'}]),
                          [d1])
+
+    def testDeleteEntity(self):
+
+        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+
+        d = Driver(e1)
+
+        d.addAttr('deltest1', 'test')
+        d.addAttr('deltest1', 'testA')
+
+        clusto.commit()
+
+        clusto.deleteEntity(e1)
+        clusto.commit()
+
+        self.assertEqual([], clusto.getEntities(names=['e1']))
+
+        self.assertEqual([], Driver.doAttrQuery(key='deltest*', glob=True))
+                         
+
+

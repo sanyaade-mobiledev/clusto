@@ -116,8 +116,8 @@ class Attribute(object):
             value = self.value
 
         entityname = (self.entity and self.entity.name) or None
-        return "%s|%s|%s %s" % (entityname, self.fullkey,
-                                self.datatype, value)
+        return "%s|%s.%s.%s|%s %s" % (entityname, self.key, self.number,
+                                      self.subkey, self.datatype, value)
 
     def getValueType(self, value=None):
         if value == None:

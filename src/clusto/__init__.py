@@ -174,3 +174,11 @@ def commit():
 ## unconverted functions
 def disconnect():
     SESSION.close()
+
+def deleteEntity(entity):
+    """Delete an entity and all it's attributes and references"""
+
+    SESSION.delete(entity)
+    SESSION.commit()
+
+    
