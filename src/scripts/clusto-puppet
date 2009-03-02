@@ -17,10 +17,13 @@ from clusto import *
 def main(argv):
     (opts, args) = parseargs(argv)
 
-    try:
-        clusto_node = clusto.getByName(args[0])
-    except LookupError:
+
+    entities = clusto.getEntites(attrs=({'key':'fqdn','value':args[0]}))
+        
+    if not entities:
         return 1
+
+    clusto_node = entities[0]
 
     clusto_attrs = clusto_node.attrs(key='puppet',
 				     mergeContainerAttrs=True,
