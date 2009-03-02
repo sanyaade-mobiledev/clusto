@@ -51,6 +51,9 @@ class ResourceManager(Driver):
         returns the resource that was either passed in and processed 
         or generated.
         """
+
+        if not self._recordAllocations:
+            return None
         
         clusto.beginTransaction()
 
