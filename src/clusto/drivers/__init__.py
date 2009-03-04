@@ -4,4 +4,4 @@ from categories import *
 
 from devices import *
 from locations import *
-from resources import *
+from resourcemanagers import *

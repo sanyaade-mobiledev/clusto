@@ -4,7 +4,7 @@ import itertools
 
 from clusto.drivers import *
 
-from clusto.drivers.resources.simplenamemanager import SimpleNameManagerException
+from clusto.drivers.resourcemanagers.simplenamemanager import SimpleNameManagerException
 
 
 

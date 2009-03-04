@@ -4,7 +4,7 @@ import itertools
 
 from clusto.drivers import *
 
-from clusto.drivers.resources.simplenummanager import *
+from clusto.drivers.resourcemanagers.simplenummanager import *
 
 
 
