@@ -116,4 +116,4 @@ class SimpleNameManagerTests(testbase.ClustoTestBase):
             ngen.allocate(d)
             
         
-        self.assertEqual(ngen.attrQuery('resource', count=True), 50)
+        self.assertEqual(len(SimpleNameManager.resources(d)), 50)

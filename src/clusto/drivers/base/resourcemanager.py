@@ -67,7 +67,7 @@ class ResourceManager(Driver):
         else:
             resource, numbered = self.ensureType(resource, numbered)
 
-        attr = self.addAttr('resource', thing, numbered=numbered, subkey=resource)
+        attr = self.addAttr(self._driverName, thing, numbered=numbered, subkey=resource)
         clusto.commit()
 
         return attr #resource
@@ -83,7 +83,7 @@ class ResourceManager(Driver):
         if resource and not self.available(resource):
             resource, numbered = self.ensureType(resource, numbered)
             
-            self.delAttrs('resource', thing, numbered=numbered, subkey=resource)
+            self.delAttrs(self._driverName, thing, numbered=numbered, subkey=resource)
 
     def available(self, resource, numbered=()):
         """return True if resource is available, False otherwise.
@@ -92,7 +92,7 @@ class ResourceManager(Driver):
         resource, numbered = self.ensureType(resource, numbered)
 
 
-        if self.hasAttr('resource', numbered=numbered, subkey=resource):
+        if self.hasAttr(self._driverName, numbered=numbered, subkey=resource):
             return False
 
         return True
@@ -104,7 +104,7 @@ class ResourceManager(Driver):
 
         resource, numbered = self.ensureType(resource, numbered)
 
-        return [Driver(x.value) for x in self.attrs('resource', 
+        return [Driver(x.value) for x in self.attrs(self._driverName, 
                                                     numbered=numbered,
                                                     subkey=resource)]
 
@@ -116,7 +116,7 @@ class ResourceManager(Driver):
         A resource is a resource attribute in a resource manager.
         """
         
-        return [x for x in thing.references('resource', thing) 
+        return [x for x in thing.references(cls._driverName, thing) 
                 if isinstance(Driver(x.entity), cls)]
 
 
@@ -125,4 +125,4 @@ class ResourceManager(Driver):
     def count(self):
         """Return the number of resources used."""
 
-        return self.attrQuery('resource', count=True)
+        return self.attrQuery(self._driverName, count=True)

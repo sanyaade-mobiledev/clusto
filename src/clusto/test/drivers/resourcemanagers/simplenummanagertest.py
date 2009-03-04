@@ -34,8 +34,6 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
         self.assertEqual(ngen.owners('num', 3), [d])
         self.assertEqual(ngen.owners('num', 4), [d])
 
-        self.assertEqual(sorted(ngen.resources(d)),
-                         sorted(ngen.attrs(key='resource')))
 
     def testAllocateMaxNum(self):
         
