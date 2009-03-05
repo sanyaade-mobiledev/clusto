@@ -40,7 +40,8 @@ class Device(Driver):
 
     def addFQDN(self, fqdn):
 
-        self.addAttr("fqdn", numbered=True, value=fqdn)
+        if not self.hasAttr("fqdn", numbered=True, value=fqdn):
+            self.addAttr("fqdn", numbered=True, value=fqdn)
 
     def removeFQDN(self, fqdn):
 
