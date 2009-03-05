@@ -1,5 +1,5 @@
 from clusto.drivers import ResourceManager, ResourceTypeException
-from clusto.exceptions import ResourceNotAvailableException
+from clusto.exceptions import ResourceNotAvailableException, ResourceException
 
 import IPy
 
@@ -30,11 +30,11 @@ class IPManager(ResourceManager):
         return self.__ipy
 
     def ensureType(self, resource, numbered=True):
-
         """check that the given ip falls within the range managed by this manager"""
 
         try:
             if not isinstance(numbered, bool) and isinstance(numbered, int):
+                ## add here to map unsigned ints from IPs to signed ints of python
                 ip = IPy.IP(numbered+2147483648)
             else:
                 ip = IPy.IP(resource)           
@@ -90,4 +90,36 @@ class IPManager(ResourceManager):
             nextip = long(self.ipy.net().int() + 1)
             
         raise ResourceNotAvailableException("out of available ips.")
-            
+
+    @classmethod
+    def getIPManager(cls, ip):
+        """return a valid ip manager for the given ip.
+
+        @param ip: the ip
+        @type ip: integer, string, or IPy object
+
+        @return: the appropriate IP manager from the clusto database
+        """
+
+        ipman = None
+        if isinstance(ip, Attribute):
+            ipman = ip.entity
+            return ipman
+
+        for ipmantest in clusto.getEntities(clustotypes=[cls]):
+            try:
+                ipmantest.ensureType(ip)
+            except ResourceTypeException:
+                pass
+
+            ipman = ipmantest
+            break
+        
+
+        if not ipman:
+            raise ResourceException("No resource manager for %s exists."
+                                    % str(ip))
+        
+        return ipman
+        
+
