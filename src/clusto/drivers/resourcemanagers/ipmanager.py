@@ -1,3 +1,5 @@
+from clusto.schema import Attribute
+
 from clusto.drivers import ResourceManager, ResourceTypeException
 from clusto.exceptions import ResourceNotAvailableException, ResourceException
 
