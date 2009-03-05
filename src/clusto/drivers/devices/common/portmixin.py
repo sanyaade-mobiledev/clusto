@@ -5,6 +5,9 @@ PortMixin is a basic mixin to be used with devices that have ports
 import re
 
 import clusto
+
+from clusto.drivers.resourcemanagers import IPManager
+
 from clusto.exceptions import ConnectionException
 
 class PortMixin:
@@ -236,7 +239,38 @@ class PortMixin:
         return self._portmeta.keys()
 
 
-    
-    
+    def bindIPtoPort(self, ip, porttype, portnum):
+        """bind an IP to a port
+
+        @param ip: the ip you want to bind to a port
+        @type ip: either an integer, IPy, string, Attribute from an IPManager
+
+        @param porttype: the port type
+        @type porttype: a porttype string
+
+        @param portnum: the number of the port
+        @type portnum: integer
+        """
+        
+        if not porttype.startswith('nic-'):
+            raise ConnectionException("Cannot bind IP to a non-network port.")
 
 
+        ipman = IPManager.getIPManager(ip)
+
+
+        if self in ipman.owners(ip):
+            keyname, value = ipman.ensureType(ip)
+
+        elif ipman.available(ip):
+
+            attr = ipman.allocate(ip)
+
+            keyname = attr.key
+            value = attr.num
+            
+        else:
+            raise ConnectionException("IP %s is not available to you." % str(ip))
+        self.setPortAttr(keyname, value, porttype, portnum)
+        
+        
