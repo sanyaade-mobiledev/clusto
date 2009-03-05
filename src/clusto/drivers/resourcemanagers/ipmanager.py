@@ -35,9 +35,9 @@ class IPManager(ResourceManager):
         """check that the given ip falls within the range managed by this manager"""
 
         try:
-            if not isinstance(numbered, bool) and isinstance(numbered, int):
+            if not isinstance(numbered, bool) and isinstance(int(numbered), int):
                 ## add here to map unsigned ints from IPs to signed ints of python
-                ip = IPy.IP(numbered+2147483648)
+                ip = IPy.IP(int(numbered+2147483648))
             else:
                 ip = IPy.IP(resource)           
         except ValueError:
