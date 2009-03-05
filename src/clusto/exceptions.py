@@ -27,3 +27,5 @@ class ResourceNotAvailableException(ResourceException):
 class ResourceTypeException(ResourceException):
     pass
 
+class ResourceLockException(ResourceException):
+    pass
