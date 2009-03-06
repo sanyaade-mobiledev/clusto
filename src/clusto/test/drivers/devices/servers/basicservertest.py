@@ -1,7 +1,9 @@
 
 import clusto
-from clusto.drivers import BasicServer
+from clusto.drivers import BasicServer, IPManager
 from clusto.test import testbase
+
+from clusto.exceptions import ResourceException, ResourceLockException
 
 class BasicServerTest(testbase.ClustoTestBase):
 
@@ -68,3 +70,36 @@ class BasicServerTest(testbase.ClustoTestBase):
         self.assertEqual(["test2.example.com"],
                          s2.FQDNs)
 
+
+    def testBindingIPtoPortWithNoIPManager(self):
+
+        s1 = clusto.getByName('bs1')
+
+        self.assertRaises(ResourceException, s1.bindIPtoPort, '192.168.1.20', 'nic-eth', 1)
+
+
+    def testBindingIPtoPort(self):
+
+        s1 = clusto.getByName('bs1')
+
+        ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
+
+        s1.bindIPtoPort('192.168.1.20', 'nic-eth', 1)
+
+        self.assertRaises(ResourceLockException, ipm.deallocate, s1, '192.168.1.20')
+        
+
+    def testUnBindingIPFromPort(self):
+
+        s1 = clusto.getByName('bs1')
+
+        ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
+
+        s1.bindIPtoPort('192.168.1.20', 'nic-eth', 1)
+
+        s1.unbindIPfromPort('192.168.1.20', 'nic-eth', 1)
+
+        ipm.deallocate(s1, '192.168.1.20')
+
+    
+        

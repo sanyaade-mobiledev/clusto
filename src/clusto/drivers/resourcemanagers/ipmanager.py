@@ -1,3 +1,4 @@
+import clusto
 from clusto.schema import Attribute
 
 from clusto.drivers import ResourceManager, ResourceTypeException
@@ -49,7 +50,7 @@ class IPManager(ResourceManager):
                                         % (str(resource), self.baseip, self.netmask))
 
 
-        return ('ip', ip.int()-2147483648)
+        return ('ip', int(ip.int()-2147483648))
 
 
     def allocator(self):
@@ -89,7 +90,7 @@ class IPManager(ResourceManager):
             # check from the beginning again in case an earlier ip
             # got freed
                     
-            nextip = long(self.ipy.net().int() + 1)
+            nextip = int(self.ipy.net().int() + 1)
             
         raise ResourceNotAvailableException("out of available ips.")
 

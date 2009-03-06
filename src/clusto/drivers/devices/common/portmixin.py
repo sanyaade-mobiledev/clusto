@@ -282,13 +282,50 @@ class PortMixin:
 
         elif ipman.available(ip):
 
-            attr = ipman.allocate(ip)
+            attr = ipman.allocate(self, ip)
 
-            keyname = attr.key
-            value = attr.num
+            keyname = attr.subkey
+            value = attr.number
             
         else:
             raise ConnectionException("IP %s is not available to you." % str(ip))
-        self.setPortAttr(keyname, value, porttype, portnum)
         
+        self.setPortAttr(porttype, portnum, keyname, value)
+        ipman.lockResource(self, keyname, value)
+
+    def unbindIPfromPort(self, ip, porttype, portnum, deallocate=True):
+        """unbind an IP from a port
+
+        @param ip: the ip you want to unbind from the port
+        @type ip: either an integer, IPy, string, Attribute from an IPManager
+
+        @param porttype: the port type
+        @type porttype: a porttype string
+
+        @param portnum: the number of the port
+        @type portnum: integer
+        """
         
+        if not porttype.startswith('nic-'):
+            raise ConnectionException("Cannot bind IP to a non-network port.")
+
+
+        ipman = IPManager.getIPManager(ip)
+
+
+        if self in ipman.owners(ip):
+            keyname, value = ipman.ensureType(ip)
+
+        elif ipman.available(ip):
+
+            attr = ipman.allocate(ip)
+
+            keyname = attr.subkey
+            value = attr.number
+            
+        else:
+            raise ConnectionException("IP %s is not available to you." % str(ip))
+
+        self.delPortAttr(porttype, portnum, keyname, value)
+        ipman.unlockResource(self, keyname, value)
+        ipman.deallocate(self, keyname, value)
