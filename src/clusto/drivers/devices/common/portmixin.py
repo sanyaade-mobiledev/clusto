@@ -62,11 +62,11 @@ class PortMixin:
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
 
-        self.setPortAttr('connection', dstdev, porttype, srcportnum)
-        self.setPortAttr('otherportnum', dstportnum, porttype, srcportnum)
+        self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
+        self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
         
-        dstdev.setPortAttr('connection', self, porttype, dstportnum)
-        dstdev.setPortAttr('otherportnum', srcportnum, porttype, dstportnum)
+        dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
+        dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
 
 
     def disconnectPort(self, porttype, portnum):
@@ -78,15 +78,15 @@ class PortMixin:
 
             dev = self.getConnected(porttype, portnum)
             
-            otherportnum = self.getPortAttr('otherportnum', porttype, portnum)
+            otherportnum = self.getPortAttr(porttype, portnum, 'otherportnum')
             
             clusto.beginTransaction()
             try:
-                dev.delPortAttr('connection', porttype, otherportnum)
-                dev.delPortAttr('otherportnum', porttype, otherportnum)
+                dev.delPortAttr(porttype, otherportnum, 'connection')
+                dev.delPortAttr(porttype, otherportnum, 'otherportnum')
                 
-                self.delPortAttr('connection', porttype, portnum)
-                self.delPortAttr('otherportnum', porttype, portnum)
+                self.delPortAttr(porttype, portnum, 'connection')
+                self.delPortAttr(porttype, portnum, 'otherportnum')
             except Exception, x:
                 clusto.rollbackTransaction()
                 raise x
@@ -102,7 +102,7 @@ class PortMixin:
             raise ConnectionException(msg % (porttype, portnum, self.name))
             
 
-        return self.getPortAttr('connection', porttype, portnum)
+        return self.getPortAttr(porttype, portnum, 'connection')
             
 
     def portsConnectable(self, porttype, srcportnum, dstdev, dstportnum):
@@ -137,7 +137,17 @@ class PortMixin:
             return True
         
 
-    def setPortAttr(self, key, value, porttype, portnum):
+    def addPortAttr(self, porttype, portnum, key, value):
+        """add an attribute on the given port"""
+
+        portnum = self._ensurePortNum(porttype, portnum)
+
+        self.addAttr(key=self._portKey(porttype),
+                     numbered=portnum,
+                     subkey=key,
+                     value=value)
+
+    def setPortAttr(self, porttype, portnum, key, value):
         """set an attribute on the given port"""
 
         portnum = self._ensurePortNum(porttype, portnum)
@@ -148,16 +158,24 @@ class PortMixin:
                      value=value)
 
 
-    def delPortAttr(self, key, porttype, portnum):
+    def delPortAttr(self, porttype, portnum, key, value=()):
         """delete an attribute on the given port"""
 
         portnum = self._ensurePortNum(porttype, portnum)
 
-        self.delAttrs(key=self._portKey(porttype),
-                      numbered=portnum,
-                      subkey=key)
+        if value is ():
+            self.delAttrs(key=self._portKey(porttype),
+                          numbered=portnum,
+                          subkey=key)
+        else:
+
+            self.delAttrs(key=self._portKey(porttype),
+                          numbered=portnum,
+                          subkey=key,
+                          value=value)
+            
                      
-    def getPortAttr(self, key, porttype, portnum):
+    def getPortAttr(self, porttype, portnum, key):
         """get an attribute on the given port"""
 
         portnum = self._ensurePortNum(porttype, portnum)
@@ -189,8 +207,8 @@ class PortMixin:
         for ptype in self.portTypes:
             portinfo[ptype]={}
             for n in range(self._portmeta[ptype]['numports']):
-                portinfo[ptype][n] = {'connection': self.getPortAttr('connection', ptype, n),
-                                      'otherportnum': self.getPortAttr('otherportnum', ptype, n)}
+                portinfo[ptype][n] = {'connection': self.getPortAttr(ptype, n, 'connection'),
+                                      'otherportnum': self.getPortAttr(ptype, n, 'otherportnum')}
 
         return portinfo
 

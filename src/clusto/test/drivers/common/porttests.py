@@ -121,17 +121,17 @@ class PortTests(testbase.ClustoTestBase):
 
         t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
 
-        t1.setPortAttr('macaddr', 'foo', 'a', 0)
-        self.assertEqual('foo', t1.getPortAttr('macaddr', 'a', 0))
+        t1.setPortAttr('a', 0, 'macaddr', 'foo')
+        self.assertEqual('foo', t1.getPortAttr('a', 0, 'macaddr'))
 
         self.assertRaises(ConnectionException, 
-                          t2.setPortAttr, 'foo', 'bar', 'j', 2)
+                          t2.setPortAttr, 'j', 2, 'foo', 'bar')
 
-        self.assertEqual(None, t2.getPortAttr('mac', 'z', 0))
-        t2.setPortAttr('mac', 'bar', 'z', 0)
-        self.assertEqual('bar', t2.getPortAttr('mac', 'z', 0))
-        t2.delPortAttr('mac', 'z', 0)
-        self.assertEqual(None, t2.getPortAttr('mac', 'z', 0))
+        self.assertEqual(None, t2.getPortAttr('z', 0, 'mac'))
+        t2.setPortAttr('z', 0, 'mac', 'bar')
+        self.assertEqual('bar', t2.getPortAttr('z', 0, 'mac'))
+        t2.delPortAttr('z', 0, 'mac')
+        self.assertEqual(None, t2.getPortAttr('z', 0, 'mac'))
         
 
 
