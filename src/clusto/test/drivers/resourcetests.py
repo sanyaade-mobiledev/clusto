@@ -3,7 +3,7 @@ from clusto.test import testbase
 import itertools
 
 from clusto.drivers import *
-
+from clusto.exceptions import ResourceLockException
 from clusto.drivers.resourcemanagers.simplenamemanager import SimpleNameManagerException
 
 
@@ -58,3 +58,62 @@ class ResourceManagerTests(testbase.ClustoTestBase):
         self.assertEqual(sorted(rm.resources(d)),
                          sorted([]))
 
+
+class ResourceLockTests(testbase.ClustoTestBase):
+
+    def data(self):
+
+        rm = ResourceManager('test')
+
+        d = Driver('d')
+        e = Driver('e')
+        
+        
+    def testDeallocatingLockedResource(self):
+
+        d, e = clusto.getEntities(clustodrivers=[Driver])
+
+        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        
+        rm.allocate(d, 'foo')
+        rm.allocate(d, 'bar')
+
+        rm.lockResource(d, 'foo')
+        
+        self.assertRaises(ResourceLockException, rm.deallocate, d, 'foo')
+
+
+    
+    def testLockingAnAlreadyLockedResource(self):
+
+        d, e = clusto.getEntities(clustodrivers=[Driver])
+
+        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        
+        rm.allocate(d, 'foo')
+        rm.allocate(d, 'bar')
+
+        rm.lockResource(d, 'foo')
+
+        self.assertRaises(ResourceLockException, rm.lockResource, d, 'foo')
+
+        
+
+    def testDeallocatingAllResourcesFromAnEntity(self):
+
+        d, e = clusto.getEntities(clustodrivers=[Driver])
+
+        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        
+        rm.allocate(d, 'foo')
+        rm.allocate(d, 'bar')
+
+        rm.lockResource(d, 'foo')
+
+        rm.unlockResource(d, 'foo')
+
+        rm.deallocate(d, 'foo')
+        
+        
+        
+        
