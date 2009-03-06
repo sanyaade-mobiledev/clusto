@@ -1,5 +1,8 @@
+import clusto
+from clusto.schema import Attribute
+
 from clusto.drivers import ResourceManager, ResourceTypeException
-from clusto.exceptions import ResourceNotAvailableException
+from clusto.exceptions import ResourceNotAvailableException, ResourceException
 
 import IPy
 
@@ -30,12 +33,12 @@ class IPManager(ResourceManager):
         return self.__ipy
 
     def ensureType(self, resource, numbered=True):
-
         """check that the given ip falls within the range managed by this manager"""
 
         try:
-            if not isinstance(numbered, bool) and isinstance(numbered, int):
-                ip = IPy.IP(numbered+2147483648)
+            if not isinstance(numbered, bool) and isinstance(int(numbered), int):
+                ## add here to map unsigned ints from IPs to signed ints of python
+                ip = IPy.IP(int(numbered+2147483648))
             else:
                 ip = IPy.IP(resource)           
         except ValueError:
@@ -47,7 +50,7 @@ class IPManager(ResourceManager):
                                         % (str(resource), self.baseip, self.netmask))
 
 
-        return ('ip', ip.int()-2147483648)
+        return ('ip', int(ip.int()-2147483648))
 
 
     def allocator(self):
@@ -87,7 +90,39 @@ class IPManager(ResourceManager):
             # check from the beginning again in case an earlier ip
             # got freed
                     
-            nextip = long(self.ipy.net().int() + 1)
+            nextip = int(self.ipy.net().int() + 1)
             
         raise ResourceNotAvailableException("out of available ips.")
-            
+
+    @classmethod
+    def getIPManager(cls, ip):
+        """return a valid ip manager for the given ip.
+
+        @param ip: the ip
+        @type ip: integer, string, or IPy object
+
+        @return: the appropriate IP manager from the clusto database
+        """
+
+        ipman = None
+        if isinstance(ip, Attribute):
+            ipman = ip.entity
+            return ipman
+
+        for ipmantest in clusto.getEntities(clustotypes=[cls]):
+            try:
+                ipmantest.ensureType(ip)
+            except ResourceTypeException:
+                pass
+
+            ipman = ipmantest
+            break
+        
+
+        if not ipman:
+            raise ResourceException("No resource manager for %s exists."
+                                    % str(ip))
+        
+        return ipman
+        
+

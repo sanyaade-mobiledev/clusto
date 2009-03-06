@@ -90,6 +90,7 @@ class SimpleEntityNameManager(SimpleNameManager):
             newobj = clustotype(name)
 
         else:
+            name = resource
             newobj = clustotype(resource)
 
 

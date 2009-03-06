@@ -4,7 +4,7 @@ import itertools
 
 from clusto.drivers import *
 
-from clusto.drivers.resources.simplenamemanager import SimpleNameManagerException
+from clusto.drivers.resourcemanagers.simplenamemanager import SimpleNameManagerException
 
 
 
@@ -95,6 +95,14 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
         self.assertEqual(clusto.getByName('foo0050').name, 'foo0050')
 
 
+    def testAllocateGivenName(self):
+
+        ngen = clusto.getByName('foonamegen')
+
+        d = ngen.allocate(Driver, 'testname')
+
+        self.assertEqual(d.name, 'testname')
+
 class SimpleNameManagerTests(testbase.ClustoTestBase):
 
     def data(self):
@@ -116,4 +124,4 @@ class SimpleNameManagerTests(testbase.ClustoTestBase):
             ngen.allocate(d)
             
         
-        self.assertEqual(ngen.attrQuery('resource', count=True), 50)
+        self.assertEqual(len(SimpleNameManager.resources(d)), 50)

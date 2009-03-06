@@ -4,7 +4,7 @@ import itertools
 
 from clusto.drivers import *
 
-from clusto.drivers.resources.simplenummanager import *
+from clusto.drivers.resourcemanagers.simplenummanager import *
 
 
 
@@ -34,8 +34,6 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
         self.assertEqual(ngen.owners('num', 3), [d])
         self.assertEqual(ngen.owners('num', 4), [d])
 
-        self.assertEqual(sorted(ngen.resources(d)),
-                         sorted(ngen.attrs(key='resource')))
 
     def testAllocateMaxNum(self):
         

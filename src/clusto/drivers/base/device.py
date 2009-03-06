@@ -39,12 +39,14 @@ class Device(Driver):
 
 
     def addFQDN(self, fqdn):
-
+        """add a fully qualified domain name"""
+        
         if not self.hasAttr("fqdn", numbered=True, value=fqdn):
             self.addAttr("fqdn", numbered=True, value=fqdn)
 
     def removeFQDN(self, fqdn):
-
+        """remove a fully qualified domain name"""
+        
         self.delAttrs("fqdn", numbered=True, value=fqdn)
 
         
