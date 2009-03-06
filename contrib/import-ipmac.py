@@ -1,4 +1,4 @@
-from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager
+from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager, IPManager
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
@@ -9,6 +9,7 @@ from pprint import pprint
 import yaml
 import socket
 import sys
+import re
 
 SWITCHPORT_TO_RU = {
     1:1, 2:2, 3:3, 4:4, 5:5,
@@ -92,40 +93,39 @@ def get_hostname(ipaddr):
     return hostname
 
 def discover_interfaces(ipaddr, server=None, ssh_user='root'):
-    if not server:
-        server = get_server(ipaddr)
-    proc = Popen(['ssh', '-o', 'StrictHostKeyChecking no', '%s@%s' % (ssh_user, ipaddr), '/sbin/ip addr show up'], stdout=PIPE)
+    #if not server:
+    #   server = get_server(ipaddr)
+    proc = Popen(['ssh', '-o', 'StrictHostKeyChecking no', '%s@%s' % (ssh_user, ipaddr), '/sbin/ifconfig'], stdout=PIPE)
     output = proc.stdout.read()
     iface = {}
     for line in output.split('\n'):
         line = line.rstrip('\r\n')
-        if line[0].isdigit():
-            num, line = line.split(':', 1)
-            iface[num] = []
-        iface[num].append(line.strip())
+        if not line: continue
+        line = line.split('  ')
+        if line[0]:
+            name = line[0]
+            iface[name] = []
+            del line[0]
+        line = [x for x in line if x]
+        iface[name] += line
 
-    patterns = [
-        re.compile('^(?P<name>[a-Z0-9]+): \<(?P<flags>[A-Z0-9,]+)\> mtu (?P<mtu>[0-9]+) (?P<linkflags>.*)$'),
-        re.compile('^link/(?P<linktype>[a-z]+) (?P<mac>[a-Z0-9:]+) brd (?P<broadcastmac>[a-Z0-9:]+)$'),
-        re.compile('^inet (?P<ip>[0-9.]+)/(?P<netmask>[0-9]+) brd (?P<broadcastip>[0-9.]+) (?P<v4flags>.*)$'),
-        re.compile('^inet6 (?P<ip6>[a-Z0-9:]+)/(?P<netmask6>[0-9]+) scope (?P<scope6>[\w]+)$')
-    ]
-    ifdict = {}
-    for num in iface:
-        ifdict[num] = {}
-        for line in iface[num]:
-            for pattern in patterns:
-                match = pattern.match(line)
-                if match:
-                    ifdict[num].update(match.groupdict())
-                    break
-            if not match:
-                if not 'extra' in ifdict[num]:
-                    ifdict[num]['extra'] = ''
-                ifdict[num]['extra'] += line
-
-    pprint(ifdict)
-    return
+    for name in iface:
+        attribs = {}
+        for attr in iface[name]:
+            if attr.startswith('Link encap') or \
+                attr.startswith('inet addr') or \
+                attr.startswith('Bcast') or \
+                attr.startswith('Mask') or \
+                attr.startswith('MTU') or \
+                attr.startswith('Metric'):
+                key, value = attr.split(':', 1)
+            if attr.startswith('HWaddr'):
+                key, value = attr.split(' ', 1)
+            if attr.startswith('inet6 addr'):
+                key, value = attr.split(': ', 1)
+            attribs[key.lower()] = value
+        iface[name] = attribs
+    return iface
 
 def get_server(ipaddr, fqdn_base='digg.internal'):
     server = None
@@ -141,7 +141,7 @@ def get_server(ipaddr, fqdn_base='digg.internal'):
         try:
             server = clusto.getByName(hostname)
         except LookupError:
-            print "Server %s doesn't exist in clusto... Creating it"
+            print "Server %s doesn't exist in clusto... Creating it" % hostname
             server = names.allocate(BasicServer, hostname)
     else:
         print 'Unable to determine hostname for %s... Assuming this is a new server' % ipaddr
@@ -187,7 +187,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     else:
         ifnum = 1
 
-    server.setPortAttr('MACAddress', macaddr, 'nic-eth', ifnum)
     if not server.portFree('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
@@ -198,12 +197,36 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if server.portFree('pwr-nema-5', 0):
         ru = rack.getRackAndU(server)['RU'][0]
         server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
-    
-    iplist = [x.value for x in server.attrs('ip-address')]
-    if not ipaddr in iplist:
-        server.addAttr('ip-address', ipaddr)
 
-    #ipnet = IPManager('sjc1-internal-network', gateway='10.2.128.1', netmask='255.255.252.0', baseip='
+    try:
+        subnet = clusto.getByName('sjc1-subnet')
+    except LookupError:
+        subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
+
+    ifaces = discover_interfaces(ipaddr)
+    for name in ifaces:
+        if name == 'lo':
+            continue
+        n = ifaces[name]
+        if not 'inet addr' in n:
+            continue
+
+        match = re.match('(?P<porttype>[a-z]+)(?P<num>[0-9]*)', name)
+        if not match:
+            print 'Unable to comprehend port name: %s' % name
+            continue
+
+        match = match.groupdict()
+        if not match['num']:
+            num = 0
+        else:
+            num = int(match['num'])
+        porttype = match['porttype']
+
+        ip = subnet.allocate(server, n['inet addr'])
+        server.bindIPtoPort(ip, 'nic-%s' % porttype, num)
+        server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
+    return
 
     clusto.commit()
     pprint(server)
