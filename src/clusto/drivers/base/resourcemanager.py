@@ -90,7 +90,7 @@ class ResourceManager(Driver):
                     self.deallocate(thing, res.subkey, res.number)
 
 
-            if resource and not self.available(resource):
+            if resource and not self.available(resource, numbered):
                 resource, numbered = self.ensureType(resource, numbered)
 
                 if self.checkLock(thing, resource, numbered):
