@@ -177,32 +177,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         rack.insert(pwr, (28, 29))
 
     # Query clusto for a device matching the mac address.
-    #server = None
-    server = None
-    hostname = get_hostname(ipaddr)
-    if hostname:
-        try:
-            server = clusto.getByName(hostname)
-        except LookupError:
-            try:
-                mgr = clusto.getByName('servernames')
-                mgr = SimpleEntityNameManager('servernames')
-            except:
-                # TODO: Finish this.
-                pass
-
-    if not server:
-        for dev in rack.contents():
-            ru = rack.getRackAndU(dev)['RU'][0]
-            if ru == SWITCHPORT_TO_RU[portnum]:
-                server = dev
-                break
-    if not server:
-        try:
-            namemgr = clusto.getByName('servernames')
-        except:
-            namemgr = SimpleEntityNameManager('servernames', basename='s', digits=4)
-        server = namemgr.allocate(BasicServer)
+    server = get_server(ipaddr)
 
     if not server in rack:
         rack.insert(server, SWITCHPORT_TO_RU[portnum])
@@ -227,20 +202,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     iplist = [x.value for x in server.attrs('ip-address')]
     if not ipaddr in iplist:
         server.addAttr('ip-address', ipaddr)
-
-    names = []
-    try:
-        names = getfqdn(ipaddr)
-    except: pass
-
-    try:
-        names.append(get_snmp_hostname(ipaddr))
-    except: pass
-
-    namelist = [x.value for x in server.attrs('hostname')]
-    for hostname in names:
-        if not hostname in namelist:
-            server.addAttr('hostname', hostname)
 
     #ipnet = IPManager('sjc1-internal-network', gateway='10.2.128.1', netmask='255.255.252.0', baseip='
 

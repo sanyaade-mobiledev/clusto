@@ -49,43 +49,36 @@ def get_hostname(ipaddr):
 def discover_interfaces(ipaddr, server=None, ssh_user='root'):
     #if not server:
     #    server = get_server(ipaddr)
-    proc = Popen(['ssh', '-o', 'StrictHostKeyChecking no', '%s@%s' % (ssh_user, ipaddr), '/sbin/ip addr show up'], stdout=PIPE)
+    proc = Popen(['ssh', '-o', 'StrictHostKeyChecking no', '%s@%s' % (ssh_user, ipaddr), '/sbin/ifconfig'], stdout=PIPE)
     output = proc.stdout.read()
     iface = {}
     for line in output.split('\n'):
         line = line.rstrip('\r\n')
         if not line: continue
-        if line[0].isdigit():
-            num, line = line.split(':', 1)
-            iface[num] = []
-        iface[num].append(line.strip())
+        line = line.split('  ')
+        if line[0]:
+            name = line[0]
+            iface[name] = []
+            del line[0]
+        line = [x for x in line if x]
+        iface[name] += line
 
-    patterns = [
-        re.compile('^(?P<name>[A-z0-9]+): \<(?P<flags>[A-Z0-9\,]+)\> mtu (?P<mtu>[0-9]+) (?P<linkflags>.*)$'),
-        re.compile('^link/(?P<linktype>[a-z]+) (?P<mac>[A-z0-9\:]+) brd (?P<broadcastmac>[A-z0-9\:]+)$'),
-        re.compile('^inet (?P<ip>[0-9\.]+)/(?P<netmask>[0-9]+) brd (?P<broadcastip>[0-9\.]+) (?P<v4flags>.*)$'),
-        re.compile('^inet6 (?P<ip6>[A-z0-9\:]+)/(?P<netmask6>[0-9]+) scope (?P<scope6>[\w]+)$'),
-        re.compile('^inet (?P<ip>[0-9\.]+)/(?P<netmask>[0-9]+) scope (?P<scope>[\w]+) (?P<v4flags>.*)$'),
-    ]
-    ifdict = {}
-    for num in iface:
-        ifdict[num] = {}
-        for line in iface[num]:
-            for pattern in patterns:
-                match = pattern.match(line)
-                if match:
-                    d = match.groupdict()
-                    for key, value in d.items():
-                        if not key in ifdict[num]:
-                            ifdict[num][key] = []
-                        ifdict[num][key].append(value)
-                    break
-            if not match:
-                if not 'extra' in ifdict[num]:
-                    ifdict[num]['extra'] = ''
-                ifdict[num]['extra'] += line
-
-    pprint(ifdict)
+    for name in iface:
+        attribs = {}
+        for attr in iface[name]:
+            if attr.startswith('Link encap') or \
+                attr.startswith('inet addr') or \
+                attr.startswith('Bcast') or \
+                attr.startswith('Mask') or \
+                attr.startswith('MTU') or \
+                attr.startswith('Metric'):
+                key, value = attr.split(':', 1)
+            if attr.startswith('HWaddr'):
+                key, value = attr.split(' ', 1)
+            if attr.startswith('inet6 addr'):
+                key, value = attr.split(': ', 1)
+            attribs[key] = value
+    pprint(iface)
     return
 
 def get_server(ipaddr, fqdn_base='digg.internal'):
