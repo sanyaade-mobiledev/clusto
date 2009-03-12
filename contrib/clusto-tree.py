@@ -1,18 +1,33 @@
 #!/usr/bin/env python
 from clusto.scripthelpers import getClustoConfig
-from pprint import pprint
 import clusto
+
+from pprint import pprint
 import sys
 
 def print_tree(root, indent=0, attrs=['name']):
     for x in root.contents():
         txt = ''
         for attr in attrs:
-            value = getattr(x, attr, None)
+            value = None
+
+            if attr.startswith('.'):
+                attr = attr.lstrip('.')
+                method = getattr(x, attr, None)
+                if method:
+                    value = method()
+
+                if not value:
+                    value = eval('%s(x)' % attr)
+
+            if not value:
+                value = getattr(x, attr, None)
+
             if not value:
                 value = [i.value for i in x.attrQuery(key=attr)]
                 if len(value) == 1:
                     value = value[0]
+
             if not value:
                 value = None
             txt += '%s: %s\t' % (attr, value)
