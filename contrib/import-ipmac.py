@@ -5,6 +5,7 @@ import clusto
 from traceback import format_exc
 from subprocess import Popen, PIPE
 from xml.etree import ElementTree
+from os.path import exists
 from pprint import pprint
 import yaml
 import socket
@@ -223,8 +224,8 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
             num = int(match['num'])
         porttype = match['porttype']
 
-        ip = subnet.allocate(server, n['inet addr'])
-        server.bindIPtoPort(ip, 'nic-%s' % porttype, num)
+        subnet.allocate(server, n['inet addr'])
+        server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
         server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
     return
 
