@@ -199,10 +199,10 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         ru = rack.getRackAndU(server)['RU'][0]
         server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
 
-    #try:
-    #    subnet = clusto.getByName('sjc1-subnet')
-    #except LookupError:
-    #    subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
+    try:
+        subnet = clusto.getByName('sjc1-subnet')
+    except LookupError:
+        subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
 
     ifaces = discover_interfaces(ipaddr)
     for name in ifaces:
@@ -225,8 +225,8 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         porttype = match['porttype']
 
         #subnet.allocate(server, n['inet addr'])
-        ipman = IPManager.getIPManager(n['inet addr'])
-        if not server in ipman.owners(n['inet addr']):
+        #ipman = IPManager.getIPManager(n['inet addr'])
+        if not server in subnet.owners(n['inet addr']):
             server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
         server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
     return
