@@ -14,11 +14,14 @@ def print_tree(root, indent=0, attrs=['name']):
             if attr.startswith('.'):
                 attr = attr.lstrip('.')
                 method = getattr(x, attr, None)
-                if method:
+                if method and callable(method):
                     value = method()
 
                 if not value:
-                    value = eval('%s(x)' % attr)
+                    try:
+                        value = eval('%s(x)' % attr)
+                    except:
+                        value = None
 
             if not value:
                 value = getattr(x, attr, None)
