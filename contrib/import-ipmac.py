@@ -1,4 +1,4 @@
-from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicVirtualServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager, IPManager
+from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicVirtualServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager, IPManager, OpenGearCM4148
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
@@ -23,6 +23,12 @@ SWITCHPORT_TO_RU = {
     31:13, 32:14, 33:15, 34:16, 35:17,
     36:19, 37:20, 38:21, 39:22, 40:23,
 }
+
+RU_TO_SWITCHPORT = {}
+for port in SWITCHPORT_TO_RU:
+    ru = SWITCHPORT_TO_RU[port]
+    if not ru in RU_TO_SWITCHPORT or RU_TO_SWITCHPORT[ru] > port:
+        RU_TO_SWITCHPORT[ru] = port
 
 RU_TO_PWRPORT = {
     1: 'bb1',
@@ -184,7 +190,7 @@ def get_server(ipaddr, fqdn_base='digg.internal'):
         return None
         #server = names.allocate(BasicServer)
 
-    server.addFQDN('%s.%s' % (hostname, fqdn_base))
+    #server.addFQDN('%s.%s' % (hostname, fqdn_base))
 
     clusto.commit()
 
@@ -206,6 +212,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     rack = get_or_create(BasicRack, rack_name)
     switch = get_or_create(BasicNetworkSwitch, switch_name)
     pwr = get_or_create(PowerTowerXM, '%s-pwr1' % rack_name)
+    ts = get_or_create(OpenGearCM4148, '%s-ts1' % rack_name)
 
     if not rack in dc:
         dc.insert(rack)
@@ -213,6 +220,13 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         rack.insert(switch, 31)
     if not pwr in rack:
         rack.insert(pwr, (28, 29))
+    if not ts in rack:
+        rack.insert(ts, 30)
+
+    if switch.portFree('pwr-nema-5', 0):
+        switch.connectPorts('pwr-nema-5', 0, pwr, '.aa8')
+    if ts.portFree('pwr-nema-5', 0):
+        ts.connectPorts('pwr-nema-5', 0, pwr, '.ab8')
 
     # Query clusto for a device matching the mac address.
     server = get_server(ipaddr)
@@ -238,9 +252,11 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     else:
         server.connectPorts('nic-eth', ifnum, switch, portnum)
 
+    ru = rack.getRackAndU(server)['RU'][0]
     if server.portFree('pwr-nema-5', 0):
-        ru = rack.getRackAndU(server)['RU'][0]
         server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
+    if server.portFree('console-serial', 0):
+        server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
 
     try:
         subnet = clusto.getByName('sjc1-subnet')
