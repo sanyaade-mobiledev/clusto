@@ -1,14 +1,16 @@
-from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager
+from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicVirtualServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager, IPManager
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
 from traceback import format_exc
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from xml.etree import ElementTree
+from os.path import exists
 from pprint import pprint
 import yaml
 import socket
 import sys
+import re
 
 SWITCHPORT_TO_RU = {
     1:1, 2:2, 3:3, 4:4, 5:5,
@@ -56,6 +58,12 @@ RU_TO_PWRPORT = {
     36: 'ba7',
 }
 
+hostpattern = re.compile('^\s*(?P<ip>[0-9A-z:.%]+)\s*(?P<hostname>[A-z\-0-9.]+)\s*$')
+ETC_HOSTS = dict([(b['ip'], b['hostname']) for b in [a.groupdict() for a in [hostpattern.match(x) for x in file('/etc/hosts', 'r').readlines() if x] if a] if 'ip' in b and 'hostname' in b])
+
+SSH_CMD = ['ssh', '-o', 'StrictHostKeyChecking no', '-o', 'PasswordAuthentication no']
+
+
 def get_or_create(objtype, name):
     try:
         return clusto.getByName(name)
@@ -63,10 +71,14 @@ def get_or_create(objtype, name):
         return objtype(name)
 
 def get_snmp_hostname(ipaddr, community='digg1t'):
-    proc = Popen(['scli', '-c', 'show system info', '-x', ipaddr, community], stdout=PIPE)
-    xmldata = proc.stdout.read()
-    xmltree = ElementTree.fromstring(xmldata)
-    hostname = list(xmltree.getiterator('name'))
+    hostname = ''
+    try:
+        proc = Popen(['scli', '-c', 'show system info', '-x', ipaddr, community], stdout=PIPE)
+        xmldata = proc.stdout.read()
+        xmltree = ElementTree.fromstring(xmldata)
+        hostname = list(xmltree.getiterator('name'))
+    except:
+        pass
     if len(hostname) > 0:
         hostname = hostname[0].text
     else:
@@ -74,12 +86,18 @@ def get_snmp_hostname(ipaddr, community='digg1t'):
     return hostname
 
 def get_ssh_hostname(ipaddr, username='root'):
-    proc = Popen(['ssh', '%s@%s' % (username, ipaddr), 'hostname'], stdout=PIPE)
+    proc = Popen(SSH_CMD + ['%s@%s' % (username, ipaddr), 'hostname'], stdout=PIPE)
     output = proc.stdout.read()
     return output.rstrip('\r\n')
 
 def get_hostname(ipaddr):
-    hostname = get_snmp_hostname(ipaddr)
+    hostname = None
+    if ipaddr in ETC_HOSTS:
+        hostname = ETC_HOSTS[ipaddr]
+
+    if not hostname:
+        hostname = get_snmp_hostname(ipaddr)
+
     if not hostname:
         try:
             hostname = getfqdn(ipaddr)
@@ -92,40 +110,59 @@ def get_hostname(ipaddr):
     return hostname
 
 def discover_interfaces(ipaddr, server=None, ssh_user='root'):
-    if not server:
-        server = get_server(ipaddr)
-    proc = Popen(['ssh', '-o', 'StrictHostKeyChecking no', '%s@%s' % (ssh_user, ipaddr), '/sbin/ip addr show up'], stdout=PIPE)
+    #if not server:
+    #   server = get_server(ipaddr)
+    proc = Popen(SSH_CMD + ['%s@%s' % (ssh_user, ipaddr), '/sbin/ifconfig'], stdout=PIPE)
     output = proc.stdout.read()
     iface = {}
     for line in output.split('\n'):
         line = line.rstrip('\r\n')
-        if line[0].isdigit():
-            num, line = line.split(':', 1)
-            iface[num] = []
-        iface[num].append(line.strip())
+        if not line: continue
+        line = line.split('  ')
+        if line[0]:
+            name = line[0]
+            iface[name] = []
+            del line[0]
+        line = [x for x in line if x]
+        iface[name] += line
 
-    patterns = [
-        re.compile('^(?P<name>[a-Z0-9]+): \<(?P<flags>[A-Z0-9,]+)\> mtu (?P<mtu>[0-9]+) (?P<linkflags>.*)$'),
-        re.compile('^link/(?P<linktype>[a-z]+) (?P<mac>[a-Z0-9:]+) brd (?P<broadcastmac>[a-Z0-9:]+)$'),
-        re.compile('^inet (?P<ip>[0-9.]+)/(?P<netmask>[0-9]+) brd (?P<broadcastip>[0-9.]+) (?P<v4flags>.*)$'),
-        re.compile('^inet6 (?P<ip6>[a-Z0-9:]+)/(?P<netmask6>[0-9]+) scope (?P<scope6>[\w]+)$')
-    ]
-    ifdict = {}
-    for num in iface:
-        ifdict[num] = {}
-        for line in iface[num]:
-            for pattern in patterns:
-                match = pattern.match(line)
-                if match:
-                    ifdict[num].update(match.groupdict())
-                    break
-            if not match:
-                if not 'extra' in ifdict[num]:
-                    ifdict[num]['extra'] = ''
-                ifdict[num]['extra'] += line
+    for name in iface:
+        attribs = {}
+        for attr in iface[name]:
+            if attr.startswith('Link encap') or \
+                attr.startswith('inet addr') or \
+                attr.startswith('Bcast') or \
+                attr.startswith('Mask') or \
+                attr.startswith('MTU') or \
+                attr.startswith('Metric'):
+                key, value = attr.split(':', 1)
+            if attr.startswith('HWaddr'):
+                key, value = attr.split(' ', 1)
+            if attr.startswith('inet6 addr'):
+                key, value = attr.split(': ', 1)
+            attribs[key.lower()] = value
+        iface[name] = attribs
+    return iface
 
-    pprint(ifdict)
-    return
+def get_facts(ipaddr, ssh_user='root'):
+    proc = Popen(SSH_CMD + ['%s@%s' % (ssh_user, ipaddr), 'facter'], stdout=PIPE, stderr=STDOUT)
+    facts = []
+    for line in proc.stdout.read().split('\n'):
+        line = line.rstrip('\r\n')
+        if line:
+            line = line.split(' => ', 1)
+            if len(line) == 2:
+                facts.append(line)
+    return facts
+
+def get_servertype(ipaddr):
+    facts = dict(get_facts(ipaddr))
+    if facts.get('virtual', None) == 'xenu':
+        print 'Virtual', ipaddr
+        return BasicVirtualServer
+    else:
+        print 'Physical', ipaddr
+        return BasicServer
 
 def get_server(ipaddr, fqdn_base='digg.internal'):
     server = None
@@ -134,21 +171,22 @@ def get_server(ipaddr, fqdn_base='digg.internal'):
     names = get_or_create(SimpleEntityNameManager, 'servernames')
     hostname = get_hostname(ipaddr)
     if hostname:
-        if hostname.endswith(fqdn_base):
-            fqdn = hostname
         hostname = hostname.split('.', 1)[0]
 
         try:
             server = clusto.getByName(hostname)
         except LookupError:
-            print "Server %s doesn't exist in clusto... Creating it"
-            server = names.allocate(BasicServer, hostname)
+            print "Server %s doesn't exist in clusto... Creating it" % hostname
+            server = names.allocate(get_servertype(ipaddr), hostname)
     else:
-        print 'Unable to determine hostname for %s... Assuming this is a new server' % ipaddr
-        server = names.allocate(BasicServer)
+        #print 'Unable to determine hostname for %s... Assuming this is a new server' % ipaddr
+        print 'Unable to determine hostname for %s... Failing quietly.' % ipaddr
+        return None
+        #server = names.allocate(BasicServer)
 
-    if fqdn:
-        server.addFQDN(fqdn)
+    server.addFQDN('%s.%s' % (hostname, fqdn_base))
+
+    clusto.commit()
 
     return server
 
@@ -179,6 +217,12 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     # Query clusto for a device matching the mac address.
     server = get_server(ipaddr)
 
+    if not server:
+        return
+
+    if server.driver != 'basicserver':
+        return
+
     if not server in rack:
         rack.insert(server, SWITCHPORT_TO_RU[portnum])
 
@@ -187,7 +231,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     else:
         ifnum = 1
 
-    server.setPortAttr('MACAddress', macaddr, 'nic-eth', ifnum)
     if not server.portFree('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
@@ -198,12 +241,42 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if server.portFree('pwr-nema-5', 0):
         ru = rack.getRackAndU(server)['RU'][0]
         server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
-    
-    iplist = [x.value for x in server.attrs('ip-address')]
-    if not ipaddr in iplist:
-        server.addAttr('ip-address', ipaddr)
 
-    #ipnet = IPManager('sjc1-internal-network', gateway='10.2.128.1', netmask='255.255.252.0', baseip='
+    try:
+        subnet = clusto.getByName('sjc1-subnet')
+    except LookupError:
+        subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
+
+    ifaces = discover_interfaces(ipaddr)
+    for name in ifaces:
+        if name == 'lo':
+            continue
+        n = ifaces[name]
+        if not 'inet addr' in n:
+            continue
+
+        match = re.match('(?P<porttype>[a-z]+)(?P<num>[0-9]*)', name)
+        if not match:
+            print 'Unable to comprehend port name: %s' % name
+            continue
+
+        match = match.groupdict()
+        if not match['num']:
+            num = 0
+        else:
+            num = int(match['num'])
+        porttype = match['porttype']
+
+        #subnet.allocate(server, n['inet addr'])
+        ipman = IPManager.getIPManager(n['inet addr'])
+        if not server in ipman.owners(n['inet addr']):
+            server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
+        server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
+
+    if not 'uniqueid' in server.attrKeys():
+        print 'Adding facts to server:', server.name
+        for key, value in get_facts(ipaddr):
+            server.addAttr(key, value)
 
     clusto.commit()
     pprint(server)
