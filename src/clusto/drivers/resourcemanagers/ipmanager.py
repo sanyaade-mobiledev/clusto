@@ -1,7 +1,7 @@
 import clusto
 from clusto.schema import Attribute
 
-from clusto.drivers import ResourceManager, ResourceTypeException
+from clusto.drivers import ResourceManager, ResourceTypeException, Driver
 from clusto.exceptions import ResourceNotAvailableException, ResourceException
 
 import IPy
@@ -107,15 +107,15 @@ class IPManager(ResourceManager):
         ipman = None
         if isinstance(ip, Attribute):
             ipman = ip.entity
-            return ipman
+            return Driver(ipman)
 
-        for ipmantest in clusto.getEntities(clustotypes=[cls]):
+        for ipmantest in clusto.getEntities(clustodrivers=[cls]):
             try:
                 ipmantest.ensureType(ip)
             except ResourceTypeException:
                 pass
 
-            ipman = ipmantest
+            ipman = Driver(ipmantest)
             break
         
 
