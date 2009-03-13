@@ -2,7 +2,6 @@
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
-from subprocess import Popen
 import sys
 
 def main():
@@ -21,11 +20,8 @@ def main():
         return
 
     port = server.portInfo['console-serial'][0]
-    tsport = port['otherportnum'] + 3000
-    tsname = port['connection'].name
-
-    proc = Popen(['ssh', '-p', str(tsport), 'digg@%s' % tsname])
-    proc.communicate()
+    tsport = port['otherportnum']
+    tsname = port['connection'].connect('console-serial', tsport, 'digg')
 
 if __name__ == '__main__':
     config = getClustoConfig()

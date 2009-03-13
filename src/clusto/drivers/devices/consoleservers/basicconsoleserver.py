@@ -16,3 +16,5 @@ class BasicConsoleServer(PortMixin, Device):
                   'console-serial' : { 'numports':24, },
                   }
 
+    def connect(self, port, num):
+        raise NotImplemented
