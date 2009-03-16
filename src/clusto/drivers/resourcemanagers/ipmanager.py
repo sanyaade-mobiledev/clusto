@@ -125,4 +125,15 @@ class IPManager(ResourceManager):
         
         return ipman
         
+    @classmethod
+    def getIP(self, device):
+        if not isinstance(device, str):
+            raise TypeError
 
+        subnet = IPManager.getIPManager(device)
+        iplist = subnet.resources(clusto.getByName(device))
+
+        ret = []
+        for ip in iplist:
+            ret.append(IPy.IP(ip.number + 2147483648).strNormal())
+        return ret
