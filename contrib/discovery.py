@@ -1,5 +1,4 @@
-from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicVirtualServer, BasicNetworkSwitch, PowerTowerXM, SimpleEntityNameManager, IPManager, OpenGearCM4148
-from clusto.scripthelpers import getClustoConfig
+from clusto.drivers import SimpleEntityNameManager
 import clusto
 
 from traceback import format_exc
@@ -69,12 +68,12 @@ ETC_HOSTS = dict([(b['ip'], b['hostname']) for b in [a.groupdict() for a in [hos
 
 SSH_CMD = ['ssh', '-o', 'StrictHostKeyChecking no', '-o', 'PasswordAuthentication no']
 
-
 def get_or_create(objtype, name):
     try:
         return clusto.getByName(name)
     except LookupError:
         return objtype(name)
+
 
 def get_snmp_hostname(ipaddr, community='digg1t'):
     hostname = ''
@@ -192,130 +191,6 @@ def get_server(ipaddr, fqdn_base='digg.internal'):
 
     #server.addFQDN('%s.%s' % (hostname, fqdn_base))
 
-    clusto.commit()
+    #clusto.commit()
 
     return server
-
-def import_ipmac(name, macaddr, ipaddr, portnum):
-    '''
-    Insert or update a server in clusto
-    '''
-
-    # Get the basic datacenter, rack, and switch objects
-    portnum = int(portnum)
-    n = name.split('-', 3)
-    switch_name = '-'.join(n)
-    rack_name = '-'.join(n[:-1])
-    dc_name = n[:-2][0]
-
-    dc = get_or_create(BasicDatacenter, dc_name)
-    rack = get_or_create(BasicRack, rack_name)
-    switch = get_or_create(BasicNetworkSwitch, switch_name)
-    pwr = get_or_create(PowerTowerXM, '%s-pwr1' % rack_name)
-    ts = get_or_create(OpenGearCM4148, '%s-ts1' % rack_name)
-
-    if not rack in dc:
-        dc.insert(rack)
-    if not switch in rack:
-        rack.insert(switch, 31)
-    if not pwr in rack:
-        rack.insert(pwr, (28, 29))
-    if not ts in rack:
-        rack.insert(ts, 30)
-
-    if switch.portFree('pwr-nema-5', 0):
-        switch.connectPorts('pwr-nema-5', 0, pwr, '.aa8')
-    if ts.portFree('pwr-nema-5', 0):
-        ts.connectPorts('pwr-nema-5', 0, pwr, '.ab8')
-
-    # Query clusto for a device matching the mac address.
-    server = get_server(ipaddr)
-
-    if not server:
-        return
-
-    if server.driver != 'basicserver':
-        return
-
-    if not server in rack:
-        rack.insert(server, SWITCHPORT_TO_RU[portnum])
-
-    if portnum < 21:
-        ifnum = 0
-    else:
-        ifnum = 1
-
-    if not server.portFree('nic-eth', ifnum):
-        if not server.getConnected('nic-eth', ifnum) == switch:
-            server.disconnectPort('nic-eth', ifnum)
-            server.connectPorts('nic-eth', ifnum, switch, portnum)
-    else:
-        server.connectPorts('nic-eth', ifnum, switch, portnum)
-
-    ru = rack.getRackAndU(server)['RU'][0]
-    if server.portFree('pwr-nema-5', 0):
-        server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
-    if server.portFree('console-serial', 0):
-        server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
-
-    try:
-        subnet = clusto.getByName('sjc1-subnet')
-    except LookupError:
-        subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
-
-    ifaces = discover_interfaces(ipaddr)
-    for name in ifaces:
-        if name == 'lo':
-            continue
-        n = ifaces[name]
-        if not 'inet addr' in n:
-            continue
-
-        match = re.match('(?P<porttype>[a-z]+)(?P<num>[0-9]*)', name)
-        if not match:
-            print 'Unable to comprehend port name: %s' % name
-            continue
-
-        match = match.groupdict()
-        if not match['num']:
-            num = 0
-        else:
-            num = int(match['num'])
-        porttype = match['porttype']
-
-        #subnet.allocate(server, n['inet addr'])
-        ipman = IPManager.getIPManager(n['inet addr'])
-        if not server in ipman.owners(n['inet addr']):
-            server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
-        server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
-
-    if not 'uniqueid' in server.attrKeys():
-        print 'Adding facts to server:', server.name
-        for key, value in get_facts(ipaddr):
-            server.addAttr(key, value)
-
-    clusto.commit()
-    pprint(server)
-
-def main():
-    if len(sys.argv) > 1:
-        if not exists(sys.argv[1]):
-            print 'File %s does not exist.' % sys.argv[1]
-            return
-        fd = file(sys.argv[1], 'r')
-    else:
-        fd = sys.stdin
-
-    for line in fd.readlines():
-        switch, macaddr, ipaddr, port = line.rstrip('\n').split(';', 3)
-        try:
-            import_ipmac(switch, macaddr, ipaddr, port)
-        except:
-            print format_exc()
-    #pprint(clusto.getEntities())
-
-if __name__ == '__main__':
-    config = getClustoConfig()
-    clusto.connect(config.get('clusto', 'dsn'))
-    clusto.initclusto()
-    main()
