@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from clusto.scripthelpers import getClustoConfig
+from clusto.drivers import IPManager
 import clusto
 
 from subprocess import Popen
@@ -16,6 +17,12 @@ def main():
         print '%s is not a clusto name' % sys.argv[1]
         return
 
+    ip = IPManager.getIP(server.name)
+    if len(ip) == 0:
+        print 'Unable to determine IP address for', server.name
+        return
+    ip = ip[0]
+
     if server.driver == 'basicserver':
         print 'Escape character is ~.'
         port = server.portInfo['console-serial'][0]
@@ -24,9 +31,21 @@ def main():
         return
 
     if server.driver == 'basicvirtualserver':
+        proc = Popen(SSH_CMD + ['-l', 'root', ip, 'xm list'], stdout=PIPE, stderr=STDOUT)
+        stdout = proc.stdout.read()
+        domu = None
+        for line in stdout.split('\n')[1:]:
+            line = line.strip('\r\n ')
+            line = [x for x in line.split(' ') if x]
+            if line[0].find(server.name) != -1:
+                domu = line[0]
+                break
+        if not domu:
+            print 'Unable to find a running domU containing the name', server.name
+            return
+
         print 'Escape character is ^]'
-        host = server.parents()[0].attrs('fqdn')[0].value
-        proc = Popen(['ssh', '-l', 'root', host, 'xm console %s' % server.name])
+        proc = Popen(SSH_CMD + ['-l', 'root', ip, 'xm console', domu])
         proc.communicate()
         return
 

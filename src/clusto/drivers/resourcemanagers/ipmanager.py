@@ -127,8 +127,7 @@ class IPManager(ResourceManager):
         
     @classmethod
     def getIP(self, device):
-        if not isinstance(device, str):
-            raise TypeError
+        device = str(device)
 
         subnet = IPManager.getIPManager(device)
         iplist = subnet.resources(clusto.getByName(device))
