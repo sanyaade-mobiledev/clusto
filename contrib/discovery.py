@@ -1,4 +1,4 @@
-from clusto.drivers import SimpleEntityNameManager
+from clusto.drivers import SimpleEntityNameManager, BasicServer, BasicVirtualServer
 import clusto
 
 from traceback import format_exc
@@ -6,8 +6,8 @@ from subprocess import Popen, PIPE, STDOUT
 from xml.etree import ElementTree
 from os.path import exists
 from pprint import pprint
+from socket import getfqdn, gethostbyaddr
 import yaml
-import socket
 import sys
 import re
 
@@ -111,7 +111,6 @@ def get_hostname(ipaddr):
         try:
             hostname = get_ssh_hostname(ipaddr)
         except: pass
-    hostname = hostname.split('.', 1)[0]
     return hostname
 
 def discover_interfaces(ipaddr, server=None, ssh_user='root'):
@@ -133,7 +132,9 @@ def discover_interfaces(ipaddr, server=None, ssh_user='root'):
 
     for name in iface:
         attribs = {}
+        value = None
         for attr in iface[name]:
+            value = None
             if attr.startswith('Link encap') or \
                 attr.startswith('inet addr') or \
                 attr.startswith('Bcast') or \
@@ -145,6 +146,7 @@ def discover_interfaces(ipaddr, server=None, ssh_user='root'):
                 key, value = attr.split(' ', 1)
             if attr.startswith('inet6 addr'):
                 key, value = attr.split(': ', 1)
+            if not value: continue
             attribs[key.lower()] = value
         iface[name] = attribs
     return iface
@@ -160,23 +162,28 @@ def get_facts(ipaddr, ssh_user='root'):
                 facts.append(line)
     return facts
 
-def get_servertype(ipaddr):
-    facts = dict(get_facts(ipaddr))
-    if facts.get('virtual', None) == 'xenu':
-        print 'Virtual', ipaddr
-        return BasicVirtualServer
-    else:
-        print 'Physical', ipaddr
+def get_servertype(ipaddr, ssh_user='root'):
+    proc = Popen(SSH_CMD + ['-l', ssh_user, ipaddr, 'cat /proc/xen/capabilities'], stdout=PIPE, stderr=STDOUT)
+    stdout = proc.stdout.read().rstrip('\n')
+    if stdout.find('No such file') != -1:
+        # not a Xen kernel
         return BasicServer
+    if stdout.find('control_d') != -1:
+        # dom0
+        return BasicServer
+    # domU
+    return BasicVirtualServer
 
-def get_server(ipaddr, fqdn_base='digg.internal'):
+def get_server(ipaddr):
     server = None
     fqdn = None
 
     names = get_or_create(SimpleEntityNameManager, 'servernames')
     hostname = get_hostname(ipaddr)
     if hostname:
-        hostname = hostname.split('.', 1)[0]
+        if hostname.find('.') != -1:
+            fqdn = hostname
+            hostname = hostname.split('.', 1)[0]
 
         try:
             server = clusto.getByName(hostname)
@@ -189,8 +196,25 @@ def get_server(ipaddr, fqdn_base='digg.internal'):
         return None
         #server = names.allocate(BasicServer)
 
-    #server.addFQDN('%s.%s' % (hostname, fqdn_base))
+    try:
+        server.delAttrs('fqdn')
+    except: pass
 
-    #clusto.commit()
+    if not fqdn:
+        fqdn = gethostbyaddr(ipaddr)[0]
+        if fqdn == ipaddr:
+            fqdn = None
+
+    if fqdn.find('.') == -1:
+        fqdn += '.digg.internal'
+
+    if len(server.attrs('fqdn')) > 0:
+        for f in server.attrs('fqdn'):
+            server.removeFQDN(f.value)
+
+    if fqdn and len(server.attrs('fqdn')) == 0:
+        server.addFQDN(fqdn)
+
+    clusto.commit()
 
     return server

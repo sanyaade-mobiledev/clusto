@@ -2,6 +2,7 @@
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
+from subprocess import Popen
 import sys
 
 def main():
@@ -15,13 +16,21 @@ def main():
         print '%s is not a clusto name' % sys.argv[1]
         return
 
-    if server.type != 'server':
-        print '%s is not a server!' % sys.argv[1]
+    if server.driver == 'basicserver':
+        print 'Escape character is ~.'
+        port = server.portInfo['console-serial'][0]
+        tsport = port['otherportnum']
+        tsname = port['connection'].connect('console-serial', tsport, 'digg')
         return
 
-    port = server.portInfo['console-serial'][0]
-    tsport = port['otherportnum']
-    tsname = port['connection'].connect('console-serial', tsport, 'digg')
+    if server.driver == 'basicvirtualserver':
+        print 'Escape character is ^]'
+        host = server.parents()[0].attrs('fqdn')[0].value
+        proc = Popen(['ssh', '-l', 'root', host, 'xm console %s' % server.name])
+        proc.communicate()
+        return
+
+    print '%s is not a server!' % sys.argv[1]
 
 if __name__ == '__main__':
     config = getClustoConfig()

@@ -87,11 +87,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if server.portFree('console-serial', 0):
         server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
 
-    try:
-        subnet = clusto.getByName('sjc1-subnet')
-    except LookupError:
-        subnet = IPManager('sjc1-subnet', gateway='10.2.128.1', netmask='255.255.252.0', baseip='10.2.128.0')
-
     ifaces = discover_interfaces(ipaddr)
     for name in ifaces:
         if name == 'lo':
@@ -113,15 +108,14 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         porttype = match['porttype']
 
         #subnet.allocate(server, n['inet addr'])
-        #ipman = IPManager.getIPManager(n['inet addr'])
-        ipman = subnet
-        if not server in ipman.owners(n['inet addr']):
+        subnet = IPManager.getIPManager(n['inet addr'])
+        if not server in subnet.owners(n['inet addr']):
             server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
         server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
 
     if not 'uniqueid' in server.attrKeys():
-        print 'Adding facts to server:', server.name
         for key, value in get_facts(ipaddr):
+            if key == 'fqdn': continue
             server.addAttr(key, value)
 
     clusto.commit()
