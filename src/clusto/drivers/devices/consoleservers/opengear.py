@@ -1,6 +1,6 @@
 from basicconsoleserver import BasicConsoleServer
 from clusto.exceptions import ConnectionException
-from clusto.drivers.resourcemanagers import IPManager
+from clusto.drivers import IPManager
 
 from subprocess import Popen
 
