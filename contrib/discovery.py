@@ -1,4 +1,4 @@
-from clusto.drivers import SimpleEntityNameManager, BasicServer, BasicVirtualServer
+from clusto.drivers import SimpleEntityNameManager, BasicServer, BasicVirtualServer, IPManager
 import clusto
 
 from traceback import format_exc
@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE, STDOUT
 from xml.etree import ElementTree
 from os.path import exists
 from pprint import pprint
-from socket import getfqdn, gethostbyaddr
+import socket
 import yaml
 import sys
 import re
@@ -105,7 +105,7 @@ def get_hostname(ipaddr):
 
     if not hostname:
         try:
-            hostname = getfqdn(ipaddr)
+            hostname = socket.getfqdn(ipaddr)
         except: pass
     if not hostname:
         try:
@@ -178,43 +178,70 @@ def get_server(ipaddr):
     server = None
     fqdn = None
 
-    names = get_or_create(SimpleEntityNameManager, 'servernames')
+    try:
+        return IPManager.getDevice(ipaddr)[0]
+    except: pass
+
+    try:
+        names = clusto.getByName('servernames')
+    except:
+        names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=1)
     hostname = get_hostname(ipaddr)
     if hostname:
         if hostname.find('.') != -1:
             fqdn = hostname
             hostname = hostname.split('.', 1)[0]
+        else:
+            fqdn = hostname + '.digg.internal'
 
-        try:
-            server = clusto.getByName(hostname)
-        except LookupError:
-            print "Server %s doesn't exist in clusto... Creating it" % hostname
-            server = names.allocate(get_servertype(ipaddr), hostname)
+        server = clusto.getEntities(attrs=[{'key': 'fqdn', 'value': fqdn}])
+
+        if server:
+            server = server[0]
+        else:
+            print "Server %s doesn't exist in clusto... Creating it" % fqdn
+            server = names.allocate(get_servertype(ipaddr))
+
     else:
-        #print 'Unable to determine hostname for %s... Assuming this is a new server' % ipaddr
-        print 'Unable to determine hostname for %s... Failing quietly.' % ipaddr
-        return None
-        #server = names.allocate(BasicServer)
+        server = names.allocate(BasicServer)
+        fqdn = server.name + '.digg.internal'
+        return server
 
-    try:
-        server.delAttrs('fqdn')
-    except: pass
-
-    if not fqdn:
-        fqdn = gethostbyaddr(ipaddr)[0]
-        if fqdn == ipaddr:
-            fqdn = None
-
-    if fqdn.find('.') == -1:
-        fqdn += '.digg.internal'
-
-    if len(server.attrs('fqdn')) > 0:
-        for f in server.attrs('fqdn'):
-            server.removeFQDN(f.value)
-
-    if fqdn and len(server.attrs('fqdn')) == 0:
+    if not fqdn in [x.value for x in server.attrs('fqdn')]:
         server.addFQDN(fqdn)
+
+    fqdn = socket.gethostbyaddr(ipaddr)[0]
+    if fqdn != ipaddr:
+        if fqdn.find('.') == -1:
+            fqdn += '.digg.internal'
+        if fqdn and not fqdn in [x.value for x in server.attrs('fqdn')]:
+            server.addFQDN(fqdn)
 
     clusto.commit()
 
     return server
+
+def simple_ipbind(device, porttype='nic-eth', portnum=0):
+    try:
+        ip = IPManager.getIP(device)
+    except:
+        ip = None
+
+    if not ip:
+        for fqdn in device.attrs('fqdn'):
+            try:
+                ip = socket.gethostbyname(fqdn)
+                break
+            except socket.gaierror:
+                pass
+
+    if not ip:
+        try:
+            ip = socket.gethostbyname(device.name)
+        except socket.gaierror:
+            pass
+
+    if ip:
+        device.bindIPtoPort(ip, porttype, portnum)
+
+    return ip

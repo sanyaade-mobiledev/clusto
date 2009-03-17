@@ -1,5 +1,6 @@
 from basicconsoleserver import BasicConsoleServer
 from clusto.exceptions import ConnectionException
+from clusto.drivers.resourcemanagers import IPManager
 
 from subprocess import Popen
 
@@ -12,9 +13,15 @@ class OpenGearCM4148(BasicConsoleServer):
                   'console-serial' : { 'numports':48, },
                   }
 
-    def connect(self, porttype, num, ssh_user):
+    def connect(self, porttype, num, ssh_user='root'):
         if porttype != 'console-serial':
             raise DriverException("Cannot connect to a non-serial port")
 
-        proc = Popen(['ssh', '-p', str(num + 3000), '%s@%s' % (ssh_user, self.name)])
+        host = IPManager.getIP(self)
+        if len(host) == 0:
+            host = self.name
+        else:
+            host = host[0]
+
+        proc = Popen(['ssh', '-p', str(num + 3000), '-l', ssh_user, host])
         proc.communicate()

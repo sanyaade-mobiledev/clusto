@@ -31,7 +31,7 @@ def main():
     ip = ip[0]
 
     if server.driver == 'basicserver':
-        print 'Escape character is ~.'
+        print 'Escape sequence is ~.'
         port = server.portInfo['console-serial'][0]
         tsport = port['otherportnum']
         tsname = port['connection'].connect('console-serial', tsport, 'digg')
@@ -48,10 +48,10 @@ def main():
                 domu = line[0]
                 break
         if not domu:
-            print 'Unable to find a running domU containing the name', server.name
+            print 'Unable to find a running VM containing the name', server.name
             return
 
-        print 'Escape character is ^]'
+        print 'Escape sequence is ^]'
         proc = Popen(SSH_CMD + ['-l', 'root', ip, 'xm console', domu])
         proc.communicate()
         return

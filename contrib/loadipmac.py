@@ -35,6 +35,11 @@ def get_environment(dc, rack, switch):
     if ts.portFree('pwr-nema-5', 0):
         ts.connectPorts('pwr-nema-5', 0, pwr, '.ab8')
 
+    clusto.commit()
+
+    simple_ipbind(switch)
+    simple_ipbind(ts)
+
     return (dc, rack, switch, pwr, ts)
 
 def import_ipmac(name, macaddr, ipaddr, portnum):
