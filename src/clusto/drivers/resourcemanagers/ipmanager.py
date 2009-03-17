@@ -136,3 +136,8 @@ class IPManager(ResourceManager):
         for ip in iplist:
             ret.append(IPy.IP(ip.number + 2147483648).strNormal())
         return ret
+
+    @classmethod
+    def getDevice(self, ip):
+        subnet = IPManager.getIPManager(ip)
+        return subnet.owners(ip)

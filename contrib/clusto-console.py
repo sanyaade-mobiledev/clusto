@@ -8,19 +8,26 @@ import sys
 
 def main():
     if len(sys.argv) < 2:
-        print 'Usage: clusto console <name>'
+        print 'Usage: clusto console <name or IP>'
         sys.exit(0)
 
+    ip = None
     try:
         server = clusto.getByName(sys.argv[1])
     except LookupError:
-        print '%s is not a clusto name' % sys.argv[1]
-        return
+        server = IPManager.getDevice(sys.argv[1])
+        ip = [sys.argv[1]]
+        if len(server) == 0:
+            print '%s is not bound to any device in clusto' % sys.argv[1]
+            return
+        else:
+            server = server[0]
 
-    ip = IPManager.getIP(server.name)
-    if len(ip) == 0:
-        print 'Unable to determine IP address for', server.name
-        return
+    if not ip:
+        ip = IPManager.getIP(server.name)
+        if len(ip) == 0:
+            print 'Unable to determine IP address for', server.name
+            return
     ip = ip[0]
 
     if server.driver == 'basicserver':
