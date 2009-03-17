@@ -37,3 +37,10 @@ class IPManagerTest(testbase.ClustoTestBase):
         self.assertEqual(len(ip1.resources(s1)), num)
         
         self.assertEqual(ip1.owners('192.168.1.' + str(num+1)), [s1])
+
+    def testGetIPManager(self):
+
+        ip1, ip2 = map(clusto.getByName, ['a1', 'b1'])
+
+        self.assertEqual(ip1, IPManager.getIPManager('192.168.1.23'))
+        self.assertEqual(ip2, IPManager.getIPManager('10.0.129.22'))

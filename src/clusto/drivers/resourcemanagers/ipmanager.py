@@ -113,7 +113,7 @@ class IPManager(ResourceManager):
             try:
                 ipmantest.ensureType(ip)
             except ResourceTypeException:
-                pass
+                continue
 
             ipman = Driver(ipmantest)
             break
