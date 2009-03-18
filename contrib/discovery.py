@@ -1,5 +1,7 @@
 from clusto.drivers import SimpleEntityNameManager, BasicServer, BasicVirtualServer, IPManager
+from clusto.exceptions import ResourceException
 import clusto
+from IPy import IP
 
 from traceback import format_exc
 from subprocess import Popen, PIPE, STDOUT
@@ -185,7 +187,7 @@ def get_server(ipaddr):
     try:
         names = clusto.getByName('servernames')
     except:
-        names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=1)
+        names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=0)
     hostname = get_hostname(ipaddr)
     if hostname:
         if hostname.find('.') != -1:
@@ -223,7 +225,7 @@ def get_server(ipaddr):
 
 def simple_ipbind(device, porttype='nic-eth', portnum=0):
     try:
-        ip = IPManager.getIP(device)
+        ip = IPManager.getIPs(device)
     except:
         ip = None
 
@@ -242,6 +244,12 @@ def simple_ipbind(device, porttype='nic-eth', portnum=0):
             pass
 
     if ip:
-        device.bindIPtoPort(ip, porttype, portnum)
+        try:
+            ipman = IPManager.getIPs(device)
+            if not ipman.getIPs(device):
+                device.bindIPtoPort(ip, porttype, portnum)
+                clusto.commit()
+        except ResourceException:
+            pass
 
     return ip

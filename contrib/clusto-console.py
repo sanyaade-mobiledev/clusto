@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/synack/src/clusto/env/bin/python
 from clusto.scripthelpers import getClustoConfig
 from clusto.drivers import IPManager
 import clusto
@@ -24,7 +24,7 @@ def main():
             server = server[0]
 
     if not ip:
-        ip = IPManager.getIP(server.name)
+        ip = IPManager.getIPs(server)
         if len(ip) == 0:
             print 'Unable to determine IP address for', server.name
             return
