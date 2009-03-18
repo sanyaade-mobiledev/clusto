@@ -126,15 +126,11 @@ class IPManager(ResourceManager):
         return ipman
         
     @classmethod
-    def getIP(self, device):
-        device = str(device)
+    def getIPs(self, device):
 
-        subnet = IPManager.getIPManager(device)
-        iplist = subnet.resources(clusto.getByName(device))
+        ret = [str(IPy.IP(x.number+2147483648))
+               for x in device.references(key='ipmanager')]
 
-        ret = []
-        for ip in iplist:
-            ret.append(IPy.IP(ip.number + 2147483648).strNormal())
         return ret
 
     @classmethod
