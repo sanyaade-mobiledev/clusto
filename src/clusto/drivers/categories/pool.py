@@ -59,3 +59,38 @@ class Pool(Driver):
         return pools
             
         
+
+class WeightedPool(Pool):
+    """Weighted Pool
+
+    Just like a pool but allows its contents to have weights using the
+    set/getWeight functions.
+
+    The property 'defaultweight' can be set to set a default weight items
+    in the pool.
+    """
+
+    _driverName = "weightedpool"
+
+    
+    _properties = {'defaultweight': None }
+
+    def setWeight(self, thing, weight):
+
+        if thing not in self:            
+            raise LookupError("%s is not in this pool." % thing)
+
+        self.setAttr("weight", numbered=weight, value=thing)
+
+    def getWeight(self, thing):
+
+        if thing not in self:            
+            raise LookupError("%s is not in this pool." % thing)
+
+        thingattr = self.attrs("weight", value=thing)
+
+        if thingattr:
+            return thingattr[0].number
+        else:
+            return self.defaultweight
+
