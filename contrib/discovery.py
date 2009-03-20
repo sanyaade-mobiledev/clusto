@@ -13,6 +13,8 @@ import yaml
 import sys
 import re
 
+NAME_PATTERN = re.compile('^s[0-9]{4}$')
+
 SWITCHPORT_TO_RU = {
     1:1, 2:2, 3:3, 4:4, 5:5,
     6:7, 7:8, 8:9, 9:10, 10:11,
@@ -189,6 +191,7 @@ def get_server(ipaddr):
     except:
         names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=0)
     hostname = get_hostname(ipaddr)
+    print 'get_hostname returned', hostname
     if hostname:
         if hostname.find('.') != -1:
             fqdn = hostname
@@ -201,11 +204,19 @@ def get_server(ipaddr):
         if server:
             server = server[0]
         else:
-            print "Server %s doesn't exist in clusto... Creating it" % fqdn
-            server = names.allocate(get_servertype(ipaddr))
+            if NAME_PATTERN.match(hostname):
+                print 'Allocating %s' % hostname
+                server = names.allocate(get_servertype(ipaddr), resource=hostname)
+            else:
+                print 'Generating name for', hostname, '...',
+                server = names.allocate(get_servertype(ipaddr))
+                print server.name
 
     else:
+        print 'No hostname for %s found. Generating one...',
         server = names.allocate(BasicServer)
+        print server.name
+
         fqdn = server.name + '.digg.internal'
         return server
 
@@ -245,8 +256,7 @@ def simple_ipbind(device, porttype='nic-eth', portnum=0):
 
     if ip:
         try:
-            ipman = IPManager.getIPs(device)
-            if not ipman.getIPs(device):
+            if not IPManager.getIPs(device):
                 device.bindIPtoPort(ip, porttype, portnum)
                 clusto.commit()
         except ResourceException:
