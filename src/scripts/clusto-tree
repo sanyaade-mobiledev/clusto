@@ -5,37 +5,39 @@ import clusto
 from pprint import pprint
 import sys
 
+def print_obj(x, indent=0, attrs=['name']):
+    txt = ''
+    for attr in attrs:
+        value = None
+        if attr.startswith('.'):
+            attr = attr.lstrip('.')
+
+        method = getattr(x, attr, None)
+        if method and callable(method):
+            value = method()
+
+        if not value:
+            try:
+                value = eval('%s(x)' % attr)
+            except:
+                value = None
+
+        if not value:
+            value = getattr(x, attr, None)
+
+        if not value:
+            value = [i.value for i in x.attrQuery(key=attr)]
+            if len(value) == 1:
+                value = value[0]
+
+        if not value:
+            value = None
+        txt += '%s: %s\t' % (attr, value)
+    print '%s%s' % ('\t' * indent, txt)
+
 def print_tree(root, indent=0, attrs=['name']):
     for x in root.contents():
-        txt = ''
-        for attr in attrs:
-            value = None
-
-            if attr.startswith('.'):
-                attr = attr.lstrip('.')
-                method = getattr(x, attr, None)
-                if method and callable(method):
-                    value = method()
-
-                if not value:
-                    try:
-                        value = eval('%s(x)' % attr)
-                    except:
-                        value = None
-
-            if not value:
-                value = getattr(x, attr, None)
-
-            if not value:
-                value = [i.value for i in x.attrQuery(key=attr)]
-                if len(value) == 1:
-                    value = value[0]
-
-            if not value:
-                value = None
-            txt += '%s: %s\t' % (attr, value)
-
-        print '\t' * indent, txt
+        print_obj(x, indent, attrs)
         print_tree(x, indent=(indent + 1), attrs=attrs)
 
 def main():
@@ -48,7 +50,9 @@ def main():
     else:
         attrs = ['name']
 
-    print_tree(clusto.getByName(sys.argv[1]), attrs=attrs)
+    root = clusto.getByName(sys.argv[1])
+    print_obj(root, indent=0, attrs=attrs)
+    print_tree(root, indent=1, attrs=attrs)
 
 if __name__ == '__main__':
     config = getClustoConfig()
