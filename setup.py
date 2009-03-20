@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 srcdir = os.path.join(os.path.dirname(sys.argv[0]), 'src')
 
 setup(name = "clusto",
-      version = "0.2.7",
+      version = "0.2.8",
       packages = find_packages('src'),
       author = "Ron Gorodetzky",
       author_email = "ron@digg.com",
@@ -23,6 +23,7 @@ setup(name = "clusto",
                os.path.join(srcdir, 'scripts', 'clusto-puppet'), 
                os.path.join(srcdir, 'scripts', 'clusto-fai'), 
                os.path.join(srcdir, 'scripts', 'clusto-tree'),
+               os.path.join(srcdir, 'scripts', 'clusto-console'),
                ],
       test_suite = "clusto.test.alltests.gettests"
       )
