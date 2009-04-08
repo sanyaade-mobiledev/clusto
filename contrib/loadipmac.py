@@ -58,6 +58,8 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
 
     # Find the server's hostname and query clusto for it. If the server does not
     # exist, create it. Returns None if something went wrong.
+    if not ipaddr:
+        return
     server = get_server(ipaddr)
 
     if not server:
@@ -71,6 +73,15 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
             clusto.commit()
         return
 
+    if not server in rack:
+        rack.insert(server, SWITCHPORT_TO_RU[portnum])
+
+    ru = rack.getRackAndU(server)['RU'][0]
+    if server.portFree('pwr-nema-5', 0):
+        server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
+    if server.portFree('console-serial', 0):
+        server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
+
     if portnum < 21:
         ifnum = 0
     else:
@@ -82,15 +93,6 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
             server.connectPorts('nic-eth', ifnum, switch, portnum)
     else:
         server.connectPorts('nic-eth', ifnum, switch, portnum)
-
-    if not server in rack:
-        rack.insert(server, SWITCHPORT_TO_RU[portnum])
-
-    ru = rack.getRackAndU(server)['RU'][0]
-    if server.portFree('pwr-nema-5', 0):
-        server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
-    if server.portFree('console-serial', 0):
-        server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
 
     ifaces = discover_interfaces(ipaddr)
     for name in ifaces:

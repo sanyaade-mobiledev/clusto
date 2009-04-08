@@ -204,13 +204,14 @@ def get_server(ipaddr):
         if server:
             server = server[0]
         else:
-            if NAME_PATTERN.match(hostname):
-                print 'Allocating %s' % hostname
-                server = names.allocate(get_servertype(ipaddr), resource=hostname)
-            else:
-                print 'Generating name for', hostname, '...',
-                server = names.allocate(get_servertype(ipaddr))
-                print server.name
+            #if NAME_PATTERN.match(hostname):
+            #    print 'Allocating %s' % hostname
+            #    server = names.allocate(get_servertype(ipaddr), resource=hostname)
+            #else:
+            #    print 'Generating name for', hostname, '...',
+            #    server = names.allocate(get_servertype(ipaddr))
+            #    print server.name
+            server = names.allocate(get_servertype(ipaddr), resource=hostname)
 
     else:
         print 'No hostname for %s found. Generating one...',
