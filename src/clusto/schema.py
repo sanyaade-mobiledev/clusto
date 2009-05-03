@@ -68,7 +68,14 @@ Index('key_num_subkey_idx',
 class Attribute(object):
     """Attribute class holds key/value pair
 
-    NOT backed by DB
+    An Attribute is a DB backed object that holds a key, number, subkey,
+    value, and a uniqattr bit.
+
+    Each Attribute is associated with an Entity.
+
+    There can be multiple attributes with the same key, number, subkey, and/or
+    value.  However only a single attribute with the same key, number, subkey,
+    and value when uniqattr is True.
     """
 
     def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
@@ -214,8 +221,8 @@ class Entity(object):
 
     An entity can have a name, type, and attributes.
 
-    An Entity's functionality is augmented by drivers which get included
-    as mixins.  
+    An Entity's functionality is augmented by Drivers which act as proxies for
+    interacting with an Entity and its Attributes.
     """
     
     def __init__(self, name, driver='entity', clustotype='entity'):
