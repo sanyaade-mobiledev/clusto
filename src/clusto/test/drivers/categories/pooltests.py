@@ -155,8 +155,18 @@ class PoolTests(testbase.ClustoTestBase):
         clusto.flush()
 
         
-
+    def testFilterPoolContents(self):
         
+        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+
+        p1.insert(d1)
+        p1.insert(d2)
+        p1.insert(BasicServer('s1'))
+        p1.insert(BasicServer('s2'))
+        p1.insert(BasicNetworkSwitch('sw1'))
+
+        self.assertEqual(p1.contents(clustoTypes=[BasicNetworkSwitch]),
+                         [clusto.getByName('sw1')])
 
 class WeightedPoolTests(testbase.ClustoTestBase):
 
