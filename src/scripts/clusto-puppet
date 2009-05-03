@@ -16,7 +16,7 @@ config, logger = clusto.scripthelpers.initScript()
 from clusto import *
 
 def main():
-    entities = clusto.getEntites(attrs=({'key':'fqdn','value':args[0]}))
+    entities = clusto.getEntities(attrs=({'key':'fqdn','value':args[0]}))
 
     if not entities:
         return 1
