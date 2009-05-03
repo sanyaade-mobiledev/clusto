@@ -76,7 +76,11 @@ def getCommandHelp(cmdname):
     return commands.getoutput(fullpath + " --help-description")
     
 def getClustoConfig(filename=None):
-    """Find, parse, and return the configuration data needed by clusto."""
+    """Find, parse, and return the configuration data needed by clusto.
+
+    Gets the config path from the CLUSTOCONFIG environment variable otherwise
+    it is /etc/clusto/clusto.conf
+    """
 
     filesearchpath = ['/etc/clusto/clusto.conf']
 
@@ -105,24 +109,56 @@ def getClustoConfig(filename=None):
     return config
 
 
-def initScript():
-    """
-    Initialize the clusto environment for clusto scripts.
+def initScript(name=os.path.basename(sys.argv[0])):
+    """Initialize the clusto environment for clusto scripts.
+
+    Connects to the clusto database, returns a python SafeConfigParser and a
+    logger.
+
+    Uses getClustoConfig and setupLogging
     """
     config = getClustoConfig()
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     
-    logger = setupLogging(config)
+    logger = setupLogging(config=config, name=name)
 
     return (config, logger)
 
 
-def setupLogging(config=None):
+def setupLogging(config=None, name="clusto.script"):
+    """Setup the default log level and return the logger
 
-    logging.basicConfig(level=logging.ERROR)
+    The logger will try to log to /var/log and console.
+    
+    #FIXME shouldn't ignore the config
+    """
 
-    return logging.getLogger()
+    loglocation="/var/log"
+
+    logfilename = os.path.join(loglocation,'clusto.log')
+    
+    if not (os.access(loglocation, os.W_OK) 
+            or (os.path.exists(logfilename) and os.access(logfilename, os.W_OK))):
+        logfilename = os.path.devnull
+        
+    logging.basicConfig(level=logging.WARNING,
+                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                        datefmt='%m-%d %H:%M',
+                        filename=logfilename,
+                        )
+    
+
+    log = logging.getLogger(name)
+
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    console.setFormatter(formatter)
+
+    log.addHandler(console)
+
+    return log
 
 
 def setupClustoEnv(options):
