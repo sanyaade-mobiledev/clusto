@@ -1,3 +1,7 @@
+"""Driver class
+
+A Driver provides an interface to an Entity and its Attributes.
+"""
 
 import re
 import itertools
@@ -10,7 +14,48 @@ from clustodriver import *
 
 
 class Driver(object):
-    """Base Driver."""
+    """Base Driver.
+
+    The Driver class provides a proxy interface for managing and Entity and
+    its Attributes. It provides many helper functions includeing attribute
+    setters and accessors, attribute querying, and a handful of conventions.
+
+    Every driver defines a _clustoType and a _driverName member variable.
+    Upon creation these become the type and driver for the Entity and provides
+    a mechanism for choosing the correct driver for a given Entity.
+
+    A Driver can be created by passing either the name (a string) for a new
+    Entity you'd like to create, an already instantiated Entity object, or a
+    Driver object (which has already been instantiated and is managing an
+    Entity).
+
+    If a _properties member dictionary is defined they will be treated as
+    default values for the given Entity attributes as well as exposed via a
+    simpler mydriver.key access pattern.  So for:
+
+    >>> class MyDriver(Driver):
+    >>>    ...
+    >>>    _properties = {'propA': 10, 'propB': "default1"}
+    >>>    ...
+
+    >>> d = MyDriver('foo')
+    >>> d.propA == 10
+    True
+    
+    >>> d.propB == "default1"
+    True
+
+    The default properties are only in the class definition and don't
+    automatically get set in the clusto db until you a different value to
+    them.
+
+    >>> d.propA = 54
+    >>> d.propA == 54
+    True
+
+    Several conventions are also exposed via the Driver interface.  
+    
+    """
     
     __metaclass__ = ClustoDriver
 
@@ -180,7 +225,7 @@ class Driver(object):
                     subkey=(), uniqattr=(), ignoreHidden=True, sortByKeys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
-        """Does queries against all Attributes."""
+        """Does queries against all Attributes using the DB."""
 
         clusto.flush()
         if querybase:
@@ -250,19 +295,47 @@ class Driver(object):
         return query.all()
 
     def attrQuery(self, *args, **kwargs):
+        """Queries all attributes of *this* entity using the DB."""
         
         kwargs['entity'] = self.entity
 
         return self.doAttrQuery(*args, **kwargs)
 
-    def _attrFilter(self, attrlist, key=(), value=(), numbered=(), 
-                    subkey=(), ignoreHidden=True, uniqattr=(),
-                    sortByKeys=True, 
-                    regex=False, 
-                    clustoTypes=None,
-                    clustoDrivers=None,
-                    ):
-        "Filter various kinds of attribute lists."
+    @classmethod
+    def attrFilter(cls, attrlist, key=(), value=(), numbered=(), 
+                   subkey=(), ignoreHidden=True, uniqattr=(),
+                   sortByKeys=True, 
+                   regex=False, 
+                   clustoTypes=None,
+                   clustoDrivers=None,
+                   ):
+        """Filter attribute lists. (Uses generator comprehension)
+
+        Given a list of Attributes filter them based on exact matches of key,
+        number, subkey, value, and/or uniqattr.
+
+        There are some special cases:
+
+        if numbered is True then the number variable must be non-null. if
+        numbered is False then the number variable must be null.
+
+        if ignoreHidden is True (the default) then filter out keys that begin
+        with an underscore, if false don't filter out such keys.  If you
+        specify a key that begins with an underscore as one of the arguments
+        then ignoreHidden is assumed to be False.
+
+        if sortByKeys is True then attributes are returned sorted by keys,
+        otherwise their order is undefined.
+
+        if regex is True then treat the key, subkey, and value query
+        parameters as regular expressions.
+
+        clustoTypes is a list of types that the entities referenced by
+        relation attributes must match.
+
+        clustoDrivers is a list of drivers that the entities referenced by
+        relation attributes must match.
+        """
 
 
         result = attrlist
@@ -333,14 +406,17 @@ class Driver(object):
         return [(x.keytuple, x.value) for x in attrlist]
         
     def attrs(self, *args, **kwargs):
-        """Return attributes for this entity. """
+        """Return attributes for this entity.
+
+        (filters whole attribute list as opposed to querying the db directly)
+        """
 
         if 'mergeContainerAttrs' in kwargs:
             mergeContainerAttrs = kwargs.pop('mergeContainerAttrs')
         else:
             mergeContainerAttrs = False
 
-        attrs = self._attrFilter(self.entity._attrs, *args, **kwargs) 
+        attrs = self.attrFilter(self.entity._attrs, *args, **kwargs) 
 
         if mergeContainerAttrs:
             kwargs['mergeContainerAttrs'] = mergeContainerAttrs
@@ -357,8 +433,11 @@ class Driver(object):
     def references(self, *args, **kwargs):
         """Return the references to this Thing. The references are attributes. 
 
-        Accepts the same arguments as attrs() except for meregeContainerAttrs.
-        Also adds clustotype and clustodriver filter parameters.
+        Accepts the same arguments as attrs().
+
+        The semantics of clustoTypes and clustoDrivers changes to match the
+        clustoType or clustoDriver of the Entity that owns the attribute as
+        opposed to the Entity the attribute refers to.
         """
 
 
@@ -379,19 +458,6 @@ class Driver(object):
 
         return refs
 
-        
-
-
-#       if clustotype or clustodriver:
-#           query = query.filter(Entity.entity_id == Attribute.entity_id)
-#           if clustodriver:
-#               query = query.filter(Entity.driver == clustodriver)
-#           if clustotype:
-#               query = query.filter(Entity.typ == clustotype)
- 
-#         attrs = self._attrQuery(query, *args, **kwargs)
-
-#        return attrs
                    
     def attrKeys(self, *args, **kwargs):
 
