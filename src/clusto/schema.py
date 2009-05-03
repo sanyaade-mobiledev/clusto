@@ -117,7 +117,7 @@ class Attribute(object):
 
     def __str__(self):
 
-        if self.datatype == 'relation':
+        if self.isRelation:
             value = self.relation_value.name
         else:
             value = self.value
@@ -125,7 +125,10 @@ class Attribute(object):
         entityname = (self.entity and self.entity.name) or None
         return "%s|%s.%s.%s|%s %s" % (entityname, self.key, self.number,
                                       self.subkey, self.datatype, value)
-
+    @property
+    def isRelation(self):
+        return self.datatype == 'relation'
+    
     def getValueType(self, value=None):
         if value == None:
             if self.datatype == None:
