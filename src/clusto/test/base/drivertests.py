@@ -310,7 +310,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
         self.assertEqual(d.attrItems(ignoreHidden=False),
                          [])
 
-    def testcontains(self):
+    def testContents(self):
         
         d1 = Driver('d1')
         d2 = Driver('d2')
