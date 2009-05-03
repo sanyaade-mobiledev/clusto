@@ -390,11 +390,11 @@ class Driver(object):
 
         if clustoDrivers:
             cdl = [clusto.getDriverName(n) for n in clustoDrivers]
-            result = (attr for attr in result if attr.entity.driver in cdl)
+            result = (attr for attr in result if attr.isRelation and attr.value.entity.driver in cdl)
 
         if clustoTypes:
             ctl = [clusto.getTypeName(n) for n in clustoTypes]
-            result = (attr for attr in result if attr.entity.type in ctl)
+            result = (attr for attr in result if attr.isRelation and attr.value.entity.type in ctl)
             
         if sortByKeys:
             result = sorted(result)
@@ -440,10 +440,23 @@ class Driver(object):
         opposed to the Entity the attribute refers to.
         """
 
+        
+        clustoDrivers = kwargs.pop('clustoDrivers', None)
+            
+        clustoTypes = kwargs.pop('clustoTypes', None)
+        
+        result = self.attrFilter(self.entity._references, *args, **kwargs)
 
-        attrs = self._attrFilter(self.entity._references, *args, **kwargs)
+        if clustoDrivers:
+            cdl = [clusto.getDriverName(n) for n in clustoDrivers]
+            result = (attr for attr in result if attr.entity.driver in cdl)
 
-        return list(attrs)
+        if clustoTypes:
+            ctl = [clusto.getTypeName(n) for n in clustoTypes]
+            result = (attr for attr in result if attr.entity.type in ctl)
+
+
+        return list(result)
 
     def referencers(self, *args, **kwargs):
         """Return the Things that reference _this_ Thing.
