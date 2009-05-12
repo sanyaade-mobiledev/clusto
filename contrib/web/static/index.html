@@ -1,0 +1,56 @@
+<html>
+<head>
+	<title>Clusto Web</title>
+	<link rel="stylesheet" type="text/css" href="css/base.css" />
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript">
+	var servers = [];
+	function update_servers() {
+		servers = [];
+		$('input.pool').each(function(i, item) {
+			if(item.checked) {
+				$.getJSON('http://mgmt.digg.internal:9999/pool/' + item.name + '/contents?format=json&callback=?', function(data) {
+					$.each(data.contents, function(x, item) {
+						if(servers.indexOf(item) == -1) {
+							servers.push(item);
+						}
+					});
+				});
+			}
+		});
+
+		$('#servers').html('');
+		$.each(servers, function(i, item) {
+			$('#servers').append('<li>' + item + '</li>');
+		});
+	}
+
+	$(document).ready(function() {
+		$.getJSON("http://mgmt.digg.internal:9999/pool?format=json&callback=?",
+		function(data) {
+			data.sort();
+			$.each(data, function(i, item) {
+				name = item.split('/')[2];
+				$('#pools').append('<div class="pool_check"><input class="pool" type="checkbox" name="' + name + '" /><label for="' + name + '">' + name + '</label></div>');
+			});
+
+			$('input.pool').click(update_servers);
+		});
+		update_servers();
+	});
+	</script>
+</head>
+
+<body>
+<div id="container">
+	<div id="filters">
+		<fieldset id="pools">
+			<legend>Pools</legend>
+		</fieldset>
+	</div>
+
+	<ul id="servers">
+	</ul>
+</div>
+</body>
+</html>
