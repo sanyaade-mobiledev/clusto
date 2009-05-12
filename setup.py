@@ -24,6 +24,7 @@ setup(name = "clusto",
                os.path.join(srcdir, 'scripts', 'clusto-fai'), 
                os.path.join(srcdir, 'scripts', 'clusto-tree'),
                os.path.join(srcdir, 'scripts', 'clusto-console'),
+               os.path.join(srcdir, 'scripts', 'clusto-pool-members'),
                ],
       test_suite = "clusto.test.alltests.gettests"
       )

@@ -109,7 +109,7 @@ def getClustoConfig(filename=None):
     return config
 
 
-def initScript(name=os.path.basename(sys.argv[0])):
+def initScript(name=os.path.basename(sys.argv[0]), configfile=None):
     """Initialize the clusto environment for clusto scripts.
 
     Connects to the clusto database, returns a python SafeConfigParser and a
@@ -117,7 +117,7 @@ def initScript(name=os.path.basename(sys.argv[0])):
 
     Uses getClustoConfig and setupLogging
     """
-    config = getClustoConfig()
+    config = getClustoConfig(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     
