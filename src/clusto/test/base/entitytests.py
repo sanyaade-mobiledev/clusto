@@ -29,7 +29,7 @@ class TestEntitySchema(testbase.ClustoTestBase):
 
     def testOutputEntityObject(self):
 
-        expectedout = "e1.clustodriver.string entity"
+        expectedout = "e1"
         
         e1 = Entity('e1')
 

@@ -278,7 +278,7 @@ class Entity(object):
     def __str__(self):
         "Return string representing this entity"
             
-        return "%s.clustodriver.string %s" % (self.name, self.driver)
+        return str(self.name)
             
 
     def delete(self):
