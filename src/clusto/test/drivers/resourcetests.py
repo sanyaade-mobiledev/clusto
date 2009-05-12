@@ -71,9 +71,9 @@ class ResourceLockTests(testbase.ClustoTestBase):
         
     def testDeallocatingLockedResource(self):
 
-        d, e = clusto.getEntities(clustodrivers=[Driver])
+        d, e = clusto.getEntities(clustoDrivers=[Driver])
 
-        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        rm = clusto.getEntities(clustoDrivers=[ResourceManager])[0]
         
         rm.allocate(d, 'foo')
         rm.allocate(d, 'bar')
@@ -86,9 +86,9 @@ class ResourceLockTests(testbase.ClustoTestBase):
     
     def testLockingAnAlreadyLockedResource(self):
 
-        d, e = clusto.getEntities(clustodrivers=[Driver])
+        d, e = clusto.getEntities(clustoDrivers=[Driver])
 
-        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        rm = clusto.getEntities(clustoDrivers=[ResourceManager])[0]
         
         rm.allocate(d, 'foo')
         rm.allocate(d, 'bar')
@@ -101,9 +101,9 @@ class ResourceLockTests(testbase.ClustoTestBase):
 
     def testDeallocatingAllResourcesFromAnEntity(self):
 
-        d, e = clusto.getEntities(clustodrivers=[Driver])
+        d, e = clusto.getEntities(clustoDrivers=[Driver])
 
-        rm = clusto.getEntities(clustodrivers=[ResourceManager])[0]
+        rm = clusto.getEntities(clustoDrivers=[ResourceManager])[0]
         
         rm.allocate(d, 'foo')
         rm.allocate(d, 'bar')

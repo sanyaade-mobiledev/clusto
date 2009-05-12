@@ -99,13 +99,13 @@ class TestClusto(testbase.ClustoTestBase):
 
         dl = [Driver]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clustodrivers=dl)]),
+                                 for n in clusto.getEntities(clustoDrivers=dl)]),
                          sorted(['d1','e1','e2','e3']))
 
 
         tl = [Location, BasicDatacenter]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clustotypes=tl)]),
+                                 for n in clusto.getEntities(clustoTypes=tl)]),
                          sorted(['l1','dc1']))
 
     def testGetEntitesWithAttrs(self):

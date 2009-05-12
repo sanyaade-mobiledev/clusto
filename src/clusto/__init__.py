@@ -89,7 +89,7 @@ def getDriver(entity, ignoreDriverColumn=False):
 
     return Driver
 
-def getEntities(names=(), clustotypes=(), clustodrivers=(), attrs=()):
+def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
     """Get entities matching the given criteria
 
     @param names: list of names to match
@@ -111,15 +111,13 @@ def getEntities(names=(), clustotypes=(), clustodrivers=(), attrs=()):
     if names:
         query = query.filter(Entity.name.in_(names))
 
-    if clustotypes:
-        ct = [(issubclass(i, Driver) and i._clustoType or i) 
-              for i in clustotypes]
-        query = query.filter(Entity.type.in_(ct))
+    if clustoTypes:
+        ctl = [getTypeName(n) for n in clustoTypes]
+        query = query.filter(Entity.type.in_(ctl))
 
-    if clustodrivers:
-        cd = [(issubclass(i, Driver) and i._driverName or i) 
-              for i in clustodrivers]
-        query = query.filter(Entity.driver.in_(cd))
+    if clustoDrivers:
+        cdl = [getDriverName(n) for n in clustoDrivers]
+        query = query.filter(Entity.driver.in_(cdl))
 
     if attrs:
         query = query.filter(Attribute.entity_id==Entity.entity_id)
