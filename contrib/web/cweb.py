@@ -1,5 +1,4 @@
-try: import json
-except ImportError: import simplejson as json
+import simplejson as json
 import xmlrpclib
 import cPickle
 import yaml
@@ -90,27 +89,6 @@ class EntityAPI(object):
         self.obj.delAttrs(request.params['key'])
         return self.show(request)
 
-    def contents(self, request):
-        '''
-        Returns a list of objects that are *inside* this object. For example,
-        calling this method on a Pool object will return a list of all servers
-        within the Pool.
-        '''
-        result = {}
-        result['object'] = self.url
-        result['contents'] = ['/%s/%s' % (x.type, x.name) for x in self.obj.contents()]
-        return Response(status=200, body=dumps(request, result))
-
-    def parents(self, request):
-        '''
-        Returns a list of objects that contain this object. For example, a Rack
-        object would likely be inside a Datacenter object.
-        '''
-        result = {}
-        result['object'] = self.url
-        result['parents'] = ['/%s/%s' % (x.type, x.name) for x in self.obj.parents()]
-        return Response(status=200, body=dumps(request, result))
-
     def insert(self, request):
         '''
         Insert an object into this object
@@ -150,6 +128,8 @@ class EntityAPI(object):
         for x in self.obj.attrs():
             attrs.append(unclusto(x))
         result['attrs'] = attrs
+        result['contents'] = [unclusto(x) for x in self.obj.contents()]
+        result['parents'] = [unclusto(x) for x in self.obj.parents()]
         result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
 
         return Response(status=200, body=dumps(request, result))
@@ -212,7 +192,7 @@ class ClustoApp(object):
         }
 
     def default_delegate(self, request, match):
-        return Response(status=200, body=dumps(request, clusto.typelist.keys()))
+        return Response(status=200, body=dumps(request, ['/' + x for x in clusto.typelist.keys()]))
 
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']

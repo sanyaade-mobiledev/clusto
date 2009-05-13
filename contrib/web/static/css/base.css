@@ -9,6 +9,17 @@ body {
 	width: 100%;
 }
 
+#filters {
+	float: left;
+	width: 20%;
+}
+
+#detail {
+	float: left;
+	width: 75%;
+}
+
+
 label {
 }
 
@@ -17,11 +28,18 @@ input.wide {
 	height: 2em;
 }
 
-fieldset {
-	float: left;
+#filters fieldset {
 	margin: 1em;
 	border: 1px solid #202D26;
-	width: 80em; 
+	width: 80%; 
+}
+
+#detail fieldset {
+	margin: 1em;
+	border: 1px solid #202D26;
+	float: left;
+	clear: right;
+	width: 100%;
 }
 
 legend {
@@ -38,17 +56,35 @@ legend {
 	text-align: center;
 }
 
-.pool_check {
-	float: left;
-	width: 15em;
+.item {
+	color: #00F;
+	text-decoration: underline;
+	display: block;
 }
 
-#servers {
-	margin: 1em;
-	padding: 0;
-}
-
-#servers li {
+.actions, .contents, .parents, .attrs {
 	margin: 0;
 	padding: 0;
+	list-style-type: none;
+}
+
+.col {
+	float: left;
+	width: 5em; 
+	margin-right: 1em;
+}
+
+.key, .value {
+	width: 20em;
+	overflow: hidden;
+}
+
+li {
+	display: block;
+	clear: both;
+}
+
+a, a:link a:visited a:active a:hover {
+	color: #00F;
+	text-decoration: underline;
 }
