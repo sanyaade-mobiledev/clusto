@@ -34,6 +34,7 @@ def main():
         print 'Escape sequence is ~.'
         port = server.portInfo['console-serial'][0]
         tsport = port['otherportnum']
+        print 'Connecting to %s port %s' % (port['connection'].name, port['otherportnum'])
         tsname = port['connection'].connect('console-serial', tsport, 'digg')
         return
 
