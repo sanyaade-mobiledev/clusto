@@ -77,7 +77,9 @@ class EntityAPI(object):
         Requires HTTP parameters "key" and "value"
         Optional parameters are "subkey" and "number"
         '''
-        self.obj.addAttr(request.params['key'], request.params['value'], request.params.get('subkey', None), request.params.get('number', None))
+        kwargs = dict(request.params.items())
+        self.obj.addAttr(**kwargs)
+        clusto.commit()
         return self.show(request)
 
     def delattr(self, request):
@@ -87,6 +89,7 @@ class EntityAPI(object):
         Requires HTTP parameter "key"
         '''
         self.obj.delAttrs(request.params['key'])
+        clusto.commit()
         return self.show(request)
 
     def insert(self, request):
@@ -96,12 +99,13 @@ class EntityAPI(object):
         Requires a "device" attribute, which is the absolute URL path to the
         object to be inserted.
 
-        For example: /pool/examplepool/insert?device=/server/exampleserver
+        For example: /pool/examplepool/insert?object=/server/exampleserver
         '''
-        device = request.params['device'].strip('/').split('/')[1]
+        device = request.params['object'].strip('/').split('/')[1]
         device = clusto.getByName(device)
         self.obj.insert(device)
-        return self.contents(request)
+        clusto.commit()
+        return self.show(request)
 
     def remove(self, request):
         '''
@@ -110,12 +114,13 @@ class EntityAPI(object):
         Requires a "device" attribute, which is the absolute URL path to the
         object to be removed.
 
-        For example: /pool/examplepool/remove?device=/server/exampleserver
+        For example: /pool/examplepool/remove?object=/server/exampleserver
         '''
-        device = request.params['device'].strip('/').split('/')[1]
+        device = request.params['object'].strip('/').split('/')[1]
         device = clusto.getByName(device)
         self.obj.remove(device)
-        return self.contents(request)
+        clusto.commit()
+        return self.show(request)
 
     def show(self, request):
         '''
@@ -162,11 +167,12 @@ class RackAPI(EntityAPI):
         This method is overridden to require a "ru" parameter in addition to
         "device"
 
-        Example: /rack/examplerack/insert?device=/server/exampleserver&ru=6
+        Example: /rack/examplerack/insert?object=/server/exampleserver&ru=6
         '''
-        device = request.params['device'].strip('/').split('/')[1]
+        device = request.params['object'].strip('/').split('/')[1]
         device = clusto.getByName(device)
         self.obj.insert(device, int(request.params['ru']))
+        clusto.commit()
         return self.contents(request)
 
 class ClustoApp(object):
@@ -202,6 +208,51 @@ class ClustoApp(object):
         return Response(status=200, body=dumps(request, result))
 
     def action_delegate(self, request, match):
+        if request.method == 'GET':
+            return self.get_action(request, match)
+
+        if request.method == 'POST':
+            return self.post_action(request, match)
+
+        if request.method == 'DELETE':
+            return self.delete_action(request, match)
+
+    def post_action(self, request, match):
+        name = request.path_info.strip('/')
+        if name.count('/') != 1:
+            return Response(status=400, body='400 Bad Request\nYou may only create objects, not types or actions\n')
+        objtype, objname = name.split('/', 1)
+
+        try:
+            obj = clusto.getByName(objname)
+            if obj:
+                return Response(status=409, body='409 Conflict\nObject already exists\n')
+        except LookupError: pass
+
+        obj = clusto.typelist[objtype](objname)
+        clusto.commit()
+
+        obj = EntityAPI(obj)
+        response = obj.show(request)
+        response.status = 201
+        return response
+
+    def delete_action(self, request, match):
+        name = request.path_info.strip('/')
+        if name.count('/') != 1:
+            return Response(status=400, body='400 Bad Request\nYou may only delete objects, not types or actions\n')
+        objtype, objname = name.split('/', 1)
+
+        try:
+            obj = clusto.getByName(objname)
+        except LookupError:
+            return Response(status=404, body='404 Not Found\n')
+
+        clusto.deleteEntity(obj.entity)
+        clusto.commit()
+        return Response(status=200, body='200 OK\nObject deleted\n')
+
+    def get_action(self, request, match):
         group = match.groupdict()
         try:
             obj = clusto.getByName(group['name'])
@@ -214,24 +265,6 @@ class ClustoApp(object):
             return response
 
         action = group.get('action', 'show')
-        if request.method == 'POST':
-            format = request.params.get('format', 'json')
-            obj = loads(format, request.body.read())
-            if len(obj['object'].strip('/').split('/')) != 2:
-                return Response(status=400, body='400 Bad Request\nYou may only create objects, not types or actions\n')
-            objtype, objname = obj['object'].strip('/').split('/')
-            obj = clusto.typelist[objtype](objname)
-            obj = EntityAPI(obj)
-            return Response(status=201, body='201 Created')
-
-        if request.method == 'DELETE':
-            if len(obj['object'].strip('/').split('/')) != 2:
-                return Response(status=400, body='400 Bad Request\nYou may only delete objects, not types or actions\n')
-            objtype, objname = obj['object'].strip('/').split('/')
-            obj = clusto.getByName(objname)
-            clusto.deleteEntity(obj.entity)
-            return Response(status=200, body='200 OK\nObject deleted\n')
-
         handler = self.types.get(group['objtype'], EntityAPI)
         if not obj:
             obj = clusto.getByName(group['name'])
