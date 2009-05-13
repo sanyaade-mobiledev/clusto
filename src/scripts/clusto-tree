@@ -2,7 +2,6 @@
 from clusto.scripthelpers import getClustoConfig
 import clusto
 
-from pprint import pprint
 import sys
 
 def print_obj(x, indent=0, attrs=['name']):
