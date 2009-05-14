@@ -217,6 +217,8 @@ class ClustoApp(object):
         if request.method == 'DELETE':
             return self.delete_action(request, match)
 
+        return Response(status=501, body='501 Not Implemented\n')
+
     def post_action(self, request, match):
         name = request.path_info.strip('/')
         if name.count('/') != 1:
