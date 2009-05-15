@@ -17,15 +17,9 @@ class BasicServer(PortMixin, Device):
                  'console-serial' : { 'numports':1, }
                  }
 
-    def addHD(self, size):
-        """
-        Add another HD to this server
-        """
-        pass
     
-    
-class BasicVirtualServer(Device):
-    _clustoType = "server"
+class BasicVirtualServer(BasicServer):
+
     _driverName = "basicvirtualserver"
 
     
