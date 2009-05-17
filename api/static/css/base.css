@@ -19,19 +19,26 @@ body {
 	width: 75%;
 }
 
-
-label {
+#search_results {
+	display: none;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 
-input.wide {
-	width: 17em;
-	height: 2em;
+label {
 }
 
 #filters fieldset {
 	margin: 1em;
 	border: 1px solid #202D26;
 	width: 80%; 
+}
+
+fieldset.search input {
+	width: 100%;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 #detail fieldset {
@@ -72,6 +79,11 @@ legend {
 	float: left;
 	width: 5em; 
 	margin-right: 1em;
+}
+
+.number {
+	overflow: hidden;
+	width: 10em;
 }
 
 .key, .value {
