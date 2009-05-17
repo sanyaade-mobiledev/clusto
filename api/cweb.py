@@ -178,6 +178,8 @@ class RackAPI(EntityAPI):
 class ClustoApp(object):
     def __init__(self):
         self.urls = [
+            ('^/search$',
+                self.search),
             ('^/(?P<objtype>\w+)/(?P<name>[-\w0-9]+)/(?P<action>\w+)',
                 self.action_delegate),
             ('^/(?P<objtype>\w+)/(?P<name>[-\w0-9]+)',
@@ -277,6 +279,17 @@ class ClustoApp(object):
         else:
             response = Response(status=404, body='404 Not Found\nInvalid action\n')
         return response
+
+    def search(self, request, match):
+        query = request.params.get('q', None)
+        if not query:
+            return Response(status=400, body='400 Bad Request\nNo query specified\n')
+
+        result = []
+        for obj in clusto.getEntities():
+            if obj.name.find(query) != -1:
+                result.append(unclusto(obj))
+        return Response(status=200, body=dumps(request, result))
 
     def __call__(self, environ, start_response):
         request = Request(environ)

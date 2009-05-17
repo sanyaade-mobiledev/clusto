@@ -6,6 +6,22 @@
 	<script type="text/javascript">
 	var apiurl = 'http://mgmt.digg.internal:9999';
 
+	function do_search(evt) {
+		query = $('#search').val();
+		if(query.length < 3) {
+			return;
+		}
+		$.getJSON(apiurl + '/search?callback=?', {'q': query}, function(data) {
+			data.sort();
+			$('#search_results').html('')
+			$.each(data, function(i, item) {
+				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#top">' + item.split('/')[2] + '</a></li>');
+				$('a.searchresult[name=' + item + ']').click(item_detail);
+			});
+			$('#search_results').show();
+		});
+	}
+
 	function update_type(data) {
 		data.sort();
 		$.each(data, function(i, item) {
@@ -71,7 +87,6 @@
 	}
 
 	$(document).ready(function() {
-		$('#filters').html('');
 		types = [
 			['Pools', 'pool'],
 			['Datacenters', 'datacenter'],
@@ -83,10 +98,11 @@
 			['Resources', 'resource']
 		];
 		$.each(types, function(i, name) {
-			$('#filters').append('<fieldset id="type_' + name[1] + '"><legend>' + name[0] + '</legend></fieldset>');
+			$('#filters').append('<fieldset class="clustotype" id="type_' + name[1] + '"><legend>' + name[0] + '</legend></fieldset>');
 		});
 
-		$('#filters fieldset').click(toggle_type);
+		$('#filters fieldset.clustotype').click(toggle_type);
+		$('#search').keyup(do_search);
 	});
 	</script>
 </head>
@@ -95,8 +111,10 @@
 <div id="container">
 	<a name="top"></a>
 	<div id="filters">
-		<fieldset id="pools">
-			<legend>Pools</legend>
+		<fieldset class="search">
+			<legend>Search</legend>
+			<input type="text" id="search" value="" />
+			<ul id="search_results"></ul>
 		</fieldset>
 	</div>
 
