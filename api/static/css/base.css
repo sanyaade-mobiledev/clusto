@@ -56,6 +56,10 @@ legend {
 	padding: 2px 6px;
 }
 
+fieldset.search legend {
+	background-color: #072b76;
+}
+
 .subtext {
 	font-size: 8pt;
 	color: #999;
