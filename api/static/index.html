@@ -19,6 +19,9 @@
 				$('a.searchresult[name=' + item + ']').click(item_detail);
 			});
 			$('#search_results').show();
+			if(data.length == 1) {
+				$('a.searchresult[name=' + data[0] + ']').trigger('click');
+			}
 		});
 	}
 
