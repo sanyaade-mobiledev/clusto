@@ -506,10 +506,6 @@ class Driver(object):
         if subkey is ():
             subkey = None
 
-        if isinstance(numbered, bool) and numbered == True:
-            numbered = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
-                                                      ATTR_TABLE.c.number!=None)).as_scalar() 
-
 
         attr = Attribute(key, value, subkey=subkey, number=numbered, uniqattr=uniqattr)
         self.entity._attrs.append(attr)

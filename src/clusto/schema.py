@@ -86,8 +86,12 @@ class Attribute(object):
 
         self.subkey = subkey
 
-        self.number = number
+        if isinstance(number, bool) and number == True:
+            self.number = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
+                                                      ATTR_TABLE.c.number!=None)).as_scalar() 
 
+        else:
+            self.number = number
         if not uniqattr:
             self.uniqattr = None
         else:
