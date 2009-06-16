@@ -76,9 +76,16 @@ class Attribute(object):
     There can be multiple attributes with the same key, number, subkey, and/or
     value.  However only a single attribute with the same key, number, subkey,
     and value when uniqattr is True.
+
+    Optionally you can explicitely set int_value, string_value,
+    datetime_value, relation_id, and datatype.  These settings would override
+    the values set by passing in 'value'.
     """
 
-    def __init__(self, key, value, subkey=None, number=None, uniqattr=False):
+    def __init__(self, key, value=None,
+                 subkey=None, number=None, uniqattr=False,
+                 int_value=None, string_value=None,
+                 datetime_value=None, relation_id=None, datatype=None):
 
         self.key = key
         
@@ -92,10 +99,17 @@ class Attribute(object):
 
         else:
             self.number = number
+
         if not uniqattr:
             self.uniqattr = None
         else:
             self.uniqattr = True
+
+        if int_value is not None: self.int_value = int_value
+        if string_value is not None: self.string_value = sting_value
+        if datetime_value is not None: self.datetime_value = datetime_value
+        if relation_id is not None: self.relation_id = relation_id
+        if datatype is not None: self.datatype = datatype
         
     def __cmp__(self, other):
 

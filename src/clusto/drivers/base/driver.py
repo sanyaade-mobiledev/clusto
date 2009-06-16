@@ -483,7 +483,7 @@ class Driver(object):
     def attrItems(self, *args, **kwargs):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value, numbered=(), subkey=(), uniqattr=False):
+    def addAttr(self, key, value=(), numbered=(), subkey=(), uniqattr=False):
         """add a key/value to the list of attributes
 
         if numbered is True, create an attribute with the next available
@@ -494,6 +494,10 @@ class Driver(object):
         numbering by default.
         """
 
+        if isinstance(key, Attribute):
+            self.entity._attrs.append(key)
+            return key
+        
         self._checkAttrName(key)
         if subkey:
             self._checkAttrName(subkey)

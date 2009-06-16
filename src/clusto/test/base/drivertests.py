@@ -7,7 +7,7 @@ from clusto.test import testbase
 import datetime
 
 import clusto
-
+from clusto import Attribute
 from clusto.drivers.base import *
 from clusto.exceptions import *
 
@@ -275,6 +275,22 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         self.assertEqual(d1.attrQuery(subkey='four', count=True), 1)
 
+
+    def testAddAttributeDirectly(self):
+
+        d1 = Driver('d1')
+        d2 = Driver('d2')
+
+        clusto.commit()
+        
+        d1.addAttr(Attribute(key='foo',                             
+                             value='bar'))
+
+        d2.addAttr(Attribute(key='foo1',
+                             value=d1.entity))
+
+        self.assertEqual(len(d1.attrs(key='foo')), 1)
+        self.assertEqual(len(d2.attrs(key='foo1')), 1)
         
 
 class TestDriverContainerFunctions(testbase.ClustoTestBase):
