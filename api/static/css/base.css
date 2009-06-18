@@ -47,6 +47,7 @@ fieldset.search input {
 	float: left;
 	clear: right;
 	width: 100%;
+	overflow: none;
 }
 
 legend {
@@ -79,20 +80,26 @@ fieldset.search legend {
 	list-style-type: none;
 }
 
-.col {
+.col, .number, .datatype, .key, .value, .subkey {
 	float: left;
-	width: 5em; 
 	margin-right: 1em;
+	overflow: hidden;
 }
 
-.number {
-	overflow: hidden;
-	width: 10em;
+.number, .datatype {
+	width: 10%;
 }
 
-.key, .value {
-	width: 20em;
-	overflow: hidden;
+.key {
+	width: 25%;
+}
+
+.value {
+	width: 30%;
+}
+
+.subkey {
+	width: 15%;
 }
 
 li {
