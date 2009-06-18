@@ -163,7 +163,7 @@ def main():
             import_ipmac(switch, macaddr, ipaddr, port)
         except:
             print format_exc()
-    bind_vservers()
+    #bind_vservers()
     #pprint(clusto.getEntities())
 
 if __name__ == '__main__':

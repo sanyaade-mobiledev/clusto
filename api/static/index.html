@@ -6,6 +6,27 @@
 	<script type="text/javascript">
 	var apiurl = 'http://mgmt.digg.internal:9999';
 
+	function break_str(s, breaklen) {
+		if(s.length < breaklen) {
+			return s;
+		}
+		result = '';
+		for(i = 0; i < (s.length / breaklen); i++) {
+			start = breaklen * i;
+			if((start + breaklen) > s.length) {
+				len = s.length - start;
+			}else{
+				len = breaklen;
+			}
+			sub = s.substr(start, len);
+			if(sub.length == 0) {
+				break;
+			}
+			result += sub + '<br />';
+		}
+		return result;
+	}
+
 	function do_search(evt) {
 		query = $('#search').val();
 		if(query.length < 3) {
@@ -44,7 +65,10 @@
 				/*if(attr.value == null) { attr.value = '&nbsp;'; }
 				if(attr.subkey == null) { attr.subkey = '&nbsp;'; }
 				if(attr['number'] == null) { attr['number'] = '&nbsp;'; }*/
-				$('#detail .attrs').append('<li><div class="col key">' + attr.key + '</div><div class="col value">' + attr.value + '</div><div class="col subkey">' + attr.subkey + '</div><div class="col number">' + attr['number'] + '</div><div class="col datatype">' + attr.datatype + '</div></li>');
+				if(attr.key == 'sshdsakey' || attr.key == 'sshrsakey') {
+					attr.value = break_str(attr.value, 40);
+				}
+				$('#detail .attrs').append('<li><div class="col key">' + attr.key + '</div><div class="col subkey">' + attr.subkey + '</div><div class="col value">' + attr.value + '</div><div class="col number">' + attr['number'] + '</div><div class="col datatype">' + attr.datatype + '</div></li>');
 			});
 
 			data.contents.sort();

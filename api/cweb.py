@@ -130,7 +130,7 @@ class EntityAPI(object):
         result['object'] = self.url
 
         attrs = []
-        for x in self.obj.attrs():
+        for x in self.obj.attrs(ignoreHidden=False):
             attrs.append(unclusto(x))
         result['attrs'] = attrs
         result['contents'] = [unclusto(x) for x in self.obj.contents()]
