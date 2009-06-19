@@ -118,8 +118,8 @@ class TestClusto(testbase.ClustoTestBase):
         d1.addAttr('k1', 'test')
         d2.addAttr('k1', 'testA')
 
-        d1.addAttr('k2', numbered=1, subkey='A', value=67)
-        d3.addAttr('k3', numbered=True, value=d4)
+        d1.addAttr('k2', number=1, subkey='A', value=67)
+        d3.addAttr('k3', number=True, value=d4)
 
         clusto.commit()
 

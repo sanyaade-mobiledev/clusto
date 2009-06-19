@@ -28,16 +28,16 @@ class ResourceManager(Driver):
                              % self.name)
 
 
-    def ensureType(self, resource, numbered=True):
+    def ensureType(self, resource, number=True):
         """checks the type of a given resourece
 
         if the resource is valid return it and optionally convert it to
         another format.  The format it returns has to be compatible with 
         attribute naming 
         """
-        return (resource, numbered)
+        return (resource, number)
 
-    def allocate(self, thing, resource=(), numbered=True):
+    def allocate(self, thing, resource=(), number=True):
         """allocates a resource element to the given thing.
 
         resource - is passed as an argument it will be checked 
@@ -57,19 +57,19 @@ class ResourceManager(Driver):
 
             if not resource:
                 # allocate a new resource
-                resource, numbered = self.allocator()
+                resource, number = self.allocator()
 
             else:
-                resource, numbered = self.ensureType(resource, numbered)
-                if not self.available(resource, numbered):
+                resource, number = self.ensureType(resource, number)
+                if not self.available(resource, number):
                     raise ResourceException("Requested resource is not available.")
 
-            if numbered and self.checkLock(thing, resource, numbered):
+            if number and self.checkLock(thing, resource, number):
                 raise ResourceLockException("Resource %s:%s is locked cannot allocate,"
-                                            % (str(resource), str(numbered)))
+                                            % (str(resource), str(number)))
 
             if self._recordAllocations:
-                attr = self.addAttr(self._driverName, thing, numbered=numbered, subkey=resource)
+                attr = self.addAttr(self._driverName, thing, number=number, subkey=resource)
             else:
                 attr = None
             clusto.commit()
@@ -79,7 +79,7 @@ class ResourceManager(Driver):
 
         return attr #resource
 
-    def deallocate(self, thing, resource=(), numbered=True):
+    def deallocate(self, thing, resource=(), number=True):
         """deallocates a resource from the given thing."""
 
 
@@ -90,39 +90,39 @@ class ResourceManager(Driver):
                     self.deallocate(thing, res.subkey, res.number)
 
 
-            if resource and not self.available(resource, numbered):
-                resource, numbered = self.ensureType(resource, numbered)
+            if resource and not self.available(resource, number):
+                resource, number = self.ensureType(resource, number)
 
-                if self.checkLock(thing, resource, numbered):
+                if self.checkLock(thing, resource, number):
                     raise ResourceLockException("Resource %s:%s is locked cannot deallocate,"
-                                                % (str(resource), str(numbered)))
+                                                % (str(resource), str(number)))
 
 
-                self.delAttrs(self._driverName, thing, numbered=numbered, subkey=resource)
+                self.delAttrs(self._driverName, thing, number=number, subkey=resource)
         except Exception, x:
             clusto.rollbackTransaction()
             raise x
-    def available(self, resource, numbered=True):
+    def available(self, resource, number=True):
         """return True if resource is available, False otherwise.
         """
 
-        resource, numbered = self.ensureType(resource, numbered)
+        resource, number = self.ensureType(resource, number)
 
 
-        if self.hasAttr(self._driverName, numbered=numbered, subkey=resource):
+        if self.hasAttr(self._driverName, number=number, subkey=resource):
             return False
 
         return True
             
 
-    def owners(self, resource, numbered=True):
+    def owners(self, resource, number=True):
         """return a list of driver objects for the owners of a given resource.
         """
 
-        resource, numbered = self.ensureType(resource, numbered)
+        resource, number = self.ensureType(resource, number)
 
         return [Driver(x.value) for x in self.attrs(self._driverName, 
-                                                    numbered=numbered,
+                                                    number=number,
                                                     subkey=resource)]
 
     @classmethod
@@ -144,48 +144,48 @@ class ResourceManager(Driver):
 
         return self.attrQuery(self._driverName, count=True)
 
-    def lockResource(self, thing, resource, numbered=True):
+    def lockResource(self, thing, resource, number=True):
         """lock a resource so that it can't be deallocated or multiply allocated"""
 
 
-        resource, numbered = self.ensureType(resource, numbered)
+        resource, number = self.ensureType(resource, number)
 
         clusto.beginTransaction()
         try:
-            res = self.attrValues(self._driverName, numbered=numbered, subkey=resource)
+            res = self.attrValues(self._driverName, number=number, subkey=resource)
 
             if len(res) == 0:
                 raise ResourceLockException("Unable to lock a resource because it isn't allocated yet.")
-            elif not self.available(resource, numbered) and thing not in res:
+            elif not self.available(resource, number) and thing not in res:
                 raise ResourceLockException("Unable to lock resource.")
 
 
-            if self.attrs(self._driverName+'lock', numbered=numbered, subkey=resource, value=thing):
+            if self.attrs(self._driverName+'lock', number=number, subkey=resource, value=thing):
                 raise ResourceLockException("Lock already exists for (%s,%s)"
-                                            % (str(resource), str(numbered)))
+                                            % (str(resource), str(number)))
             
-            self.addAttr(self._driverName+'lock', numbered=numbered, subkey=resource, value=thing)
+            self.addAttr(self._driverName+'lock', number=number, subkey=resource, value=thing)
             clusto.commit()
         except Exception, x:
             clusto.rollbackTransaction()
             raise x
         
-    def unlockResource(self, thing, resource, numbered=True):
+    def unlockResource(self, thing, resource, number=True):
         """unlock a resource"""
 
-        resource, numbered = self.ensureType(resource, numbered)
+        resource, number = self.ensureType(resource, number)
 
-        if self.checkLock(thing, resource, numbered):
+        if self.checkLock(thing, resource, number):
 
-            self.delAttrs(self._driverName+'lock', numbered=numbered, subkey=resource, value=thing)
+            self.delAttrs(self._driverName+'lock', number=number, subkey=resource, value=thing)
         
-    def checkLock(self, thing, resource, numbered=True):
+    def checkLock(self, thing, resource, number=True):
         """check if a given resource is locked"""
 
 
-        resource, numbered = self.ensureType(resource, numbered)
+        resource, number = self.ensureType(resource, number)
 
-        if self.hasAttr(self._driverName+'lock', numbered=numbered, subkey=resource, value=thing):            
+        if self.hasAttr(self._driverName+'lock', number=number, subkey=resource, value=thing):            
             return True
         else:
             return False

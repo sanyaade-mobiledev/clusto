@@ -30,7 +30,7 @@ class Pool(Driver):
                                "Tried to insert %s." % str(type(thing)))
 
 
-        self.addAttr("_contains", d, numbered=True)
+        self.addAttr("_contains", d, number=True)
         
 
     def isParent(self, thing):
@@ -80,7 +80,7 @@ class WeightedPool(Pool):
         if thing not in self:            
             raise LookupError("%s is not in this pool." % thing)
 
-        self.setAttr("weight", numbered=weight, value=thing)
+        self.setAttr("weight", number=weight, value=thing)
 
     def getWeight(self, thing):
 

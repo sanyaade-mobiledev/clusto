@@ -130,7 +130,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         if (not self.portExists(porttype, portnum) or
-            self.hasAttr(key=self._portKey(porttype), numbered=portnum, 
+            self.hasAttr(key=self._portKey(porttype), number=portnum, 
                          subkey='connection')):
             return False
         else:
@@ -143,7 +143,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         self.addAttr(key=self._portKey(porttype),
-                     numbered=portnum,
+                     number=portnum,
                      subkey=key,
                      value=value)
 
@@ -153,7 +153,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         self.setAttr(key=self._portKey(porttype),
-                     numbered=portnum,
+                     number=portnum,
                      subkey=key,
                      value=value)
 
@@ -165,12 +165,12 @@ class PortMixin:
 
         if value is ():
             self.delAttrs(key=self._portKey(porttype),
-                          numbered=portnum,
+                          number=portnum,
                           subkey=key)
         else:
 
             self.delAttrs(key=self._portKey(porttype),
-                          numbered=portnum,
+                          number=portnum,
                           subkey=key,
                           value=value)
             
@@ -181,7 +181,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         attr = self.attrs(key=self._portKey(porttype),
-                          numbered=portnum,
+                          number=portnum,
                           subkey=key)
 
         if len(attr) > 1:

@@ -66,7 +66,7 @@ class SimpleEntityNameManager(SimpleNameManager):
     _recordAllocations = False
 
 
-    def allocate(self, clustotype, resource=None, numbered=True):
+    def allocate(self, clustotype, resource=None, number=True):
         """allocates a resource element to the given thing.
 
         resource - is passed as an argument it will be checked 
@@ -101,6 +101,6 @@ class SimpleEntityNameManager(SimpleNameManager):
         return newobj
 
 
-    def deallocate(self, thing, resource=None, numbered=True):
+    def deallocate(self, thing, resource=None, number=True):
         raise Exception("can't deallocate an entity name, delete the entity instead.")
 

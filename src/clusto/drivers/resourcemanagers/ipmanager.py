@@ -32,13 +32,13 @@ class IPManager(ResourceManager):
 
         return self.__ipy
 
-    def ensureType(self, resource, numbered=True):
+    def ensureType(self, resource, number=True):
         """check that the given ip falls within the range managed by this manager"""
 
         try:
-            if not isinstance(numbered, bool) and isinstance(int(numbered), int):
+            if not isinstance(number, bool) and isinstance(int(number), int):
                 ## add here to map unsigned ints from IPs to signed ints of python
-                ip = IPy.IP(int(numbered+2147483648))
+                ip = IPy.IP(int(number+2147483648))
             else:
                 ip = IPy.IP(resource)           
         except ValueError:

@@ -221,7 +221,7 @@ class Driver(object):
         return d
         
     @classmethod
-    def doAttrQuery(cls, key=(), value=(), numbered=(),
+    def doAttrQuery(cls, key=(), value=(), number=(),
                     subkey=(), uniqattr=(), ignoreHidden=True, sortByKeys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
@@ -265,14 +265,14 @@ class Driver(object):
             else:
                 query = query.filter_by(**{typename+'_value':value})
 
-        if numbered is not ():
-            if isinstance(numbered, bool):
-                if numbered == True:
+        if number is not ():
+            if isinstance(number, bool):
+                if number == True:
                     query = query.filter(Attribute.number != None)
                 else:
                     query = query.filter(Attribute.number == None)
-            elif isinstance(numbered, (int, long)):
-                query = query.filter_by(number=numbered)
+            elif isinstance(number, (int, long)):
+                query = query.filter_by(number=number)
                 
             else:
                 raise TypeError("num must be either a boolean or an integer.")
@@ -302,7 +302,7 @@ class Driver(object):
         return self.doAttrQuery(*args, **kwargs)
 
     @classmethod
-    def attrFilter(cls, attrlist, key=(), value=(), numbered=(), 
+    def attrFilter(cls, attrlist, key=(), value=(), number=(), 
                    subkey=(), ignoreHidden=True, uniqattr=(),
                    sortByKeys=True, 
                    regex=False, 
@@ -316,8 +316,8 @@ class Driver(object):
 
         There are some special cases:
 
-        if numbered is True then the number variable must be non-null. if
-        numbered is False then the number variable must be null.
+        if number is True then the number variable must be non-null. if
+        number is False then the number variable must be null.
 
         if ignoreHidden is True (the default) then filter out keys that begin
         with an underscore, if false don't filter out such keys.  If you
@@ -361,15 +361,15 @@ class Driver(object):
             result = subfilter(result, v, n)
 
 
-        if numbered is not ():
-            if isinstance(numbered, bool):
-                if numbered:
+        if number is not ():
+            if isinstance(number, bool):
+                if number:
                     result = (attr for attr in result if attr.number is not None)
                 else:
                     result = (attr for attr in result if attr.number is None)
 
-            elif isinstance(numbered, (int, long)):
-                result = (attr for attr in result if attr.number == numbered)
+            elif isinstance(number, (int, long)):
+                result = (attr for attr in result if attr.number == number)
             
             else:
                 raise TypeError("num must be either a boolean or an integer.")
@@ -483,11 +483,11 @@ class Driver(object):
     def attrItems(self, *args, **kwargs):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value=(), numbered=(), subkey=(), uniqattr=False):
+    def addAttr(self, key, value=(), number=(), subkey=(), uniqattr=False):
         """add a key/value to the list of attributes
 
-        if numbered is True, create an attribute with the next available
-        otherwise numbered just gets passed to the Attribute constructor so it
+        if number is True, create an attribute with the next available
+        otherwise number just gets passed to the Attribute constructor so it
         can be an integer or an sqlalchemy expression
         
         An optional subkey can also be specified. Subkeys don't affect
@@ -505,13 +505,13 @@ class Driver(object):
         if isinstance(value, Driver):
             value = value.entity
 
-        if numbered is ():
-            numbered = None
+        if number is ():
+            number = None
         if subkey is ():
             subkey = None
 
 
-        attr = Attribute(key, value, subkey=subkey, number=numbered, uniqattr=uniqattr)
+        attr = Attribute(key, value, subkey=subkey, number=number, uniqattr=uniqattr)
         self.entity._attrs.append(attr)
 
         return attr
@@ -526,12 +526,12 @@ class Driver(object):
         clusto.flush()
 
 
-    def setAttr(self, key, value, numbered=(), subkey=(), uniqattr=()):
+    def setAttr(self, key, value, number=(), subkey=(), uniqattr=()):
         """replaces all attributes with the given key"""
         self._checkAttrName(key)
-        self.delAttrs(key=key, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
+        self.delAttrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
         
-        return self.addAttr(key, value, numbered=numbered, subkey=subkey, uniqattr=uniqattr)
+        return self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
         
 
     
@@ -564,7 +564,7 @@ class Driver(object):
             raise TypeError("%s is already in %s and cannot be inserted into %s."
                             % (d.name, parent[0].entity.name, self.name))
 
-        self.addAttr("_contains", d, numbered=True)
+        self.addAttr("_contains", d, number=True)
         
     def remove(self, thing):
         """Remove the given Entity or Driver from this Entity. Such that:

@@ -103,7 +103,7 @@ def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
 
     @param attrs: list of attribute parameters
     @type attrs: list of dictionaries with the following 
-                 valid keys: key, numbered, subkey, value
+                 valid keys: key, number, subkey, value
     """
     
     query = SESSION.query(Entity)

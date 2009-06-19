@@ -70,7 +70,7 @@ class BasicRack(Location):
                 raise TypeError("%s is already in RU %d" % (dev.name, U))
 
         for U in rackU:
-            self.addAttr("_contains", device, numbered=U, subkey='ru')
+            self.addAttr("_contains", device, number=U, subkey='ru')
 
         
     def getDeviceIn(self, rackU):
@@ -80,7 +80,7 @@ class BasicRack(Location):
 
         rackU = self._ensureRackU(rackU)[0]
         
-        owners = self.contents(numbered=rackU, subkey='ru')
+        owners = self.contents(number=rackU, subkey='ru')
 
         if len(owners) > 1:
             raise Exception('Somehow there is more than one thing in %s.'

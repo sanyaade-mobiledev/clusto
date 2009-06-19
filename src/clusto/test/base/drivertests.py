@@ -42,7 +42,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1 = Driver('d1')
 
         d1.addAttr('foo', 'bar')
-        d1.addAttr('foo', 'bar1', numbered=0)
+        d1.addAttr('foo', 'bar1', number=0)
 
         self.assertEqual(sorted(d1.attrItems()),
                          [(('foo', None, None), 'bar'), 
@@ -50,7 +50,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
 
 
-        self.assertEqual(d1.attrItems(numbered=True),
+        self.assertEqual(d1.attrItems(number=True),
                          [(('foo', 0, None), 'bar1')])
 
     def testGettingAttrValues(self):
@@ -93,8 +93,8 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         d1.addAttr('foo', 'bar')
 
-        d1.addAttr('foo', 'bar1', numbered=5)
-        d1.addAttr('foo', 'bar2', numbered=6)
+        d1.addAttr('foo', 'bar1', number=5)
+        d1.addAttr('foo', 'bar2', number=6)
 
         clusto.flush()
 
@@ -103,7 +103,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
                           (('foo', 5, None), 'bar1'), 
                           (('foo', 6, None), 'bar2')]))
 
-        self.assertEqual(sorted(d1.attrItems(numbered=True)),
+        self.assertEqual(sorted(d1.attrItems(number=True)),
                          sorted([(('foo', 5, None), 'bar1'), 
                           (('foo', 6, None), 'bar2')]))
 
@@ -113,8 +113,8 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         d1.addAttr('foo', 'bar')
 
-        d1.addAttr('foo', 'bar1', numbered=True)
-        d1.addAttr('foo', 'bar2', numbered=True)
+        d1.addAttr('foo', 'bar1', number=True)
+        d1.addAttr('foo', 'bar2', number=True)
 
         clusto.flush()
 
@@ -123,7 +123,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
                                  (('foo', 0, None), 'bar1'),
                                  (('foo', 1, None), 'bar2')]))
 
-        self.assertEqual(sorted(d1.attrItems(numbered=True)),
+        self.assertEqual(sorted(d1.attrItems(number=True)),
                          sorted([(('foo', 0, None), 'bar1'),
                                  (('foo', 1, None), 'bar2')]))
 
@@ -142,8 +142,8 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
         
         self.assertEqual(d1.attrItems(),
                          [(('foo', 0, 'one'), 'bar1'),
@@ -153,25 +153,25 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
-        self.assertEqual(list(d1.attrItems(key='foo', numbered=2)),
+        self.assertEqual(list(d1.attrItems(key='foo', number=2)),
                          [(('foo',2,'three'), 'bar3')])
         
-        self.assertEqual(list(d1.attrItems(key='foo', numbered=0)),
+        self.assertEqual(list(d1.attrItems(key='foo', number=0)),
                          [(('foo',0,'one'), 'bar1')])
         
     def testGettingAttrsWithSpecificValues(self):
 
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
         self.assertEqual(list(d1.attrItems(value='bar3')),
                          [(('foo',2,'three'), 'bar3')])
@@ -184,10 +184,10 @@ class TestDriverAttributes(testbase.ClustoTestBase):
     def testDelAttrs(self):
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
         d1.delAttrs(key='foo', value='bar4')
 
@@ -198,7 +198,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(list(d1.attrItems(value='bar3')),
                          [(('foo',2,'three'), 'bar3')])
 
-        d1.delAttrs(key='foo', subkey='three', numbered=2)
+        d1.delAttrs(key='foo', subkey='three', number=2)
         self.assertEqual(list(d1.attrItems(value='bar3')),
                          [])
 
@@ -207,23 +207,23 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
-        self.assertFalse(d1.hasAttr(key='foo', numbered=False))
-        self.assertTrue(d1.hasAttr(key='foo', numbered=True))
-        self.assertTrue(d1.hasAttr(key='foo', numbered=1, subkey='two'))
+        self.assertFalse(d1.hasAttr(key='foo', number=False))
+        self.assertTrue(d1.hasAttr(key='foo', number=True))
+        self.assertTrue(d1.hasAttr(key='foo', number=1, subkey='two'))
 
     def testHiddenAttrs(self):
 
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='_foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='_foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='_foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='_foo', value='bar4', number=True, subkey='four')
 
         self.assertEqual(d1.attrItems(ignoreHidden=True),
                          [(('foo',0,'one'), 'bar1'), (('foo',1,'two'), 'bar2')])
@@ -261,16 +261,16 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         
         d1 = Driver('d1')
 
-        d1.addAttr(key='foo', value='bar1', numbered=True, subkey='one')
-        d1.addAttr(key='foo', value='bar2', numbered=True, subkey='two')
-        d1.addAttr(key='foo', value='bar3', numbered=True, subkey='three')
-        d1.addAttr(key='foo', value='bar4', numbered=True, subkey='four')
+        d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
+        d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
+        d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
         
-        self.assertEqual(d1.attrQuery(key='foo', numbered=2, count=True), 1)
+        self.assertEqual(d1.attrQuery(key='foo', number=2, count=True), 1)
         
-        self.assertEqual(d1.attrQuery(key='foo', numbered=0, count=True), 1)
+        self.assertEqual(d1.attrQuery(key='foo', number=0, count=True), 1)
 
-        self.assertEqual(d1.attrQuery(key='foo', numbered=False, count=True), 0)
+        self.assertEqual(d1.attrQuery(key='foo', number=False, count=True), 0)
         self.assertEqual(d1.attrQuery(key='foo', count=True), 4)
 
         self.assertEqual(d1.attrQuery(subkey='four', count=True), 1)
@@ -436,14 +436,14 @@ class TestDriverQueries(testbase.ClustoTestBase):
         d1.addAttr('_foo', 'bar1')
         d1.addAttr('car', 'baz')
         d1.addAttr('car', 'baz')
-        d1.addAttr('d', 'dee', numbered=True)
-        d1.addAttr('d', 'dee', numbered=True)
+        d1.addAttr('d', 'dee', number=True)
+        d1.addAttr('d', 'dee', number=True)
         d1.addAttr('a', 1)
         d1.addAttr('a', 1, subkey='t')
         d1.addAttr('a', 1, subkey='g')
-        d1.addAttr('a', 1, subkey='z', numbered=4)
-        d1.addAttr('a', 1, subkey='z', numbered=5)
-        d1.addAttr('a', 1, subkey='z', numbered=6)
+        d1.addAttr('a', 1, subkey='z', number=4)
+        d1.addAttr('a', 1, subkey='z', number=5)
+        d1.addAttr('a', 1, subkey='z', number=6)
         
         d1.setAttr('d2', d2)
         d1.setAttr('d3', d3)
@@ -464,11 +464,11 @@ class TestDriverQueries(testbase.ClustoTestBase):
 
         self.assertEqual(d1.attrs('a', 1), d1.attrQuery('a', 1))
 
-        self.assertEqual(d1.attrs('a', 1, numbered=True), 
-                         d1.attrQuery('a', 1, numbered=True))
+        self.assertEqual(d1.attrs('a', 1, number=True), 
+                         d1.attrQuery('a', 1, number=True))
 
-        self.assertEqual(d1.attrs('a', 1, numbered=5), 
-                         d1.attrQuery('a', 1, numbered=5))
+        self.assertEqual(d1.attrs('a', 1, number=5), 
+                         d1.attrQuery('a', 1, number=5))
 
         self.assertEqual(d1.attrs(value='dee'), 
                          d1.attrQuery(value='dee'))
