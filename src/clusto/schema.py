@@ -127,22 +127,18 @@ class Attribute(object):
         return ((self.key == other.key) and (self.value == other.value))
 
     def __repr__(self):
-        
-        s = "%s(key=%s, value=%s, subkey=%s, number=%s)"
 
-        return s % (self.__class__.__name__, 
-                    self.key, self.value, self.subkey, self.number)
+        params = ('key','value','subkey','number','uniqattr','datatype',
+                  'int_value','string_value','datetime_value','relation_id')
 
-    def __str__(self):
 
-        if self.isRelation:
-            value = self.relation_value.name
-        else:
-            value = self.value
+        vals = ((x,getattr(self,x)) for x in params)
+        strs = ("%s=%s" % (key, ("'%s'" % val if isinstance(val,basestring) else '%s'%str(val))) for key, val in vals)
 
-        entityname = (self.entity and self.entity.name) or None
-        return "%s|%s.%s.%s|%s %s" % (entityname, self.key, self.number,
-                                      self.subkey, self.datatype, value)
+        s = "%s(%s)" % (self.__class__.__name__, ','.join(strs))
+
+        return s
+
     @property
     def isRelation(self):
         return self.datatype == 'relation'
