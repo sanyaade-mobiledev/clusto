@@ -32,8 +32,8 @@ class SimpleNameManager(ResourceManager):
                  *args, **kwargs):
 
 
-        super(ResourceManager, self).__init__(nameDriverEntity,
-                                              *args, **kwargs)
+        super(SimpleNameManager, self).__init__(nameDriverEntity,
+                                                *args, **kwargs)
         
         self.basename = basename
         self.digits = digits

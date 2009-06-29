@@ -25,7 +25,7 @@ class SimpleNumManager(ResourceManager):
                  *args, **kwargs):
 
 
-        super(ResourceManager, self).__init__(nameDriverEntity,
+        super(SimpleNumManager, self).__init__(nameDriverEntity,
                                               *args, **kwargs)
         
         if maxnum:
