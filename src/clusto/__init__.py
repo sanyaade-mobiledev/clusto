@@ -13,7 +13,7 @@ driverlist = DRIVERLIST
 typelist = TYPELIST
 
 
-def connect(dsn):
+def connect(dsn, echo=False):
     """Connect to a given Clusto datastore.
 
     Accepts a dsn string.
@@ -23,7 +23,7 @@ def connect(dsn):
 
     @param dsn: the clusto database URI
     """
-    METADATA.bind = create_engine(dsn)
+    METADATA.bind = create_engine(dsn, echo=echo)
 
 def checkDBcompatibility(dbver):
 
