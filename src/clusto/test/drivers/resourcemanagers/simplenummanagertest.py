@@ -12,10 +12,9 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
 
     def data(self):
 
-        n1 = SimpleNumManager('numgen1', startingnum=1)
+        n1 = SimpleNumManager('numgen1', next=1)
 
-
-        n2 = SimpleNumManager('numgen2', maxnum=4, startingnum=0)
+        n2 = SimpleNumManager('numgen2', maxnum=4, next=0)
         
         clusto.flush()
 

@@ -15,14 +15,14 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
         n1 = SimpleEntityNameManager('foonamegen',
                                      basename='foo',
                                      digits=4,
-                                     startingnum=1,
+                                     next=1,
                                      )
 
 
         n2 = SimpleEntityNameManager('barnamegen',
                                      basename='bar',
                                      digits=2,
-                                     startingnum=95,
+                                     next=95,
                                      )
         
         clusto.flush()

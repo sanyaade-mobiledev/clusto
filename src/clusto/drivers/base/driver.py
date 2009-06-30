@@ -45,9 +45,8 @@ class Driver(object):
     >>> d.propB == "default1"
     True
 
-    The default properties are only in the class definition and don't
-    automatically get set in the clusto db until you a different value to
-    them.
+    Only properties with non-None default values are set in the clusto db at
+    initial instantiation time (when creating a brand new entity).
 
     >>> d.propA = 54
     >>> d.propA == 54
@@ -93,7 +92,7 @@ class Driver(object):
             
             self.entity = nameDriverEntity
             self._chooseBestDriver()
-
+            return
         elif isinstance(nameDriverEntity, (str, unicode)):
 
             try:
@@ -113,12 +112,14 @@ class Driver(object):
         else:
             raise TypeError("Could not create driver from given arguments.")
 
-        for key, val in kwargs.iteritems():
-            if key in self._properties:
-                setattr(self, key, val)
-            ## unsure if I should fail on bad keys
+        for key, val in self._properties.iteritems():
+            if key in kwargs:
+                val = kwargs[key]
+            if val is None:
+                continue
+            setattr(self, key, val)
 
-        
+
     def __eq__(self, other):
 
         if isinstance(other, Entity):

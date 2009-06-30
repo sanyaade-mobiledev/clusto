@@ -17,29 +17,13 @@ class SimpleNameManager(ResourceManager):
     """
 
     _driverName = "simplenamemanager"
-    _properties = {'basename':None,
-                   'digits':None,
-                   'next':None,
-                   'leadingZeros':None}
+    _properties = {'basename':'',
+                   'digits':2,
+                   'next':1,
+                   'leadingZeros':int(True)}
 
     _recordAllocations = True
     
-    def __init__(self, nameDriverEntity,
-                 basename='',
-                 digits=2,
-                 startingnum=1,
-                 leadingZeros=int(True),
-                 *args, **kwargs):
-
-
-        super(SimpleNameManager, self).__init__(nameDriverEntity,
-                                                *args, **kwargs)
-        
-        self.basename = basename
-        self.digits = digits
-        self.next = startingnum
-        self.leadingZeros = leadingZeros
-
     def allocator(self):
         clusto.flush()
         num = str(self.next)

@@ -14,26 +14,11 @@ class SimpleNumManager(ResourceManager):
 
     _driverName = "simplenummanager"
     _properties = {'maxnum':None,
-                   'next':None,
+                   'next':0,
                    }
 
     _recordAllocations = True
     
-    def __init__(self, nameDriverEntity,
-                 startingnum=0,
-                 maxnum=False,
-                 *args, **kwargs):
-
-
-        super(SimpleNumManager, self).__init__(nameDriverEntity,
-                                              *args, **kwargs)
-        
-        if maxnum:
-            self.maxnum = maxnum
-
-        self.next = startingnum
-
-
     def allocator(self):
 
         clusto.flush()
