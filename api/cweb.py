@@ -175,6 +175,16 @@ class RackAPI(EntityAPI):
         clusto.commit()
         return self.contents(request)
 
+class ResourceAPI(EntityAPI):
+    def allocate(self, request):
+        '''
+        Allocate a new object of the given type
+        '''
+        driver = clusto.DRIVERLIST[request.params['driver']]
+        device = self.obj.allocate(driver)
+        clusto.commit()
+        return Response(status=201, body=unclusto(device))
+
 class ClustoApp(object):
     def __init__(self):
         self.urls = [
@@ -197,6 +207,7 @@ class ClustoApp(object):
             'networkswitch': PortInfoAPI,
             'powerstrip': PortInfoAPI,
             'rack': RackAPI,
+            'resource': ResourceAPI,
         }
 
     def default_delegate(self, request, match):
