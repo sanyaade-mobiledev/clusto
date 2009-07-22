@@ -290,7 +290,6 @@ class PortMixin:
         else:
             raise ConnectionException("IP %s is not available to you." % str(ip))
         
-        ipman.lockResource(self, keyname, value)
         self.setPortAttr(porttype, portnum, keyname, value)
 
     def unbindIPfromPort(self, ip, porttype, portnum, deallocate=True):
@@ -327,7 +326,6 @@ class PortMixin:
             raise ConnectionException("IP %s is not available to you." % str(ip))
 
         self.delPortAttr(porttype, portnum, keyname, value)
-        ipman.unlockResource(self, keyname, value)
 
         if deallocate:
             ipman.deallocate(self, keyname, value)

@@ -3,7 +3,7 @@ import clusto
 from clusto.drivers import BasicServer, IPManager
 from clusto.test import testbase
 
-from clusto.exceptions import ResourceException, ResourceLockException
+from clusto.exceptions import ResourceException
 
 class BasicServerTest(testbase.ClustoTestBase):
 
@@ -86,8 +86,7 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         s1.bindIPtoPort('192.168.1.20', 'nic-eth', 1)
 
-        self.assertRaises(ResourceLockException, ipm.deallocate, s1, '192.168.1.20')
-        
+        ##FIXME: this needs a fuller test once ip to port binding is reworked
 
     def testUnBindingIPFromPort(self):
 

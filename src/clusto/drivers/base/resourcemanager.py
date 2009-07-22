@@ -2,7 +2,7 @@
 import clusto
 from clusto.schema import select, and_, ATTR_TABLE, Attribute, func
 from clusto.drivers.base import Driver
-from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException, ResourceLockException, ResourceException
+from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException, ResourceException
 
 
 
@@ -65,10 +65,6 @@ class ResourceManager(Driver):
                 if not self.available(resource, number):
                     raise ResourceException("Requested resource is not available.")
 
-            if number and self.checkLock(thing, resource, number):
-                raise ResourceLockException("Resource %s:%s is locked cannot allocate,"
-                                            % (str(resource), str(number)))
-
             if self._recordAllocations:
                 if number == True:
                     attr = thing.addAttr(Attribute(self._driverName,
@@ -115,11 +111,6 @@ class ResourceManager(Driver):
 
             elif resource and not self.available(resource, number):
                 resource, number = self.ensureType(resource, number)
-
-                if self.checkLock(thing, resource, number):
-                    raise ResourceLockException("Resource %s:%s is locked cannot deallocate,"
-                                                % (str(resource), str(number)))
-
 
                 res = thing.attrs(self._driverName, self, subkey='manager', number=number)
                 for a in res: 
@@ -183,49 +174,4 @@ class ResourceManager(Driver):
         else:
             return None
 
-    def lockResource(self, thing, resource, number=True):
-        """lock a resource so that it can't be deallocated or multiply allocated"""
-
-
-        resource, number = self.ensureType(resource, number)
-
-        clusto.beginTransaction()
-        try:
-            res = self.owners(resource, number)
-
-            if len(res) == 0:
-                raise ResourceLockException("Unable to lock a resource because it isn't allocated yet.")
-            elif not self.available(resource, number) and thing not in res:
-                raise ResourceLockException("Unable to lock resource.")
-
-
-            if thing.attrs(self._driverName, number=number, subkey='resource-lock', value=self):
-                raise ResourceLockException("Lock already exists for (%s,%s)"
-                                            % (str(resource), str(number)))
-            
-            thing.addAttr(self._driverName, number=number, subkey='resource-lock', value=self)
-            clusto.commit()
-        except Exception, x:
-            clusto.rollbackTransaction()
-            raise x
-        
-    def unlockResource(self, thing, resource, number=True):
-        """unlock a resource"""
-
-        resource, number = self.ensureType(resource, number)
-
-        if self.checkLock(thing, resource, number):
-
-            thing.delAttrs(self._driverName, number=number, subkey='resource-lock', value=self)
-        
-    def checkLock(self, thing, resource, number=True):
-        """check if a given resource is locked"""
-
-
-        resource, number = self.ensureType(resource, number)
-
-        if self.hasAttr(self._driverName, number=number, subkey='resource-lock', value=self):
-            return True
-        else:
-            return False
         
