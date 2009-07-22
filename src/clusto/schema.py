@@ -87,6 +87,7 @@ class Attribute(object):
                  int_value=None, string_value=None,
                  datetime_value=None, relation_id=None, datatype=None):
 
+
         self.key = key
         
         self.value = value
@@ -95,7 +96,8 @@ class Attribute(object):
 
         if isinstance(number, bool) and number == True:
             self.number = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
-                                                      ATTR_TABLE.c.number!=None)).as_scalar() 
+                                                         ATTR_TABLE.c.number!=None,
+                                                         )).as_scalar() 
 
         else:
             self.number = number
@@ -128,9 +130,9 @@ class Attribute(object):
 
     def __repr__(self):
 
-        params = ('key','value','subkey','number','uniqattr','datatype',
-                  'int_value','string_value','datetime_value','relation_id')
-
+        params = ('key','value','subkey','number','uniqattr','datatype',)
+                  #'int_value','string_value','datetime_value','relation_id')
+                  
 
         vals = ((x,getattr(self,x)) for x in params)
         strs = ("%s=%s" % (key, ("'%s'" % val if isinstance(val,basestring) else '%s'%str(val))) for key, val in vals)
