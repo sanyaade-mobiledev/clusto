@@ -28,10 +28,10 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
         s3 = ngen.allocate(d)
         s4 = ngen.allocate(d)
 
-        self.assertEqual(ngen.owners('num', 1), [d])
-        self.assertEqual(ngen.owners('num', 2), [d])
-        self.assertEqual(ngen.owners('num', 3), [d])
-        self.assertEqual(ngen.owners('num', 4), [d])
+        self.assertEqual(ngen.owners(1), [d])
+        self.assertEqual(ngen.owners(2), [d])
+        self.assertEqual(ngen.owners(3), [d])
+        self.assertEqual(ngen.owners(4), [d])
 
 
     def testAllocateMaxNum(self):

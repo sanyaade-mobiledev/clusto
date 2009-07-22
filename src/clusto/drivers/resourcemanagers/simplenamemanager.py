@@ -40,7 +40,7 @@ class SimpleNameManager(ResourceManager):
 
         self.next = ATTR_TABLE.c.int_value + 1
 
-        return (nextname, None)
+        return (nextname, True)
         
 
 class SimpleEntityNameManager(SimpleNameManager):    

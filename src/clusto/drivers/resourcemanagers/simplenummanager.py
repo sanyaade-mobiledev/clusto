@@ -31,4 +31,4 @@ class SimpleNumManager(ResourceManager):
         
         self.next = ATTR_TABLE.c.int_value + 1
 
-        return ('num', num)
+        return (num, True)

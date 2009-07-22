@@ -49,7 +49,7 @@ class ResourceManagerTests(testbase.ClustoTestBase):
         rm.allocate(d, 'bar')
         
         self.assertEqual(rm.count, 2)
-        self.assertEqual(sorted([x.subkey for x in rm.resources(d)]),
+        self.assertEqual(sorted([x.value for x in rm.resources(d)]),
                          sorted(['foo', 'bar']))
 
         rm.deallocate(d)
