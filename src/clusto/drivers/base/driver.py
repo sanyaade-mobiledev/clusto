@@ -363,7 +363,7 @@ class Driver(object):
 
 
         if number is not ():
-            if isinstance(number, bool):
+            if isinstance(number, bool) or number is None:
                 if number:
                     result = (attr for attr in result if attr.number is not None)
                 else:
