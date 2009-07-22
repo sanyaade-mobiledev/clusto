@@ -42,8 +42,7 @@ def flush():
     """Flush changes made to clusto objects to the database."""
 
     SESSION.flush()
-    SESSION.commit()
-        
+            
 
 
 def clear():
