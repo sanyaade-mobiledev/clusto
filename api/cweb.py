@@ -8,7 +8,7 @@ import re
 
 from webob import Request, Response
 from clusto.scripthelpers import getClustoConfig
-from clusto.drivers import Driver, PortMixin, BasicRack
+from clusto.drivers import Driver
 import clusto
 
 config = getClustoConfig()
