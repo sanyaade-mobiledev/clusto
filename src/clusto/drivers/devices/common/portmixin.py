@@ -10,7 +10,25 @@ import clusto
 from clusto.exceptions import ConnectionException
 
 class PortMixin:
+    """Provide port capabilities to devices
+    
+    The ports are defined in the Driver's _portmeta dictionary:
 
+    _portmeta = { '<porttype>' : {'numports': <num> }}
+
+    Several ports types can be defined in this dictionary.  Currently
+    'numports' is the only porttype attribute used.  This data does not get
+    stored as Entity attributes in the clusto db.  They live only in the class
+    definition.
+
+    Port data gets stored in the DB as the connect to other ports.  The
+    keynames are of the form '_port-<porttype>'.  Each port has a specific
+    number associated with it (usually the same number as on the physical
+    device itself) and can have several port attributes.  There are no
+    restrictions on attributes but some common ones might be: osname,
+    cabletype, status, etc.
+    
+    """
     
     # _portmeta = { 'porttype' : {'numports': 10 }}
 
