@@ -21,6 +21,7 @@ class IPManager(ResourceManager):
 
     _attrName = "ip"
 
+    __int_ip_const = 2147483648
     
     @property
     def ipy(self):
@@ -38,9 +39,11 @@ class IPManager(ResourceManager):
         try:
             if not isinstance(number, bool) and isinstance(int(number), int):
                 ## add here to map unsigned ints from IPs to signed ints of python
-                ip = IPy.IP(int(number+2147483648))
+                ip = IPy.IP(int(number+self.__int_ip_const))
+            elif isinstance(resource, int):
+                ip = IPy.IP(resource+self.__int_ip_const)
             else:
-                ip = IPy.IP(resource)           
+                ip = IPy.IP(resource)
         except ValueError:
             raise ResourceTypeException("%s is not a valid ip."
                                         % resource)
@@ -50,7 +53,7 @@ class IPManager(ResourceManager):
                                         % (str(resource), self.baseip, self.netmask))
 
 
-        return ('ip', int(ip.int()-2147483648))
+        return (int(ip.int()-self.__int_ip_const), True)
 
 
     def allocator(self):
@@ -62,8 +65,8 @@ class IPManager(ResourceManager):
         lastip = self.attrQuery('_lastip')
                 
         if not lastip:
-            # I subtract 2147483648 to keep in int range
-            startip=int(self.ipy.net().int() + 1) - 2147483648 
+            # I subtract self.__int_ip_const to keep in int range
+            startip=int(self.ipy.net().int() + 1) - self.__int_ip_const 
         else:
             startip = lastip[0].value
 
@@ -71,8 +74,8 @@ class IPManager(ResourceManager):
         
         ## generate new ips the slow naive way
         nextip = int(startip)
-        gateway = IPy.IP(self.gateway).int() - 2147483648
-        endip = self.ipy.broadcast().int() - 2147483648
+        gateway = IPy.IP(self.gateway).int() - self.__int_ip_const
+        endip = self.ipy.broadcast().int() - self.__int_ip_const
 
         for i in range(2):
             while nextip < endip:
@@ -81,9 +84,9 @@ class IPManager(ResourceManager):
                     nextip += 1
                     continue
 
-                if self.available('ip', nextip):
+                if self.available(nextip):
                     self.setAttr('_lastip', nextip)
-                    return self.ensureType('ip', nextip)
+                    return self.ensureType(nextip, True)
                 else:
                     nextip += 1
             
@@ -126,10 +129,10 @@ class IPManager(ResourceManager):
         return ipman
         
     @classmethod
-    def getIPs(self, device):
+    def getIPs(cls, device):
 
-        ret = [str(IPy.IP(x.number+2147483648))
-               for x in device.references(key='ipmanager')]
+        ret = [str(IPy.IP(x.value+cls.__int_ip_const))
+               for x in cls.resources(device)]
 
         return ret
 
