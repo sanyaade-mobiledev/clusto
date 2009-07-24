@@ -1,8 +1,8 @@
 
 from clusto.drivers.base import Device
-from clusto.drivers.devices.common import PortMixin
+from clusto.drivers.devices.common import PortMixin, IPMixin
 
-class BasicNetworkSwitch(PortMixin, Device):
+class BasicNetworkSwitch(IPMixin, PortMixin, Device):
     """
     Basic network switch driver
     """
