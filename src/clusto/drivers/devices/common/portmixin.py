@@ -61,13 +61,16 @@ class PortMixin:
                 msg = "port %s%d on %s is already in use"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
-
-        self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
-        self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
-        
-        dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
-        dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
-
+        clusto.beginTransaction()
+        try:
+            self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
+            self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
+            
+            dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
+            dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
+        except Exception, x:
+            clusto.rollbackTransaction()
+            raise x
 
     def disconnectPort(self, porttype, portnum):
         """disconnect both sides of a port"""
