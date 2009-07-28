@@ -26,8 +26,8 @@ __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
 
 METADATA = MetaData()
 
+SESSION = scoped_session(sessionmaker(autoflush=True)) #, autocommit=True))
 
-SESSION = scoped_session(sessionmaker())#autoflush=True, autocommit=True)) 
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
@@ -112,6 +112,8 @@ class Attribute(object):
         if datetime_value is not None: self.datetime_value = datetime_value
         if relation_id is not None: self.relation_id = relation_id
         if datatype is not None: self.datatype = datatype
+
+        SESSION.add(self)
         
     def __cmp__(self, other):
 
@@ -258,7 +260,7 @@ class Entity(object):
         self.driver = driver
         self.type = clustotype
 
-
+        SESSION.add(self)
         
     def __eq__(self, otherentity):
         """Am I the same as the Other Entity.
@@ -313,28 +315,28 @@ class Entity(object):
     
 
 
-SESSION.mapper(Attribute, ATTR_TABLE,
-               properties = {'relation_value': relation(Entity, lazy=True, 
-                                                        primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
-                                                        uselist=False,
-                                                        passive_updates=False)})
+mapper(Attribute, ATTR_TABLE,
+       properties = {'relation_value': relation(Entity, lazy=True, 
+                                                primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
+                                                uselist=False,
+                                                passive_updates=False)})
 
 
 ## might be better to make the relationships here dynamic_loaders in the long
 ## term.
-SESSION.mapper(Entity, ENTITY_TABLE,
-               properties={'_attrs' : relation(Attribute, lazy='dynamic',
-                                               cascade="all, delete, delete-orphan",
-                                               primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
-                                               backref='entity',
-                                               passive_updates=False,
-                                               uselist=True),
-                           '_references' : relation(Attribute, lazy='dynamic',
-                                                    cascade="all, delete, delete-orphan",
-                                                    primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
-                                                    passive_updates=False,
-                                                    uselist=True)
-                           }
-               )
-        
+mapper(Entity, ENTITY_TABLE,
+       properties={'_attrs' : relation(Attribute, lazy='dynamic',
+                                       cascade="all, delete, delete-orphan",
+                                       primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
+                                       backref='entity',
+                                       passive_updates=False,
+                                       uselist=True),
+                   '_references' : relation(Attribute, lazy='dynamic',
+                                            cascade="all, delete, delete-orphan",
+                                            primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
+                                            passive_updates=False,
+                                            uselist=True)
+                }
+       )
+
 

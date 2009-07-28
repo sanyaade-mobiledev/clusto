@@ -47,10 +47,8 @@ def flush():
 
 def clear():
     """Clear the changes made to objects in the current session. """
-    
-    SESSION.clear()
-    #SESSION.remove()
 
+    SESSION.expunge_all()
 
 def getDriverName(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
