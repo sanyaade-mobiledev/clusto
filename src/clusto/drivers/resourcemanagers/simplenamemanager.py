@@ -66,22 +66,26 @@ class SimpleEntityNameManager(SimpleNameManager):
         if not isinstance(clustotype, type):
             raise TypeError("thing is not a Driver class")
 
-        clusto.beginTransaction()
+        try:
+            clusto.beginTransaction()
 
-        if not resource:
-            name, num = self.allocator()
+            if not resource:
+                name, num = self.allocator()
 
-            newobj = clustotype(name)
+                newobj = clustotype(name)
 
-        else:
-            name = resource
-            newobj = clustotype(resource)
+            else:
+                name = resource
+                newobj = clustotype(resource)
 
 
-        super(SimpleEntityNameManager, self).allocate(newobj, name)
+            super(SimpleEntityNameManager, self).allocate(newobj, name)
 
-        clusto.commit()
-
+            clusto.commit()
+        except Exception, x:
+            clusto.rollbackTransaction()
+            raise x
+        
         return newobj
 
 

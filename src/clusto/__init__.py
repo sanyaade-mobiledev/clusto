@@ -153,27 +153,39 @@ def rename(oldname, newname):
 
     flush()
 
-def beginTransaction():
-    """Start a transaction"""
-    SESSION.begin(subtransactions=True)
+def beginTransaction(allow_nested=True):
+    """Start a transaction
+
+    If already in a transaction start a savepoint transaction.
+
+    If allow_nested is False then an exception will be raised if we're already
+    in a transaction.
+    """
+    if allow_nested and SESSION.is_active:
+        return SESSION.begin(nested=True)
+    else:
+        return SESSION.begin()
 
 def rollbackTransaction():
     """Rollback a transaction"""
     SESSION.rollback()
-    SESSION.close()
-
+    
 def commit():
     """Commit changes to the datastore"""
     SESSION.commit()
 
-## unconverted functions
 def disconnect():
     SESSION.close()
 
 def deleteEntity(entity):
     """Delete an entity and all it's attributes and references"""
-
-    SESSION.delete(entity)
-    SESSION.commit()
+    try:
+        beginTransaction()
+        SESSION.delete(entity)
+        commit()
+    except Exception, x:
+        rollbackTransaction()
+        raise x
+    
 
     

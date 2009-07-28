@@ -281,7 +281,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1 = Driver('d1')
         d2 = Driver('d2')
 
-        clusto.commit()
+
         
         d1.addAttr(Attribute(key='foo',                             
                              value='bar'))
@@ -452,7 +452,7 @@ class TestDriverQueries(testbase.ClustoTestBase):
         d2.setAttr('aab', 2)
         d2.setAttr('aac', 3)
 
-        clusto.commit()
+
 
     def testAttrAndQueryEqual(self):
 

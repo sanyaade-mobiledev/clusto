@@ -78,13 +78,14 @@ class PortMixin:
                 msg = "port %s%d on %s is already in use"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
-        clusto.beginTransaction()
         try:
+            clusto.beginTransaction()
             self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
             self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
             
             dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
             dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
+            clusto.commit()
         except Exception, x:
             clusto.rollbackTransaction()
             raise x

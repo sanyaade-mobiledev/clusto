@@ -5,6 +5,7 @@ import clusto
 from clusto.schema import *
 from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter
+from sqlalchemy.exceptions import InvalidRequestError
 
 class TestClusto(testbase.ClustoTestBase):
     def data(self):
@@ -79,7 +80,27 @@ class TestClusto(testbase.ClustoTestBase):
 
         clusto.getByName('d1')
         self.assertRaises(LookupError, clusto.getByName, 'd2')
-        
+
+    def testNestedTransactionRollback(self):
+
+        clusto.beginTransaction()
+        d1 = Entity('d1')
+
+        clusto.beginTransaction()
+        d2 = Entity('d2')
+        clusto.rollbackTransaction()
+
+        clusto.commit()
+
+        clusto.getByName('d1')
+
+    def testDisallowNestedTransaction(self):
+
+        clusto.beginTransaction()
+        d1 = Entity('d1')
+
+        self.assertRaises(InvalidRequestError, clusto.beginTransaction, allow_nested=False)
+
 
     def testTransactionCommit(self):
 
@@ -101,8 +122,7 @@ class TestClusto(testbase.ClustoTestBase):
         Location('l1')
         BasicDatacenter('dc1')
 
-        clusto.commit()
-
+        
         namelist = ['e1', 'e2', 'dv1']
 
         self.assertEqual(sorted([n.name 
@@ -133,7 +153,7 @@ class TestClusto(testbase.ClustoTestBase):
         d1.addAttr('k2', number=1, subkey='A', value=67)
         d3.addAttr('k3', number=True, value=d4)
 
-        clusto.commit()
+
 
         self.assertEqual(clusto.getEntities(attrs=[{'key':'k2'}]),
                          [d1])
@@ -166,10 +186,10 @@ class TestClusto(testbase.ClustoTestBase):
         d.addAttr('deltest1', 'test')
         d.addAttr('deltest1', 'testA')
 
-        clusto.commit()
+
 
         clusto.deleteEntity(e1)
-        clusto.commit()
+
 
         self.assertEqual([], clusto.getEntities(names=['e1']))
 

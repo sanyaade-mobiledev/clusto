@@ -24,9 +24,10 @@ import clusto
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
 
+
 METADATA = MetaData()
 
-SESSION = scoped_session(sessionmaker(autoflush=True)) #, autocommit=True))
+SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True))
 
 
 ENTITY_TABLE = Table('entities', METADATA,

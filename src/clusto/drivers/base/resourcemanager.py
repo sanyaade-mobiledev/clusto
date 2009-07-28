@@ -51,8 +51,8 @@ class ResourceManager(Driver):
         or generated.
         """
 
-        clusto.beginTransaction()
         try:
+            clusto.beginTransaction()
             if not isinstance(thing, Driver):
                 raise TypeError("thing is not of type Driver")
 
