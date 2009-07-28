@@ -130,9 +130,6 @@ def getByName(name):
     try:
         entity = SESSION.query(Entity).filter_by(name=name).one()
 
-        #klass = getDriver(entity)
-        #retval = klass(entity=entity)
-
         retval = Driver(entity)
             
         return retval
