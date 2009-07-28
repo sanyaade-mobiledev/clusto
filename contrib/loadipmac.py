@@ -158,11 +158,12 @@ def main():
 
     for line in fd.readlines():
         switch, macaddr, ipaddr, port = line.rstrip('\n').split(';', 3)
+        print switch
         try:
             import_ipmac(switch, macaddr, ipaddr, port)
         except:
             print format_exc()
-    bind_vservers()
+    #bind_vservers()
     #pprint(clusto.getEntities())
 
 if __name__ == '__main__':

@@ -169,6 +169,10 @@ def get_facts(ipaddr, ssh_user='root'):
 def get_servertype(ipaddr, ssh_user='root'):
     proc = Popen(SSH_CMD + ['-l', ssh_user, ipaddr, 'cat /proc/xen/capabilities'], stdout=PIPE, stderr=STDOUT)
     stdout = proc.stdout.read().rstrip('\n')
+    print repr(stdout)
+    if stdout.lower().find('permission denied') != -1:
+        # couldn't connect or access /proc
+        return BasicServer
     if stdout.find('No such file') != -1:
         # not a Xen kernel
         return BasicServer
@@ -224,13 +228,16 @@ def get_server(ipaddr):
     if not fqdn in [x.value for x in server.attrs('fqdn')]:
         server.addFQDN(fqdn)
 
-    fqdn = socket.gethostbyaddr(ipaddr)[0]
-    if fqdn != ipaddr:
-        if fqdn.find('.') == -1:
-            fqdn += '.digg.internal'
-        if fqdn and not fqdn in [x.value for x in server.attrs('fqdn')]:
-            server.addFQDN(fqdn)
-
+    try:
+        fqdn = socket.gethostbyaddr(ipaddr)[0]
+        if fqdn != ipaddr:
+            if fqdn.find('.') == -1:
+                fqdn += '.digg.internal'
+            if fqdn and not fqdn in [x.value for x in server.attrs('fqdn')]:
+                server.addFQDN(fqdn)
+    except:
+        pass
+        
     clusto.commit()
 
     return server
