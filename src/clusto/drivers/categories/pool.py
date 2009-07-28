@@ -1,6 +1,8 @@
 from clusto.drivers.base import Driver
 from clusto.schema import *
 
+from clusto.exceptions import PoolException
+
 from itertools import imap, chain
 
 class Pool(Driver):
@@ -15,21 +17,24 @@ class Pool(Driver):
 
 
     def insert(self, thing):
-        """
-        Insert the given Enity or Driver into this Entity.  Such that:
+        """Insert the given Enity or Driver into this Entity.
+
+        Such that:
 
         >>> A.insert(B)
         >>> (B in A) 
         True
 
-
+        A given entity can only be in a Pool one time.
         """
         
         d = self.ensureDriver(thing, 
                                "Can only insert an Entity or a Driver. "
                                "Tried to insert %s." % str(type(thing)))
 
-
+        if d in self:
+            raise PoolException("%s is already in pool %s." % (d, self))
+        
         self.addAttr("_contains", d, number=True)
         
 

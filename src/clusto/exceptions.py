@@ -27,3 +27,7 @@ class ResourceNotAvailableException(ResourceException):
 class ResourceTypeException(ResourceException):
     pass
 
+
+class PoolException(ClustoException):
+    pass
+

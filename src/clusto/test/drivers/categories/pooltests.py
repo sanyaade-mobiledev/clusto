@@ -4,7 +4,7 @@ from clusto.test import testbase
 import itertools
 
 from clusto.drivers import *
-
+from clusto.exceptions import PoolException
 
 class PoolTests(testbase.ClustoTestBase):
 
@@ -168,6 +168,14 @@ class PoolTests(testbase.ClustoTestBase):
         self.assertEqual(p1.contents(clustoTypes=[BasicNetworkSwitch]),
                          [clusto.getByName('sw1')])
 
+    def testAddToPoolMultipleTimes(self):
+        
+        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+
+        p1.insert(d1)
+
+        self.assertRaises(PoolException, p1.insert, d1)
+        
 class WeightedPoolTests(testbase.ClustoTestBase):
 
     def testSetWeight(self):
