@@ -74,7 +74,10 @@ class IPManager(ResourceManager):
         
         ## generate new ips the slow naive way
         nextip = int(startip)
-        gateway = IPy.IP(self.gateway).int() - self.__int_ip_const
+        if self.gateway:
+            gateway = IPy.IP(self.gateway).int() - self.__int_ip_const
+        else:
+            gateway = None
         endip = self.ipy.broadcast().int() - self.__int_ip_const
 
         for i in range(2):
