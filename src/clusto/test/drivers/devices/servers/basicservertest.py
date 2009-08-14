@@ -71,37 +71,6 @@ class BasicServerTest(testbase.ClustoTestBase):
                          s2.FQDNs)
 
 
-    def testBindingIPtoPortWithNoIPManager(self):
-
-        s1 = clusto.getByName('bs1')
-
-        self.assertRaises(ResourceException, s1.bindIPtoPort, '192.168.1.20', 'nic-eth', 1)
-
-
-    def testBindingIPtoPort(self):
-
-        s1 = clusto.getByName('bs1')
-
-        ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
-
-        s1.bindIPtoPort('192.168.1.20', 'nic-eth', 1)
-
-        ##FIXME: this needs a fuller test once ip to port binding is reworked
-
-    def testUnBindingIPFromPort(self):
-
-        s1 = clusto.getByName('bs1')
-
-        ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
-
-        s1.bindIPtoPort('192.168.1.20', 'nic-eth', 1)
-
-        s1.unbindIPfromPort('192.168.1.20', 'nic-eth', 1)
-
-        ipm.deallocate(s1, '192.168.1.20')
-
-    
-        
     def testAddingIP(self):
 
         s1 = clusto.getByName('bs1')
