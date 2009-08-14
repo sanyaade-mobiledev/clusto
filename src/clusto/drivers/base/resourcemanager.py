@@ -69,10 +69,11 @@ class ResourceManager(Driver):
                 if number == True:
                     attr = thing.addAttr(Attribute(self._driverName,
                                                    resource,
-                                                   number=select([func.count('*')], and_(ATTR_TABLE.c.key==self._driverName,
-                                                                                         ATTR_TABLE.c.number!=None,
-                                                                                         ATTR_TABLE.c.subkey==None,
-                                                                                         )).as_scalar() ,
+                                                   number=select([func.count('*')],
+                                                                 and_(ATTR_TABLE.c.key==self._driverName,
+                                                                      ATTR_TABLE.c.number!=None,
+                                                                      ATTR_TABLE.c.subkey==None,
+                                                                      )).as_scalar(), 
                                                    uniqattr=True))
                 else:
                     attr = thing.addAttr(self._driverName, resource, number=number, uniqattr=True)
