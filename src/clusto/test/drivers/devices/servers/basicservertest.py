@@ -102,3 +102,14 @@ class BasicServerTest(testbase.ClustoTestBase):
 
     
         
+    def testAddingIP(self):
+
+        s1 = clusto.getByName('bs1')
+
+        self.assertRaises(ResourceException, s1.addIP, '10.0.0.100')
+
+        ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1')
+
+        s1.addIP('10.0.0.100')
+        
+        self.assertTrue(s1.hasIP('10.0.0.100'))
