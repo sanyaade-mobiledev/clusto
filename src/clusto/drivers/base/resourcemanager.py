@@ -117,7 +117,7 @@ class ResourceManager(Driver):
                 for a in res: 
                     thing.delAttrs(self._driverName, number=a.number)
                     
-                    
+            clusto.commit()
         except Exception, x:
             clusto.rollbackTransaction()
             raise x
