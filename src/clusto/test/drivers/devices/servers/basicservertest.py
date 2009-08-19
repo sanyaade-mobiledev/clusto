@@ -11,7 +11,6 @@ class BasicServerTest(testbase.ClustoTestBase):
         s1 = BasicServer('bs1', model='7000', manufacturer='ibm')
         s2 = BasicServer('bs2', model='ab1200', manufacturer='sun')
 
-        clusto.flush()
         
     def testBasicServerCreation(self):
 
