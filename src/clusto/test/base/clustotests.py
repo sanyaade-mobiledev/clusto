@@ -81,26 +81,6 @@ class TestClusto(testbase.ClustoTestBase):
         clusto.getByName('d1')
         self.assertRaises(LookupError, clusto.getByName, 'd2')
 
-    def testNestedTransactionRollback(self):
-
-        clusto.beginTransaction()
-        d1 = Entity('d1')
-
-        clusto.beginTransaction()
-        d2 = Entity('d2')
-        clusto.rollbackTransaction()
-
-        clusto.commit()
-
-        clusto.getByName('d1')
-
-    def testDisallowNestedTransaction(self):
-
-        clusto.beginTransaction()
-        d1 = Entity('d1')
-
-        self.assertRaises(InvalidRequestError, clusto.beginTransaction, allow_nested=False)
-
 
     def testTransactionCommit(self):
 

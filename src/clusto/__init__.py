@@ -150,7 +150,7 @@ def rename(oldname, newname):
 
     flush()
 
-def beginTransaction(allow_nested=True):
+def beginTransaction():
     """Start a transaction
 
     If already in a transaction start a savepoint transaction.
@@ -158,18 +158,20 @@ def beginTransaction(allow_nested=True):
     If allow_nested is False then an exception will be raised if we're already
     in a transaction.
     """
-    if allow_nested and SESSION.is_active:
-        return SESSION.begin(nested=True)
+    if SESSION.is_active:
+        return None #SESSION.begin(nested=True)
     else:
         return SESSION.begin()
 
 def rollbackTransaction():
     """Rollback a transaction"""
-    SESSION.rollback()
+    if SESSION.is_active:
+        SESSION.rollback()
     
 def commit():
     """Commit changes to the datastore"""
-    SESSION.commit()
+    if SESSION.is_active:
+        SESSION.commit()
 
 def disconnect():
     SESSION.close()
