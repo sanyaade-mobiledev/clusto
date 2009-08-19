@@ -169,7 +169,7 @@ class ResourceManager(Driver):
 
     def getResourceNum(self, thing, resource):
 
-        res = thing.attr(self._driverName, number=True, value=resource)
+        res = thing.attrs(self._driverName, number=True, value=resource)
         if res:
             return res[0].number
         else:
