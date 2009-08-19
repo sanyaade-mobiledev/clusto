@@ -176,3 +176,6 @@ class ResourceManager(Driver):
             return None
 
         
+    def getResourceAttrs(self, thing, resource):
+
+        return thing.attrs(self._driverName, number=True, value=resource)
