@@ -56,6 +56,13 @@ class IPManager(ResourceManager):
         return (int(ip.int()-self.__int_ip_const), True)
 
 
+    def additionalAttrs(self, thing, resource, number):
+
+        resource, number = self.ensureType(resource, number)
+
+        thing.addAttr(self._attrName, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
+        
+                     
     def allocator(self):
         """allocate IPs from this manager"""
 
