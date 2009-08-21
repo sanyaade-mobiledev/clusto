@@ -144,6 +144,13 @@ class Attribute(object):
 
         return s
 
+    def __str__(self):
+
+        params = ('key','number','subkey','datatype','uniqattr',)
+
+        val = "%s.%s %s" % (self.entity.name, '|'.join([str(getattr(self, param)) for param in params]), str(self.value))
+        return val
+
     @property
     def isRelation(self):
         return self.datatype == 'relation'
