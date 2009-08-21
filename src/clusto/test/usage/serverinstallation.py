@@ -1,7 +1,7 @@
 
 from clusto.test import testbase
 
-from clusto.drivers import BasicServer, BasicRack
+from clusto.drivers import BasicServer, BasicRack, IPManager
 from clusto.drivers import BasicNetworkSwitch, BasicPowerStrip
 from clusto.exceptions import ConnectionException
 import clusto
@@ -94,3 +94,12 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
         self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
 
+        ipman = IPManager('subnet-10.0.0.1', netmask='255.255.255.0', basip='10.0.0.1')
+        newserver.bindIPtoOSPort('10.0.0.10', 'eth0', porttype='nic-eth', portnum=0)
+
+        ipvals = newserver.attrs(value='10.0.0.10')
+        self.assertEqual(len(ipvals), 1)
+
+        self.assertEqual(ipvals[0].value, '10.0.0.10')
+
+        self.assertEqual(clusto.getByAttr('ip', '10.0.0.10'), [newserver])
