@@ -136,7 +136,9 @@ def getByName(name):
     except InvalidRequestError:
         raise LookupError(name + " does not exist.")
 
+getByAttr = drivers.base.Driver.getByAttr
 
+              
 def rename(oldname, newname):
     """Rename an Entity from oldname to newname.
 
