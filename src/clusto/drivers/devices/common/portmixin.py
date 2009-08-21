@@ -39,7 +39,7 @@ class PortMixin:
 
     def _portKey(self, porttype):
         
-        return '_port-' + porttype
+        return 'port-' + porttype
     
     def _ensurePortNum(self, porttype, num):
 
