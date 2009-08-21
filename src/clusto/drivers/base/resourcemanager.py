@@ -40,6 +40,9 @@ class ResourceManager(Driver):
         """
         return (resource, number)
 
+    def additionalAttrs(self, thing, resource, number):
+        pass
+    
     def allocate(self, thing, resource=(), number=True):
         """allocates a resource element to the given thing.
 
@@ -93,7 +96,8 @@ class ResourceManager(Driver):
 
                 a=thing.addAttr(a)
                                           
-
+                self.additionalAttrs(thing, resource, number)
+                
             else:
                 attr = None
             clusto.commit()
