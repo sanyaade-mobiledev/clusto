@@ -70,6 +70,16 @@ class BasicServerTest(testbase.ClustoTestBase):
                          s2.FQDNs)
 
 
+    def testBindingIPtoOSPort(self):
+
+        s1 = clusto.getByName('bs1')
+        s2 = clusto.getByName('bs2')
+                
+        ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
+
+        s1.bindIPtoOSPort('192.168.1.20', 'eth0', porttype='nic-eth', portnum=1)
+
+        
     def testAddingIP(self):
 
         s1 = clusto.getByName('bs1')
@@ -94,4 +104,18 @@ class BasicServerTest(testbase.ClustoTestBase):
         s1.addIP(ipman=ipm)
 
         self.assertTrue(s1.hasIP('10.0.0.2'))
+        
+
+    def testBindingIPtoOSPort(self):
+
+        s1 = clusto.getByName('bs1')
+
+        ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
+
+        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', porttype='nic-eth')
+        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', portnum=0)
+        
+        s1.bindIPtoOSPort('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
+
+        self.assertEqual(IPManager.getDevice('10.0.0.100'), [s1])
         

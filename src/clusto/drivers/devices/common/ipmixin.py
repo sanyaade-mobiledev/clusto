@@ -35,3 +35,51 @@ class IPMixin:
 
         return self in ipman.owners(ip)
     
+    def bindIPtoOSPort(self, ip, osportname, ipman=None, porttype=None, portnum=None):
+        """bind an IP to an os port and optionally also asign the os port name
+        to a physical port
+
+        If the given ip is already allocated to this device then use it.  If
+        it isn't, try to allocate it from a matching IPManager.
+
+        
+        """
+
+        if (porttype != None) ^ (portnum != None):
+                raise Exception("both portype and portnum need to be specified or set to None")
+            
+        try:
+            clusto.beginTransaction()
+
+            if not self.hasIP(ip):
+                if not ipman:
+                    ipman = IPManager.getIPManager(ip)
+
+                ipman.allocate(self, ip)
+
+                clusto.flush()
+
+
+            ipattrs = ipman.getResourceAttrs(self, ip)
+
+            if porttype is not None and portnum is not None:
+                self.setPortAttr(porttype, portnum, 'osportname', osportname)
+
+            self.setAttr(ipattrs[0].key,
+                         number=ipattrs[0].number,
+                         subkey='osportname',
+                         value=osportname)
+
+            clusto.commit()
+        except Exception, x:
+            clusto.rollbackTransaction()
+            raise x
+        
+
+
+        
+
+
+
+            
+        

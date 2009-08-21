@@ -168,8 +168,11 @@ class ResourceManager(Driver):
         return len(self.references(self._driverName, self, subkey='manager'))
 
     def getResourceNum(self, thing, resource):
+        """Retrun the resource number for the given resource on the given Entity"""
 
-        res = thing.attrs(self._driverName, number=True, value=resource)
+        resource, number = self.ensureType(resource)
+        res = thing.attrs(self._driverName, number=number, value=resource)
+
         if res:
             return res[0].number
         else:
@@ -177,5 +180,8 @@ class ResourceManager(Driver):
 
         
     def getResourceAttrs(self, thing, resource):
+        """Return the Attribute objects for a given resource on a given Entity"""
+        
+        resource, number = self.ensureType(resource)
 
-        return thing.attrs(self._driverName, number=True, value=resource)
+        return thing.attrs(self._driverName, number=number, value=resource)
