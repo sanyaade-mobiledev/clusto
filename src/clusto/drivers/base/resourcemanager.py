@@ -15,13 +15,15 @@ class ResourceManager(Driver):
     """
     
 
-    _clustoType = "resource"
-    _driverName = "resource"
+    _clustoType = "resourcemanager"
+    _driverName = "resourcemanager"
 
-
+    _attrName = "resource"
     _recordAllocations = True
     
 
+
+        
     def allocator(self):
         """return an unused resource from this resource manager"""
 
@@ -67,26 +69,27 @@ class ResourceManager(Driver):
 
             if self._recordAllocations:
                 if number == True:
-                    attr = thing.addAttr(Attribute(self._driverName,
+                    attr = thing.addAttr(Attribute(self._attrName,
                                                    resource,
                                                    number=select([func.count('*')],
-                                                                 and_(ATTR_TABLE.c.key==self._driverName,
+                                                                 and_(ATTR_TABLE.c.key==self._attrName,
                                                                       ATTR_TABLE.c.number!=None,
                                                                       ATTR_TABLE.c.subkey==None,
                                                                       )).as_scalar(), 
                                                    uniqattr=True))
                 else:
-                    attr = thing.addAttr(self._driverName, resource, number=number, uniqattr=True)
+                    attr = thing.addAttr(self._attrName, resource, number=number, uniqattr=True)
+                    
                 clusto.flush()
                 n=select(['number'], ATTR_TABLE.c.attr_id==attr.attr_id).as_scalar()
 
-                a=Attribute(self._driverName,
+                a=Attribute(self._attrName,
                             self.entity,
                             number=n,
                             subkey='manager',
                             uniqattr=True,
                             )
-
+                
 
                 a=thing.addAttr(a)
                                           
@@ -108,14 +111,14 @@ class ResourceManager(Driver):
         try:
             if resource is ():                      
                 for res in self.resources(thing):
-                    thing.delAttrs(self._driverName, number=number)
+                    thing.delAttrs(self._attrName, number=number)
 
             elif resource and not self.available(resource, number):
                 resource, number = self.ensureType(resource, number)
 
-                res = thing.attrs(self._driverName, self, subkey='manager', number=number)
+                res = thing.attrs(self._attrName, self, subkey='manager', number=number)
                 for a in res: 
-                    thing.delAttrs(self._driverName, number=a.number)
+                    thing.delAttrs(self._attrName, number=a.number)
                     
             clusto.commit()
         except Exception, x:
@@ -139,7 +142,7 @@ class ResourceManager(Driver):
 
         resource, number = self.ensureType(resource, number)
 
-        return Driver.getByAttr(self._driverName, resource, number=number)
+        return Driver.getByAttr(self._attrName, resource, number=number)
 
     @classmethod
     def resources(cls, thing):
@@ -149,13 +152,13 @@ class ResourceManager(Driver):
         A resource is a resource attribute in a resource manager.
         """
         
-        attrs = [x for x in thing.attrs(cls._driverName, subkey='manager') 
+        attrs = [x for x in thing.attrs(cls._attrName, subkey='manager') 
                  if isinstance(Driver(x.value), cls)]
 
         res = []
 
         for attr in attrs:
-            t=thing.attrs(cls._driverName, number=attr.number, subkey=None)
+            t=thing.attrs(cls._attrName, number=attr.number, subkey=None)
             res.extend(t)
 
 
@@ -165,13 +168,13 @@ class ResourceManager(Driver):
     def count(self):
         """Return the number of resources used."""
 
-        return len(self.references(self._driverName, self, subkey='manager'))
+        return len(self.references(self._attrName, self, subkey='manager'))
 
     def getResourceNum(self, thing, resource):
         """Retrun the resource number for the given resource on the given Entity"""
 
         resource, number = self.ensureType(resource)
-        res = thing.attrs(self._driverName, number=number, value=resource)
+        res = thing.attrs(self._attrName, number=number, value=resource)
 
         if res:
             return res[0].number
@@ -184,4 +187,4 @@ class ResourceManager(Driver):
         
         resource, number = self.ensureType(resource)
 
-        return thing.attrs(self._driverName, number=number, value=resource)
+        return thing.attrs(self._attrName, number=number, value=resource)
