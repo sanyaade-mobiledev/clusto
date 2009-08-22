@@ -35,7 +35,6 @@ def initclusto():
     METADATA.create_all(METADATA.bind)
     c = ClustoMeta()
 
-    flush()
 
 
 def flush():
@@ -150,7 +149,6 @@ def rename(oldname, newname):
 
     old.entity.name = newname
 
-    flush()
 
 TRANSACTIONCOUNTER = 0
 
