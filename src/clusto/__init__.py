@@ -152,6 +152,8 @@ def rename(oldname, newname):
 
     flush()
 
+TRANSACTIONCOUNTER = 0
+
 def beginTransaction():
     """Start a transaction
 
@@ -160,20 +162,32 @@ def beginTransaction():
     If allow_nested is False then an exception will be raised if we're already
     in a transaction.
     """
+    global TRANSACTIONCOUNTER
     if SESSION.is_active:
-        return None #SESSION.begin(nested=True)
+        TRANSACTIONCOUNTER += 1
+        return None
     else:
+        TRANSACTIONCOUNTER += 1
         return SESSION.begin()
 
 def rollbackTransaction():
     """Rollback a transaction"""
+    global TRANSACTIONCOUNTER
+
     if SESSION.is_active:
         SESSION.rollback()
+        TRANSACTIONCOUNTER -= 1
+    
     
 def commit():
     """Commit changes to the datastore"""
+    global TRANSACTIONCOUNTER
+
     if SESSION.is_active:
-        SESSION.commit()
+        if TRANSACTIONCOUNTER == 1:
+            SESSION.commit()
+        TRANSACTIONCOUNTER -= 1
+            
 
 def disconnect():
     SESSION.close()

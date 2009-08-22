@@ -81,6 +81,34 @@ class TestClusto(testbase.ClustoTestBase):
         clusto.getByName('d1')
         self.assertRaises(LookupError, clusto.getByName, 'd2')
 
+    def testTransactionRollback4(self):
+
+        d1 = Driver('d1')
+
+        try:
+            clusto.beginTransaction()
+
+            d2 = Driver('d2')
+
+            try:
+                clusto.beginTransaction()
+                d2.addAttr('foo', 'bar')
+
+                clusto.commit()
+            
+            except:
+                clusto.rollbackTransaction()
+
+            d1.addAttr('foo2', 'bar2')
+
+            raise Exception()
+            clusto.commit()
+        except:
+            clusto.rollbackTransaction()
+
+        self.assertEqual(d1.attrs(), [])
+        self.assertRaises(LookupError, clusto.getByName, 'd2')
+            
 
     def testTransactionCommit(self):
 
