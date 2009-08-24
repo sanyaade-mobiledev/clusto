@@ -2,7 +2,7 @@
 Clusto schema
 
 """
-VERSION = 0.1
+VERSION = 0.2
 from sqlalchemy import *
 
 from sqlalchemy.exceptions import InvalidRequestError
@@ -32,11 +32,11 @@ SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True))
 
 ENTITY_TABLE = Table('entities', METADATA,
                     Column('entity_id', Integer, primary_key=True),
-                    Column('name', String(512, convert_unicode=True,
+                    Column('name', String(128, convert_unicode=True,
                            assert_unicode=None), unique=True,
                            nullable=False, ),
-                    Column('type', String(64), nullable=False),
-                    Column('driver', String(64), nullable=False),
+                    Column('type', String(32), nullable=False),
+                    Column('driver', String(32), nullable=False),
                     mysql_engine='InnoDB'
                     )
 
@@ -44,9 +44,9 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
                    Column('entity_id', Integer,
                           ForeignKey('entities.entity_id'), nullable=False),
-                   Column('key', String(1024, convert_unicode=True,
+                   Column('key', String(256, convert_unicode=True,
                            assert_unicode=None),),
-                   Column('subkey', String(1024, convert_unicode=True,
+                   Column('subkey', String(256, convert_unicode=True,
                            assert_unicode=None), nullable=True,
                           default=None, ),
                    Column('number', Integer, nullable=True, default=None),
