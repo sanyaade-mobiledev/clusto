@@ -9,6 +9,9 @@ from sqlalchemy import create_engine
 
 
 import drivers
+
+import threading
+
 driverlist = DRIVERLIST
 typelist = TYPELIST
 
@@ -150,7 +153,8 @@ def rename(oldname, newname):
     old.entity.name = newname
 
 
-TRANSACTIONCOUNTER = 0
+tl = threading.local()
+tl.TRANSACTIONCOUNTER = 0
 
 def beginTransaction():
     """Start a transaction
@@ -160,31 +164,32 @@ def beginTransaction():
     If allow_nested is False then an exception will be raised if we're already
     in a transaction.
     """
-    global TRANSACTIONCOUNTER
+    global tl
     if SESSION.is_active:
-        TRANSACTIONCOUNTER += 1
+        tl.TRANSACTIONCOUNTER += 1
         return None
     else:
-        TRANSACTIONCOUNTER += 1
+        tl.TRANSACTIONCOUNTER += 1
         return SESSION.begin()
 
 def rollbackTransaction():
     """Rollback a transaction"""
-    global TRANSACTIONCOUNTER
+    global tl
 
     if SESSION.is_active:
         SESSION.rollback()
-        TRANSACTIONCOUNTER -= 1
+        tl.TRANSACTIONCOUNTER -= 1
     
     
 def commit():
     """Commit changes to the datastore"""
-    global TRANSACTIONCOUNTER
+    global tl
 
     if SESSION.is_active:
-        if TRANSACTIONCOUNTER == 1:
+        if tl.TRANSACTIONCOUNTER == 1:
             SESSION.commit()
-        TRANSACTIONCOUNTER -= 1
+        tl.TRANSACTIONCOUNTER -= 1
+        flush()
             
 
 def disconnect():
