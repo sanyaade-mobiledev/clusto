@@ -521,18 +521,33 @@ class Driver(object):
         "delete attribute with the given key and value optionally value also"
 
         clusto.flush()
-        for i in self.attrQuery(*args, **kwargs):
-            self.entity._attrs.remove(i)
-            i.delete()
-        clusto.flush()
+        try:
+            clusto.beginTransaction()
+            for i in self.attrQuery(*args, **kwargs):
+                self.entity._attrs.remove(i)
+                i.delete()
+            clusto.commit()
+        except Exception, x:
+            clusto.rollbackTransaction()
+            raise x
 
 
     def setAttr(self, key, value, number=(), subkey=(), uniqattr=()):
-        """replaces all attributes with the given key"""
+        """replaces all attributes with the given key"""        
         self._checkAttrName(key)
-        self.delAttrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
-        
-        return self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
+
+        attr = False
+        try:
+            clusto.flush()
+            clusto.beginTransaction()
+            self.delAttrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
+            attr = self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
+            clusto.commit()
+        except Exception, x:
+            clusto.rollbackTransaction()
+            raise x
+
+        return attr
         
 
     
