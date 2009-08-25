@@ -167,10 +167,10 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
         e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-                                   value='thestring', uniqattr=False))
+                                   value='thestring'))
 
         e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-                                   value='thestring', uniqattr=False))
+                                   value='thestring'))
 
 
         clusto.flush()

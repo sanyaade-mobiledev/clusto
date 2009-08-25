@@ -79,9 +79,9 @@ class ResourceManager(Driver):
                                                                       ATTR_TABLE.c.number!=None,
                                                                       ATTR_TABLE.c.subkey==None,
                                                                       )).as_scalar(), 
-                                                   uniqattr=True))
+                                                   ))
                 else:
-                    attr = thing.addAttr(self._attrName, resource, number=number, uniqattr=True)
+                    attr = thing.addAttr(self._attrName, resource, number=number)
                     
                 clusto.flush()
                 n=select(['number'], ATTR_TABLE.c.attr_id==attr.attr_id).as_scalar()
@@ -90,7 +90,6 @@ class ResourceManager(Driver):
                             self.entity,
                             number=n,
                             subkey='manager',
-                            uniqattr=True,
                             )
                 
 

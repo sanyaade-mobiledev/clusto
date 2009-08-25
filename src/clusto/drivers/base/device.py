@@ -18,7 +18,7 @@ class Device(Driver):
     def _getHostname(self):
         """return a hostname set for this device or its entity name"""
 
-        hostname = self.attrs("hostname", uniqattr=True)
+        hostname = self.attrs("hostname")
 
         if hostname:
             return hostname[0].value
@@ -27,7 +27,7 @@ class Device(Driver):
         
     def _setHostname(self, name):
 
-        self.setAttr("hostname", value=name, uniqattr=True)
+        self.setAttr("hostname", value=name)
 
     hostname = property(_getHostname, _setHostname)
 

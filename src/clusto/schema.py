@@ -50,7 +50,6 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                            assert_unicode=None), nullable=True,
                           default=None, ),
                    Column('number', Integer, nullable=True, default=None),
-                   Column('uniqattr', Boolean, nullable=True, default=None),
                    Column('datatype', String(32), default='string', nullable=False),
 
                    Column('int_value', Integer, default=None),
@@ -61,10 +60,6 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                           ForeignKey('entities.entity_id'), default=None),
 
                    )
-Index('key_num_subkey_idx', 
-      ATTR_TABLE.c.entity_id, ATTR_TABLE.c.key, 
-      ATTR_TABLE.c.number, ATTR_TABLE.c.subkey, ATTR_TABLE.c.uniqattr,
-      unique=True)
 
 class Attribute(object):
     """Attribute class holds key/value pair
@@ -84,7 +79,7 @@ class Attribute(object):
     """
 
     def __init__(self, key, value=None,
-                 subkey=None, number=None, uniqattr=False,
+                 subkey=None, number=None,
                  int_value=None, string_value=None,
                  datetime_value=None, relation_id=None, datatype=None):
 
@@ -102,11 +97,6 @@ class Attribute(object):
 
         else:
             self.number = number
-
-        if not uniqattr:
-            self.uniqattr = None
-        else:
-            self.uniqattr = True
 
         if int_value is not None: self.int_value = int_value
         if string_value is not None: self.string_value = sting_value

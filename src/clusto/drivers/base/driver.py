@@ -180,7 +180,7 @@ class Driver(object):
         if name in self._properties:                
             if not self.hasAttr(name):
                 return self._properties[name]
-            attr = self.attrQuery(name, subkey='property', uniqattr=True)
+            attr = self.attrQuery(name, subkey='property')
             if not attr:
                 return None
             else:
@@ -192,7 +192,7 @@ class Driver(object):
     def __setattr__(self, name, value):
 
         if name in self._properties:
-            self.setAttr(name, value, subkey='property', uniqattr=True)
+            self.setAttr(name, value, subkey='property')
         else:
             object.__setattr__(self, name, value)
         
@@ -218,7 +218,7 @@ class Driver(object):
         
     @classmethod
     def doAttrQuery(cls, key=(), value=(), number=(),
-                    subkey=(), uniqattr=(), ignoreHidden=True, sortByKeys=True, 
+                    subkey=(), ignoreHidden=True, sortByKeys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
         """Does queries against all Attributes using the DB."""
@@ -273,9 +273,6 @@ class Driver(object):
             else:
                 raise TypeError("number must be either a boolean or an integer.")
 
-        if uniqattr is True:
-            query = query.filter_by(uniqattr=uniqattr)
-
         if ignoreHidden:
             query.filter(not_(Attribute.key.like('_%')))
 
@@ -299,7 +296,7 @@ class Driver(object):
 
     @classmethod
     def attrFilter(cls, attrlist, key=(), value=(), number=(), 
-                   subkey=(), ignoreHidden=True, uniqattr=(),
+                   subkey=(), ignoreHidden=True, 
                    sortByKeys=True, 
                    regex=False, 
                    clustoTypes=None,
@@ -308,7 +305,7 @@ class Driver(object):
         """Filter attribute lists. (Uses generator comprehension)
 
         Given a list of Attributes filter them based on exact matches of key,
-        number, subkey, value, and/or uniqattr.
+        number, subkey, value.
 
         There are some special cases:
 
@@ -371,9 +368,6 @@ class Driver(object):
                 raise TypeError("number must be either a boolean or an integer.")
 
                     
-        if uniqattr is True:
-            result = (attr for attr in result if attr.uniqattr == uniqattr)
-
         if value:
             result = (attr for attr in result if attr.value == value)
 
@@ -479,7 +473,7 @@ class Driver(object):
     def attrItems(self, *args, **kwargs):
         return self._itemizeAttrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value=(), number=(), subkey=(), uniqattr=False):
+    def addAttr(self, key, value=(), number=(), subkey=()):
         """add a key/value to the list of attributes
 
         if number is True, create an attribute with the next available
@@ -507,7 +501,7 @@ class Driver(object):
             subkey = None
 
 
-        attr = Attribute(key, value, subkey=subkey, number=number, uniqattr=uniqattr)
+        attr = Attribute(key, value, subkey=subkey, number=number)
         self.entity._attrs.append(attr)
 
         return attr
@@ -527,17 +521,17 @@ class Driver(object):
             raise x
 
 
-    def setAttr(self, key, value, number=False, subkey=None, uniqattr=False):
+    def setAttr(self, key, value, number=False, subkey=None):
         """replaces all attributes with the given key"""        
         self._checkAttrName(key)
 
-        attrs = self.attrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
+        attrs = self.attrs(key=key, number=number, subkey=subkey)
 
         if len(attrs) > 1:
             raise DriverException("cannot set an attribute when args match more than one value")
 
         elif len(attrs) == 0:
-            attr = self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
+            attr = self.addAttr(key, value, number=number, subkey=subkey)
 
         else:
             attr = attrs[0]
