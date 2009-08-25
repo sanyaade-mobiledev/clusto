@@ -276,7 +276,7 @@ class Driver(object):
                 query = query.filter_by(number=number)
                 
             else:
-                raise TypeError("num must be either a boolean or an integer.")
+                raise TypeError("number must be either a boolean or an integer.")
 
         if uniqattr is not ():
             query = query.filter_by(uniqattr=uniqattr)
@@ -373,7 +373,7 @@ class Driver(object):
                 result = (attr for attr in result if attr.number == number)
             
             else:
-                raise TypeError("num must be either a boolean or an integer.")
+                raise TypeError("number must be either a boolean or an integer.")
 
                     
         if uniqattr is not ():
