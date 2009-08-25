@@ -32,10 +32,21 @@ class TestDriverAttributes(testbase.ClustoTestBase):
                          [(('foo', None, None), 'bar2'),
                           (('foo', None, None), 'bar3')]))
 
-        d1.setAttr('foo', 'bar4')
-        self.assertEqual(d1.attrItems(),
-                         [(('foo', None, None), 'bar4')])
+        self.assertRaises(DriverException, d1.setAttr, 'foo', 'bar4')
 
+
+        d2 = Driver('d2')
+        d2.addAttr('a', number=0, subkey='foo', value='bar1')
+        d2.addAttr('a', number=1, subkey='foo', value='bar1')
+        d2.addAttr('a', number=2, subkey='foo', value='bar1')
+
+        d2.setAttr('a', 't1')
+
+        self.assertEqual(sorted(d2.attrItems()),
+                         sorted([(('a', 0, 'foo'), 'bar1'),
+                                 (('a', 1, 'foo'), 'bar1'),
+                                 (('a', 2, 'foo'), 'bar1'),
+                                 (('a', None, None), 't1'),]))
 
     def testGettingAttrs(self):
 

@@ -192,12 +192,7 @@ class Driver(object):
     def __setattr__(self, name, value):
 
         if name in self._properties:
-            a = self.attrQuery(name)
-            if a:
-                attr = a[0]             
-                attr.value = value
-            else:
-                self.setAttr(name, value, subkey='property', uniqattr=True)
+            self.setAttr(name, value, subkey='property', uniqattr=True)
         else:
             object.__setattr__(self, name, value)
         
@@ -278,7 +273,7 @@ class Driver(object):
             else:
                 raise TypeError("number must be either a boolean or an integer.")
 
-        if uniqattr is not ():
+        if uniqattr is True:
             query = query.filter_by(uniqattr=uniqattr)
 
         if ignoreHidden:
@@ -376,7 +371,7 @@ class Driver(object):
                 raise TypeError("number must be either a boolean or an integer.")
 
                     
-        if uniqattr is not ():
+        if uniqattr is True:
             result = (attr for attr in result if attr.uniqattr == uniqattr)
 
         if value:
@@ -506,7 +501,7 @@ class Driver(object):
         if isinstance(value, Driver):
             value = value.entity
 
-        if number is ():
+        if (number is ()) or (number is False):
             number = None
         if subkey is ():
             subkey = None
@@ -532,23 +527,23 @@ class Driver(object):
             raise x
 
 
-    def setAttr(self, key, value, number=(), subkey=(), uniqattr=()):
+    def setAttr(self, key, value, number=False, subkey=None, uniqattr=False):
         """replaces all attributes with the given key"""        
         self._checkAttrName(key)
 
-        attr = False
-        try:
-            clusto.flush()
-            clusto.beginTransaction()
-            self.delAttrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
-            attr = self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
-            clusto.commit()
-        except Exception, x:
-            clusto.rollbackTransaction()
-            raise x
+        attrs = self.attrs(key=key, number=number, subkey=subkey, uniqattr=uniqattr)
 
-        return attr
-        
+        if len(attrs) > 1:
+            raise DriverException("cannot set an attribute when args match more than one value")
+
+        elif len(attrs) == 0:
+            attr = self.addAttr(key, value, number=number, subkey=subkey, uniqattr=uniqattr)
+
+        else:
+            attr = attrs[0]
+            attr.value = value
+
+        return attr        
 
     
     def hasAttr(self, *args, **kwargs):
