@@ -90,9 +90,10 @@ class Attribute(object):
         self.subkey = subkey
 
         if isinstance(number, bool) and number == True:
-            self.number = select([func.count('*')], and_(ATTR_TABLE.c.key==key,
-                                                         ATTR_TABLE.c.number!=None,
-                                                         )).as_scalar() 
+            self.number = select([func.coalesce(select([func.max(ATTR_TABLE.c.number)+1], 
+                                                       and_(ATTR_TABLE.c.key==key,
+                                                            ATTR_TABLE.c.number!=None,
+                                                            )).as_scalar(), 0)])
 
         else:
             self.number = number

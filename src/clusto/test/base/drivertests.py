@@ -287,6 +287,12 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(d1.attrQuery(subkey='four', count=True), 1)
 
 
+        d1.delAttrs(key='foo', value='bar1', number=True, subkey='one')
+        d1.addAttr(key='foo', value='bar5', number=True, subkey='five')
+        self.assertEqual(d1.attrQuery(key='foo', number=0, count=True), 0)
+        self.assertEqual(d1.attrQuery(key='foo', number=4, count=True), 1)
+        
+        
     def testAddAttributeDirectly(self):
 
         d1 = Driver('d1')
