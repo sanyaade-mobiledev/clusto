@@ -65,13 +65,12 @@ class Attribute(object):
     """Attribute class holds key/value pair
 
     An Attribute is a DB backed object that holds a key, number, subkey,
-    value, and a uniqattr bit.
+    and a value.
 
     Each Attribute is associated with an Entity.
 
     There can be multiple attributes with the same key, number, subkey, and/or
-    value.  However only a single attribute with the same key, number, subkey,
-    and value when uniqattr is True.
+    value.  
 
     Optionally you can explicitely set int_value, string_value,
     datetime_value, relation_id, and datatype.  These settings would override
@@ -123,7 +122,7 @@ class Attribute(object):
 
     def __repr__(self):
 
-        params = ('key','value','subkey','number','uniqattr','datatype',)
+        params = ('key','value','subkey','number','datatype',)
                   #'int_value','string_value','datetime_value','relation_id')
                   
 
@@ -136,7 +135,7 @@ class Attribute(object):
 
     def __str__(self):
 
-        params = ('key','number','subkey','datatype','uniqattr',)
+        params = ('key','number','subkey','datatype',)
 
         val = "%s.%s %s" % (self.entity.name, '|'.join([str(getattr(self, param)) for param in params]), str(self.value))
         return val
@@ -204,7 +203,7 @@ class Attribute(object):
             pass #SESSION.expunge(self)
 
     @classmethod
-    def queryarg(cls, key=None, value=(), subkey=(), number=(), uniqattr=False):
+    def queryarg(cls, key=None, value=(), subkey=(), number=()):
 
         args = []
         
