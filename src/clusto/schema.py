@@ -2,7 +2,7 @@
 Clusto schema
 
 """
-VERSION = 0.2
+VERSION = 2
 from sqlalchemy import *
 
 from sqlalchemy.exceptions import InvalidRequestError

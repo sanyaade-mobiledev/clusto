@@ -16,6 +16,12 @@ class TestClusto(testbase.ClustoTestBase):
 
         clusto.flush()
         
+
+    def testClustoMeta(self):
+
+        cm = clusto.getByName('clustometa')
+
+        self.assertEqual(cm.version, VERSION)
         
     def testGetByName(self):
 
