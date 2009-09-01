@@ -91,7 +91,7 @@ class Driver(object):
         if isinstance(name_driver_entity, Entity):
             
             self.entity = name_driver_entity
-            self._chooseBestDriver()
+            self._choose_best_driver()
             return
         elif isinstance(name_driver_entity, (str, unicode)):
 
@@ -146,7 +146,7 @@ class Driver(object):
     def __contains__(self, other):
         return self.hasAttr(key="_contains", value=other)
     
-    def _chooseBestDriver(self):
+    def _choose_best_driver(self):
         """
         Examine the attributes of our entity and set the best driver class and
         mixins.
