@@ -28,7 +28,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         self.assertEqual(r1.contents(subkey='ru')[0].name, 's1')
         
-        self.assertEqual(s1.parents(clustoDrivers=[BasicRack])[0].name, 'r1')
+        self.assertEqual(s1.parents(clusto_drivers=[BasicRack])[0].name, 'r1')
 
     def testMaxRackPosition(self):
 

@@ -122,7 +122,7 @@ class IPManager(ResourceManager):
             ipman = ip.entity
             return Driver(ipman)
 
-        for ipmantest in clusto.getEntities(clustoDrivers=[cls]):
+        for ipmantest in clusto.getEntities(clusto_drivers=[cls]):
             try:
                 ipmantest.ensureType(ip)
             except ResourceTypeException:

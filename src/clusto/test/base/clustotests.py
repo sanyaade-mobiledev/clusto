@@ -145,7 +145,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         dl = [Driver]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clustoDrivers=dl)]),
+                                 for n in clusto.getEntities(clusto_drivers=dl)]),
                          sorted(['d1','e1','e2','e3']))
 
 

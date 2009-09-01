@@ -300,7 +300,7 @@ class Driver(object):
                    sortByKeys=True, 
                    regex=False, 
                    clusto_types=None,
-                   clustoDrivers=None,
+                   clusto_drivers=None,
                    ):
         """Filter attribute lists. (Uses generator comprehension)
 
@@ -326,7 +326,7 @@ class Driver(object):
         clusto_types is a list of types that the entities referenced by
         relation attributes must match.
 
-        clustoDrivers is a list of drivers that the entities referenced by
+        clusto_drivers is a list of drivers that the entities referenced by
         relation attributes must match.
         """
 
@@ -378,8 +378,8 @@ class Driver(object):
         if ignoreHidden:
             result = (attr for attr in result if not attr.key.startswith('_'))
 
-        if clustoDrivers:
-            cdl = [clusto.getDriverName(n) for n in clustoDrivers]
+        if clusto_drivers:
+            cdl = [clusto.getDriverName(n) for n in clusto_drivers]
             result = (attr for attr in result if attr.isRelation and attr.value.entity.driver in cdl)
 
         if clusto_types:
@@ -425,20 +425,20 @@ class Driver(object):
 
         Accepts the same arguments as attrs().
 
-        The semantics of clusto_types and clustoDrivers changes to match the
-        clusto_type or clustoDriver of the Entity that owns the attribute as
+        The semantics of clusto_types and clusto_drivers changes to match the
+        clusto_type or clusto_driver of the Entity that owns the attribute as
         opposed to the Entity the attribute refers to.
         """
 
         
-        clustoDrivers = kwargs.pop('clustoDrivers', None)
+        clusto_drivers = kwargs.pop('clusto_drivers', None)
             
         clusto_types = kwargs.pop('clusto_types', None)
         
         result = self.attrFilter(self.entity._references, *args, **kwargs)
 
-        if clustoDrivers:
-            cdl = [clusto.getDriverName(n) for n in clustoDrivers]
+        if clusto_drivers:
+            cdl = [clusto.getDriverName(n) for n in clusto_drivers]
             result = (attr for attr in result if attr.entity.driver in cdl)
 
         if clusto_types:
