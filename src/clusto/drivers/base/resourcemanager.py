@@ -145,7 +145,7 @@ class ResourceManager(Driver):
 
         resource, number = self.ensureType(resource, number)
 
-        return Driver.getByAttr(self._attrName, resource, number=number)
+        return Driver.get_by_attr(self._attrName, resource, number=number)
 
     @classmethod
     def resources(cls, thing):

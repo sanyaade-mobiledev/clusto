@@ -622,7 +622,7 @@ class Driver(object):
         return parents
                        
     @classmethod
-    def getByAttr(cls, *args, **kwargs):
+    def get_by_attr(cls, *args, **kwargs):
         """Get list of Drivers that have by attributes search """
         
         attrlist = cls.do_attr_query(*args, **kwargs)

@@ -264,7 +264,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        result = Driver.getByAttr('foo', 2)
+        result = Driver.get_by_attr('foo', 2)
 
         self.assertEqual(result, [d2])
         
@@ -512,5 +512,5 @@ class TestDriverQueries(testbase.ClustoTestBase):
 
         d1 = clusto.get_by_name('d1')
         d2 = clusto.get_by_name('d2')
-        self.assertEqual(set(Driver.getByAttr(key='a*')),
+        self.assertEqual(set(Driver.get_by_attr(key='a*')),
                          set([d1,d2]))

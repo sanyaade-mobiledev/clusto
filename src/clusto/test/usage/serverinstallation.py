@@ -102,4 +102,4 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
         self.assertEqual(ipvals[0].value, '10.0.0.10')
 
-        self.assertEqual(clusto.getByAttr('ip', '10.0.0.10'), [newserver])
+        self.assertEqual(clusto.get_by_attr('ip', '10.0.0.10'), [newserver])

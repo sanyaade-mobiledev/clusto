@@ -138,7 +138,7 @@ def get_by_name(name):
     except InvalidRequestError:
         raise LookupError(name + " does not exist.")
 
-getByAttr = drivers.base.Driver.getByAttr
+get_by_attr = drivers.base.Driver.get_by_attr
 
               
 def rename(oldname, newname):
