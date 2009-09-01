@@ -184,7 +184,7 @@ class WeightedPoolTests(testbase.ClustoTestBase):
         p = WeightedPool('p')
 
         p.insert(s)
-        p.setWeight(s, 45)
+        p.set_weight(s, 45)
 
         self.assertEqual(45, p.getWeight(s))
 
@@ -193,7 +193,7 @@ class WeightedPoolTests(testbase.ClustoTestBase):
         s = BasicServer('s')
         p = WeightedPool('p')
 
-        self.assertRaises(LookupError, p.setWeight, s, 45)
+        self.assertRaises(LookupError, p.set_weight, s, 45)
 
     def testDefaultWeight(self):
         

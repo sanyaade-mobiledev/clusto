@@ -80,7 +80,7 @@ class WeightedPool(Pool):
     
     _properties = {'defaultweight': None }
 
-    def setWeight(self, thing, weight):
+    def set_weight(self, thing, weight):
 
         if thing not in self:            
             raise LookupError("%s is not in this pool." % thing)
