@@ -218,7 +218,7 @@ class Driver(object):
         
     @classmethod
     def do_attr_query(cls, key=(), value=(), number=(),
-                    subkey=(), ignore_hidden=True, sortByKeys=True, 
+                    subkey=(), ignore_hidden=True, sort_by_keys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
         """Does queries against all Attributes using the DB."""
@@ -276,7 +276,7 @@ class Driver(object):
         if ignore_hidden:
             query.filter(not_(Attribute.key.like('_%')))
 
-        if sortByKeys:
+        if sort_by_keys:
             query = query.order_by(Attribute.key)
 
         if count:
@@ -297,7 +297,7 @@ class Driver(object):
     @classmethod
     def attrFilter(cls, attrlist, key=(), value=(), number=(), 
                    subkey=(), ignore_hidden=True, 
-                   sortByKeys=True, 
+                   sort_by_keys=True, 
                    regex=False, 
                    clusto_types=None,
                    clusto_drivers=None,
@@ -317,7 +317,7 @@ class Driver(object):
         specify a key that begins with an underscore as one of the arguments
         then ignore_hidden is assumed to be False.
 
-        if sortByKeys is True then attributes are returned sorted by keys,
+        if sort_by_keys is True then attributes are returned sorted by keys,
         otherwise their order is undefined.
 
         if regex is True then treat the key, subkey, and value query
@@ -386,7 +386,7 @@ class Driver(object):
             ctl = [clusto.getTypeName(n) for n in clusto_types]
             result = (attr for attr in result if attr.isRelation and attr.value.entity.type in ctl)
             
-        if sortByKeys:
+        if sort_by_keys:
             result = sorted(result)
 
         
