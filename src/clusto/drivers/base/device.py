@@ -12,7 +12,7 @@ class Device(Driver):
 
 
     @classmethod
-    def getBySerialNumber(self, serialnum):
+    def get_by_serial_number(self, serialnum):
         pass
 
     def _getHostname(self):
