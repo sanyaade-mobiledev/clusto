@@ -32,7 +32,7 @@ class ClustoTestBase(unittest.TestCase):
     def setUp(self):
 
         clusto.connect(DB,echo=ECHO)
-        clusto.initclusto()
+        clusto.init_clusto()
         self.data()
 
 

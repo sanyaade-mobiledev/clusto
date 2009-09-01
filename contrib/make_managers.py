@@ -11,5 +11,5 @@ def main():
 if __name__ == '__main__':
     config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
-    clusto.initclusto()
+    clusto.init_clusto()
     main()

@@ -119,7 +119,7 @@ def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
     """
     config = get_clusto_config(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
-    clusto.initclusto()
+    clusto.init_clusto()
     
     logger = setupLogging(config=config, name=name)
 

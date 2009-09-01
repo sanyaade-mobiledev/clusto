@@ -33,7 +33,7 @@ def checkDBcompatibility(dbver):
     if dbver == VERSION:
         return True
 
-def initclusto():
+def init_clusto():
     """Initialize a clusto database. """
     METADATA.create_all(METADATA.bind)
     c = ClustoMeta()
