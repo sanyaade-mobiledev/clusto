@@ -219,7 +219,7 @@ class Driver(object):
     @classmethod
     def do_attr_query(cls, key=(), value=(), number=(),
                     subkey=(), ignore_hidden=True, sort_by_keys=True, 
-                    glob=True, count=False, querybase=None, returnQuery=False,
+                    glob=True, count=False, querybase=None, return_query=False,
                     entity=None):
         """Does queries against all Attributes using the DB."""
 
@@ -282,7 +282,7 @@ class Driver(object):
         if count:
             return query.count()
 
-        if returnQuery:
+        if return_query:
             return query
 
         return query.all()
