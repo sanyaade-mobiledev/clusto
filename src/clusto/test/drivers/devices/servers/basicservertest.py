@@ -63,7 +63,7 @@ class BasicServerTest(testbase.ClustoTestBase):
                                  "test2.example.com"]),
                          sorted(s2.fqdns))
 
-        s2.removefqdn("test.example.com")
+        s2.remove_fqdn("test.example.com")
 
         
         self.assertEqual(["test2.example.com"],
