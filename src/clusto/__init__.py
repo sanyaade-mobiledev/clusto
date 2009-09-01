@@ -79,7 +79,7 @@ def get_type_name(name):
         return name.type
         
 
-def getDriver(entity, ignoreDriverColumn=False):
+def get_driver(entity, ignoreDriverColumn=False):
     """Return the driver to use for a given entity """
 
     if not ignoreDriverColumn:
