@@ -136,11 +136,11 @@ class PoolTests(testbase.ClustoTestBase):
 
         d2 = clusto.get_by_name('d2')
 
-        self.assertEqual(sorted(d2.attrs(mergeContainerAttrs=True)), sorted(p1.attrs()))
+        self.assertEqual(sorted(d2.attrs(merge_container_attrs=True)), sorted(p1.attrs()))
 
 
         self.assertEqual(sorted(['t1', 't2', 't3']),
-                         sorted([x.key for x in d1.attrs(mergeContainerAttrs=True)]))
+                         sorted([x.key for x in d1.attrs(merge_container_attrs=True)]))
 
 
     def testPoolAttrsOverride(self):

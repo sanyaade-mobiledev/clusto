@@ -401,15 +401,15 @@ class Driver(object):
         (filters whole attribute list as opposed to querying the db directly)
         """
 
-        if 'mergeContainerAttrs' in kwargs:
-            mergeContainerAttrs = kwargs.pop('mergeContainerAttrs')
+        if 'merge_container_attrs' in kwargs:
+            merge_container_attrs = kwargs.pop('merge_container_attrs')
         else:
-            mergeContainerAttrs = False
+            merge_container_attrs = False
 
         attrs = self.attr_filter(self.entity._attrs, *args, **kwargs) 
 
-        if mergeContainerAttrs:
-            kwargs['mergeContainerAttrs'] = mergeContainerAttrs
+        if merge_container_attrs:
+            kwargs['merge_container_attrs'] = merge_container_attrs
             for parent in self.parents():
                 attrs.extend(parent.attrs(*args,  **kwargs))
 
