@@ -160,7 +160,7 @@ class Driver(object):
                     lambda x,y: setattr(x.entity, 'name', y))
 
 
-    def _checkAttrName(self, key):
+    def _check_attr_name(self, key):
         """
         check to make sure the key does not contain invalid characters
         raise NameException if fail.
@@ -488,9 +488,9 @@ class Driver(object):
             self.entity._attrs.append(key)
             return key
         
-        self._checkAttrName(key)
+        self._check_attr_name(key)
         if subkey:
-            self._checkAttrName(subkey)
+            self._check_attr_name(subkey)
 
         if isinstance(value, Driver):
             value = value.entity
@@ -523,7 +523,7 @@ class Driver(object):
 
     def setAttr(self, key, value, number=False, subkey=None):
         """replaces all attributes with the given key"""        
-        self._checkAttrName(key)
+        self._check_attr_name(key)
 
         attrs = self.attrs(key=key, number=number, subkey=subkey)
 
