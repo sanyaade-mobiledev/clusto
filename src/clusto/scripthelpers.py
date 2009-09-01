@@ -69,7 +69,7 @@ def getCommand(cmdname):
 
     return None
 
-def getCommandHelp(cmdname):
+def get_command_help(cmdname):
 
     fullpath = getCommand(cmdname)
 
