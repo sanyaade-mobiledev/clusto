@@ -52,7 +52,7 @@ def clear():
 
     SESSION.expunge_all()
 
-def getDriverName(name):
+def get_driver_name(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
 
     if isinstance(name, str):
@@ -115,7 +115,7 @@ def getEntities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
         query = query.filter(Entity.type.in_(ctl))
 
     if clusto_drivers:
-        cdl = [getDriverName(n) for n in clusto_drivers]
+        cdl = [get_driver_name(n) for n in clusto_drivers]
         query = query.filter(Entity.driver.in_(cdl))
 
     if attrs:

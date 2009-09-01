@@ -379,7 +379,7 @@ class Driver(object):
             result = (attr for attr in result if not attr.key.startswith('_'))
 
         if clusto_drivers:
-            cdl = [clusto.getDriverName(n) for n in clusto_drivers]
+            cdl = [clusto.get_driver_name(n) for n in clusto_drivers]
             result = (attr for attr in result if attr.is_relation and attr.value.entity.driver in cdl)
 
         if clusto_types:
@@ -438,7 +438,7 @@ class Driver(object):
         result = self.attr_filter(self.entity._references, *args, **kwargs)
 
         if clusto_drivers:
-            cdl = [clusto.getDriverName(n) for n in clusto_drivers]
+            cdl = [clusto.get_driver_name(n) for n in clusto_drivers]
             result = (attr for attr in result if attr.entity.driver in cdl)
 
         if clusto_types:
