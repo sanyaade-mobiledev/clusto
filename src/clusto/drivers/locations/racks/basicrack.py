@@ -83,9 +83,9 @@ class BasicRack(Location):
         owners = self.contents(number=rackU, subkey='ru')
 
         if len(owners) > 1:
-            raise Exception('Somehow there is more than one thing in %s.'
+            raise Exception('Somehow there is more than one thing in ru%d.'
                             'Only one of these should be in this space in the '
-                            'rack: %s' % (self.ruName(rackU),
+                            'rack: %s' % (rackU,
                                           ','.join([x.name for x in owners])))
         if owners:
             return owners[0]
