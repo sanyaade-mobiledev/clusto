@@ -466,7 +466,7 @@ class Driver(object):
 
         return [x.key for x in self.attrs(*args, **kwargs)]
 
-    def attrKeyTuples(self, *args, **kwargs):
+    def attr_key_tuples(self, *args, **kwargs):
 
         return [x.keytuple for x in self.attrs(*args, **kwargs)]
 

@@ -146,7 +146,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr('foo', 'bar', subkey='subfoo')
         d1.addAttr('foo', 'caz', subkey='subbar')
 
-        self.assertEqual(sorted(d1.attrKeyTuples()),
+        self.assertEqual(sorted(d1.attr_key_tuples()),
                          sorted([('foo',None,'subfoo'), ('foo',None,'subbar')]))
 
     def testNumberedAttrsWithSubKeys(self):
