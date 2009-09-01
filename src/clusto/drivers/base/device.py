@@ -38,7 +38,7 @@ class Device(Driver):
         return self.attr_values("fqdn")
 
 
-    def addfqdn(self, fqdn):
+    def add_fqdn(self, fqdn):
         """add a fully qualified domain name"""
         
         if not self.has_attr("fqdn", number=True, value=fqdn):

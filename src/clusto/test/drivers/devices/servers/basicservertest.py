@@ -50,12 +50,12 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         self.assertEqual(s1.fqdns, [])
 
-        s2.addfqdn("test.example.com")
+        s2.add_fqdn("test.example.com")
 
         self.assertEqual(["test.example.com"],
                          s2.fqdns)
 
-        s2.addfqdn("test2.example.com")
+        s2.add_fqdn("test2.example.com")
         
         clusto.flush()
 
