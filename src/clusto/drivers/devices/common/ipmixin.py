@@ -29,7 +29,7 @@ class IPMixin:
             
             
         
-    def hasIP(self, ip):
+    def has_ip(self, ip):
 
         ipman = IPManager.getIPManager(ip)
 
@@ -51,7 +51,7 @@ class IPMixin:
         try:
             clusto.begin_transaction()
 
-            if not self.hasIP(ip):
+            if not self.has_ip(ip):
                 if not ipman:
                     ipman = IPManager.getIPManager(ip)
 

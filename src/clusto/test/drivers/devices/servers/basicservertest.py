@@ -90,11 +90,11 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         s1.add_ip('10.0.0.100')
         
-        self.assertTrue(s1.hasIP('10.0.0.100'))
+        self.assertTrue(s1.has_ip('10.0.0.100'))
 
         s1.add_ip(ipman=ipm)
 
-        self.assertTrue(s1.hasIP('10.0.0.1'))
+        self.assertTrue(s1.has_ip('10.0.0.1'))
 
     def testAddingIPfromIPManagerWithGateway(self):
                         
@@ -103,7 +103,7 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         s1.add_ip(ipman=ipm)
 
-        self.assertTrue(s1.hasIP('10.0.0.2'))
+        self.assertTrue(s1.has_ip('10.0.0.2'))
         
 
     def testBindingIPtoOSPort(self):
