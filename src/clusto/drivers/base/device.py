@@ -35,7 +35,7 @@ class Device(Driver):
     def FQDNs(self):
         """return the fully qualified domain names for this device"""
 
-        return self.attrValues("fqdn")
+        return self.attr_values("fqdn")
 
 
     def addFQDN(self, fqdn):
