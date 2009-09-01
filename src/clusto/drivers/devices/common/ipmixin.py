@@ -60,7 +60,7 @@ class IPMixin:
                 clusto.flush()
 
 
-            ipattrs = ipman.getResourceAttrs(self, ip)
+            ipattrs = ipman.get_resource_attrs(self, ip)
 
             if porttype is not None and portnum is not None:
                 self.setPortAttr(porttype, portnum, 'osportname', osportname)

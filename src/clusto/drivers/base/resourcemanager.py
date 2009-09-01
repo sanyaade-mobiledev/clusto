@@ -185,7 +185,7 @@ class ResourceManager(Driver):
             return None
 
         
-    def getResourceAttrs(self, thing, resource):
+    def get_resource_attrs(self, thing, resource):
         """Return the Attribute objects for a given resource on a given Entity"""
         
         resource, number = self.ensure_type(resource)
