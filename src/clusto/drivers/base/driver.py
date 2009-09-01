@@ -295,7 +295,7 @@ class Driver(object):
         return self.do_attr_query(*args, **kwargs)
 
     @classmethod
-    def attrFilter(cls, attrlist, key=(), value=(), number=(), 
+    def attr_filter(cls, attrlist, key=(), value=(), number=(), 
                    subkey=(), ignore_hidden=True, 
                    sort_by_keys=True, 
                    regex=False, 
@@ -406,7 +406,7 @@ class Driver(object):
         else:
             mergeContainerAttrs = False
 
-        attrs = self.attrFilter(self.entity._attrs, *args, **kwargs) 
+        attrs = self.attr_filter(self.entity._attrs, *args, **kwargs) 
 
         if mergeContainerAttrs:
             kwargs['mergeContainerAttrs'] = mergeContainerAttrs
@@ -435,7 +435,7 @@ class Driver(object):
             
         clusto_types = kwargs.pop('clusto_types', None)
         
-        result = self.attrFilter(self.entity._references, *args, **kwargs)
+        result = self.attr_filter(self.entity._references, *args, **kwargs)
 
         if clusto_drivers:
             cdl = [clusto.getDriverName(n) for n in clusto_drivers]
