@@ -56,7 +56,7 @@ def runcmd(args):
     os.execvpe(cmdname, args, env=os.environ)
 
 
-def getCommand(cmdname):
+def get_command(cmdname):
 
     for path in scriptpaths:
 
@@ -71,7 +71,7 @@ def getCommand(cmdname):
 
 def get_command_help(cmdname):
 
-    fullpath = getCommand(cmdname)
+    fullpath = get_command(cmdname)
 
     return commands.getoutput(fullpath + " --help-description")
     
