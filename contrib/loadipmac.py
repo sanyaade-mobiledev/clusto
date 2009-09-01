@@ -1,5 +1,5 @@
 from clusto.drivers import BasicDatacenter, BasicRack, BasicServer, BasicVirtualServer, BasicNetworkSwitch, PowerTowerXM, IPManager, OpenGearCM4148
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 import clusto
 
 from traceback import format_exc
@@ -167,7 +167,7 @@ def main():
     #pprint(clusto.get_entities())
 
 if __name__ == '__main__':
-    config = getClustoConfig()
+    config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     main()

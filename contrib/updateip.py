@@ -1,4 +1,4 @@
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import *
 from subprocess import Popen, PIPE, STDOUT
 import clusto
@@ -124,7 +124,7 @@ def main():
     clusto.commit()
 
 if __name__ == '__main__':
-    config = getClustoConfig()
+    config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     main()

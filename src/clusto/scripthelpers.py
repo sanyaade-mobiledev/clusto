@@ -75,7 +75,7 @@ def get_command_help(cmdname):
 
     return commands.getoutput(fullpath + " --help-description")
     
-def getClustoConfig(filename=None):
+def get_clusto_config(filename=None):
     """Find, parse, and return the configuration data needed by clusto.
 
     Gets the config path from the CLUSTOCONFIG environment variable otherwise
@@ -115,9 +115,9 @@ def initScript(name=os.path.basename(sys.argv[0]), configfile=None):
     Connects to the clusto database, returns a python SafeConfigParser and a
     logger.
 
-    Uses getClustoConfig and setupLogging
+    Uses get_clusto_config and setupLogging
     """
-    config = getClustoConfig(filename=configfile)
+    config = get_clusto_config(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     
@@ -173,9 +173,9 @@ def setupClustoEnv(options):
         os.environ['CLUSTOCONFIG'] = options.configfile
 
     if os.environ.has_key('CLUSTOCONFIG'):
-        config = getClustoConfig(os.environ['CLUSTOCONFIG'])
+        config = get_clusto_config(os.environ['CLUSTOCONFIG'])
     else:
-        config = getClustoConfig()
+        config = get_clusto_config()
 
     if not os.environ.has_key('CLUSTODSN'):
         os.environ['CLUSTODSN'] = config.get('clusto','dsn')

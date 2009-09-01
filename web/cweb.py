@@ -7,11 +7,11 @@ import new
 import re
 
 from webob import Request, Response
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import Driver
 import clusto
 
-config = getClustoConfig()
+config = get_clusto_config()
 clusto.connect(config.get('clusto', 'dsn'))
 
 config = json.load(file('web.conf', 'r'))

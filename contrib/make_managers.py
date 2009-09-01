@@ -1,4 +1,4 @@
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import IPManager
 import clusto
 
@@ -9,7 +9,7 @@ def main():
     IPManager('sjc1-subnet-04', baseip='192.168.248.0', netmask='255.255.255.0')
 
 if __name__ == '__main__':
-    config = getClustoConfig()
+    config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.initclusto()
     main()
