@@ -15,7 +15,7 @@ class Device(Driver):
     def get_by_serial_number(self, serialnum):
         pass
 
-    def _getHostname(self):
+    def _get_hostname(self):
         """return a hostname set for this device or its entity name"""
 
         hostname = self.attrs("hostname")
@@ -29,7 +29,7 @@ class Device(Driver):
 
         self.set_attr("hostname", value=name)
 
-    hostname = property(_getHostname, _setHostname)
+    hostname = property(_get_hostname, _setHostname)
 
     @property
     def FQDNs(self):
