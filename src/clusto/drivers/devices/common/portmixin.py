@@ -80,11 +80,11 @@ class PortMixin:
 
         try:
             clusto.begin_transaction()
-            self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
-            self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
+            self.set_port_attr(porttype, srcportnum, 'connection', dstdev)
+            self.set_port_attr(porttype, srcportnum, 'otherportnum', dstportnum)
             
-            dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
-            dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
+            dstdev.set_port_attr(porttype, dstportnum, 'connection', self)
+            dstdev.set_port_attr(porttype, dstportnum, 'otherportnum', srcportnum)
             clusto.commit()
         except Exception, x:
             clusto.rollback_transaction()
@@ -168,7 +168,7 @@ class PortMixin:
                      subkey=key,
                      value=value)
 
-    def setPortAttr(self, porttype, portnum, key, value):
+    def set_port_attr(self, porttype, portnum, key, value):
         """set an attribute on the given port"""
 
         portnum = self._ensurePortNum(porttype, portnum)

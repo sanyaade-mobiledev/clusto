@@ -63,7 +63,7 @@ class IPMixin:
             ipattrs = ipman.get_resource_attrs(self, ip)
 
             if porttype is not None and portnum is not None:
-                self.setPortAttr(porttype, portnum, 'osportname', osportname)
+                self.set_port_attr(porttype, portnum, 'osportname', osportname)
 
             self.set_attr(ipattrs[0].key,
                          number=ipattrs[0].number,

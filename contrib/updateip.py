@@ -119,7 +119,7 @@ def main():
             continue
         print repr((ipaddr, 'nic-' + iftype, ifnum, macaddr))
         device.bindIPtoPort(ipaddr, 'nic-' + iftype, ifnum)
-        device.setPortAttr('nic-' + iftype, ifnum, 'mac-address', macaddr)
+        device.set_port_attr('nic-' + iftype, ifnum, 'mac-address', macaddr)
     print repr(device)
     clusto.commit()
 

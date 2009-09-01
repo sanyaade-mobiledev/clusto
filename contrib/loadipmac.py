@@ -118,7 +118,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         subnet = IPManager.get_ip_manager(n['inet addr'])
         if not server in subnet.owners(n['inet addr']):
             server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
-        server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
+        server.set_port_attr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
 
     if not 'uniqueid' in server.attr_keys():
         for key, value in get_facts(ipaddr):
