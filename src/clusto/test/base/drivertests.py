@@ -236,7 +236,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='_foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='_foo', value='bar4', number=True, subkey='four')
 
-        self.assertEqual(d1.attrItems(ignoreHidden=True),
+        self.assertEqual(d1.attrItems(ignore_hidden=True),
                          [(('foo',0,'one'), 'bar1'), (('foo',1,'two'), 'bar2')])
 
 
@@ -323,7 +323,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 
         d = clusto.get_by_name('d1')
 
-        self.assertEqual(d.attrItems(ignoreHidden=False),
+        self.assertEqual(d.attrItems(ignore_hidden=False),
                          [(('_contains', 0, None), d2)])
 
     def testRemove(self):
@@ -340,7 +340,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(d.attrItems(ignoreHidden=False),
+        self.assertEqual(d.attrItems(ignore_hidden=False),
                          [])
 
     def testContents(self):
@@ -375,7 +375,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 
         
         self.assertEqual(range(5),
-                         [x.number for x in d1.attrs(ignoreHidden=False)])
+                         [x.number for x in d1.attrs(ignore_hidden=False)])
         
 
 

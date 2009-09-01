@@ -218,7 +218,7 @@ class Driver(object):
         
     @classmethod
     def do_attr_query(cls, key=(), value=(), number=(),
-                    subkey=(), ignoreHidden=True, sortByKeys=True, 
+                    subkey=(), ignore_hidden=True, sortByKeys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
         """Does queries against all Attributes using the DB."""
@@ -273,7 +273,7 @@ class Driver(object):
             else:
                 raise TypeError("number must be either a boolean or an integer.")
 
-        if ignoreHidden:
+        if ignore_hidden:
             query.filter(not_(Attribute.key.like('_%')))
 
         if sortByKeys:
@@ -296,7 +296,7 @@ class Driver(object):
 
     @classmethod
     def attrFilter(cls, attrlist, key=(), value=(), number=(), 
-                   subkey=(), ignoreHidden=True, 
+                   subkey=(), ignore_hidden=True, 
                    sortByKeys=True, 
                    regex=False, 
                    clusto_types=None,
@@ -312,10 +312,10 @@ class Driver(object):
         if number is True then the number variable must be non-null. if
         number is False then the number variable must be null.
 
-        if ignoreHidden is True (the default) then filter out keys that begin
+        if ignore_hidden is True (the default) then filter out keys that begin
         with an underscore, if false don't filter out such keys.  If you
         specify a key that begins with an underscore as one of the arguments
-        then ignoreHidden is assumed to be False.
+        then ignore_hidden is assumed to be False.
 
         if sortByKeys is True then attributes are returned sorted by keys,
         otherwise their order is undefined.
@@ -373,9 +373,9 @@ class Driver(object):
 
 
         if key and key.startswith('_'):
-            ignoreHidden = False
+            ignore_hidden = False
 
-        if ignoreHidden:
+        if ignore_hidden:
             result = (attr for attr in result if not attr.key.startswith('_'))
 
         if clusto_drivers:
@@ -591,7 +591,7 @@ class Driver(object):
                             "Tried to remove %s." % str(type(thing)))
 
 
-        self.delAttrs("_contains", d, ignoreHidden=False)
+        self.delAttrs("_contains", d, ignore_hidden=False)
 
     def contentAttrs(self, *args, **kwargs):
         """Return the attributes referring to this Thing's contents
