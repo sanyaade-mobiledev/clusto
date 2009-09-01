@@ -142,7 +142,7 @@ class Attribute(object):
         return val
 
     @property
-    def isRelation(self):
+    def is_relation(self):
         return self.datatype == 'relation'
     
     def getValueType(self, value=None):
