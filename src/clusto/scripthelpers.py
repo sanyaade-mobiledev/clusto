@@ -115,18 +115,18 @@ def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
     Connects to the clusto database, returns a python SafeConfigParser and a
     logger.
 
-    Uses get_clusto_config and setupLogging
+    Uses get_clusto_config and setup_logging
     """
     config = get_clusto_config(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
     clusto.init_clusto()
     
-    logger = setupLogging(config=config, name=name)
+    logger = setup_logging(config=config, name=name)
 
     return (config, logger)
 
 
-def setupLogging(config=None, name="clusto.script"):
+def setup_logging(config=None, name="clusto.script"):
     """Setup the default log level and return the logger
 
     The logger will try to log to /var/log and console.
