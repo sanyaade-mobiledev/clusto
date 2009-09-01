@@ -72,40 +72,40 @@ class Driver(object):
     def driver(self):
         return self.entity.driver
 
-    def __new__(cls, nameDriverEntity, **kwargs):
+    def __new__(cls, name_driver_entity, **kwargs):
 
-        if isinstance(nameDriverEntity, Driver):
-            return nameDriverEntity
+        if isinstance(name_driver_entity, Driver):
+            return name_driver_entity
         else:
-            return object.__new__(cls, nameDriverEntity, **kwargs)
+            return object.__new__(cls, name_driver_entity, **kwargs)
 
-    def __init__(self, nameDriverEntity, **kwargs):
+    def __init__(self, name_driver_entity, **kwargs):
 
-        if not isinstance(nameDriverEntity, (str, unicode, Entity, Driver)):
+        if not isinstance(name_driver_entity, (str, unicode, Entity, Driver)):
             raise TypeError("First argument must be a string, "
                             "Driver, or Entity.")
 
-        if isinstance(nameDriverEntity, Driver):
+        if isinstance(name_driver_entity, Driver):
             return 
 
-        if isinstance(nameDriverEntity, Entity):
+        if isinstance(name_driver_entity, Entity):
             
-            self.entity = nameDriverEntity
+            self.entity = name_driver_entity
             self._chooseBestDriver()
             return
-        elif isinstance(nameDriverEntity, (str, unicode)):
+        elif isinstance(name_driver_entity, (str, unicode)):
 
             try:
-                existing = clusto.getByName(nameDriverEntity)
+                existing = clusto.getByName(name_driver_entity)
             except LookupError, x:
                 existing = None
             
             if existing:
                 raise NameException("Driver with the name %s already exists."
-                                    % (nameDriverEntity))
+                                    % (name_driver_entity))
 
 
-            self.entity = Entity(nameDriverEntity)
+            self.entity = Entity(name_driver_entity)
             self.entity.driver = self._driver_name
             self.entity.type = self._clusto_type
 
