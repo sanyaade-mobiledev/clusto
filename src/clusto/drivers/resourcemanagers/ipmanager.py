@@ -33,7 +33,7 @@ class IPManager(ResourceManager):
 
         return self.__ipy
 
-    def ensureType(self, resource, number=True):
+    def ensure_type(self, resource, number=True):
         """check that the given ip falls within the range managed by this manager"""
 
         try:
@@ -58,7 +58,7 @@ class IPManager(ResourceManager):
 
     def additionalAttrs(self, thing, resource, number):
 
-        resource, number = self.ensureType(resource, number)
+        resource, number = self.ensure_type(resource, number)
 
         thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
         
@@ -96,7 +96,7 @@ class IPManager(ResourceManager):
 
                 if self.available(nextip):
                     self.set_attr('_lastip', nextip)
-                    return self.ensureType(nextip, True)
+                    return self.ensure_type(nextip, True)
                 else:
                     nextip += 1
             
@@ -124,7 +124,7 @@ class IPManager(ResourceManager):
 
         for ipmantest in clusto.get_entities(clusto_drivers=[cls]):
             try:
-                ipmantest.ensureType(ip)
+                ipmantest.ensure_type(ip)
             except ResourceTypeException:
                 continue
 

@@ -31,7 +31,7 @@ class ResourceManager(Driver):
                              % self.name)
 
 
-    def ensureType(self, resource, number=True):
+    def ensure_type(self, resource, number=True):
         """checks the type of a given resourece
 
         if the resource is valid return it and optionally convert it to
@@ -66,7 +66,7 @@ class ResourceManager(Driver):
                 resource, number = self.allocator()
 
             else:
-                resource, number = self.ensureType(resource, number)
+                resource, number = self.ensure_type(resource, number)
                 if not self.available(resource, number):
                     raise ResourceException("Requested resource is not available.")
 
@@ -117,7 +117,7 @@ class ResourceManager(Driver):
                     thing.del_attrs(self._attr_name, number=number)
 
             elif resource and not self.available(resource, number):
-                resource, number = self.ensureType(resource, number)
+                resource, number = self.ensure_type(resource, number)
 
                 res = thing.attrs(self._attr_name, self, subkey='manager', number=number)
                 for a in res: 
@@ -131,7 +131,7 @@ class ResourceManager(Driver):
         """return True if resource is available, False otherwise.
         """
 
-        resource, number = self.ensureType(resource, number)
+        resource, number = self.ensure_type(resource, number)
 
         if self.owners(resource, number):
             return False
@@ -143,7 +143,7 @@ class ResourceManager(Driver):
         """return a list of driver objects for the owners of a given resource.
         """
 
-        resource, number = self.ensureType(resource, number)
+        resource, number = self.ensure_type(resource, number)
 
         return Driver.get_by_attr(self._attr_name, resource, number=number)
 
@@ -176,7 +176,7 @@ class ResourceManager(Driver):
     def getResourceNum(self, thing, resource):
         """Retrun the resource number for the given resource on the given Entity"""
 
-        resource, number = self.ensureType(resource)
+        resource, number = self.ensure_type(resource)
         res = thing.attrs(self._attr_name, number=number, value=resource)
 
         if res:
@@ -188,6 +188,6 @@ class ResourceManager(Driver):
     def getResourceAttrs(self, thing, resource):
         """Return the Attribute objects for a given resource on a given Entity"""
         
-        resource, number = self.ensureType(resource)
+        resource, number = self.ensure_type(resource)
 
         return thing.attrs(self._attr_name, number=number, value=resource)
