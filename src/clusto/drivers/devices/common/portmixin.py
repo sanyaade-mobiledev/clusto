@@ -260,7 +260,7 @@ class PortMixin:
         return [(pinfo[0], pinfo[1]) for pinfo in self.port_info_tuples if pinfo[3] == None]
 
     @property
-    def connectedPorts(self):
+    def connected_ports(self):
         """Return a list of connected ports"""
 
         pdict = {}

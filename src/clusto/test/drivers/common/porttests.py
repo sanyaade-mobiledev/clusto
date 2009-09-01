@@ -182,10 +182,10 @@ class PortTests(testbase.ClustoTestBase):
 
         for i in [t1, t2]:
             for t in i.portTypes:
-                self.assertEqual([], i.connectedPorts[t])
+                self.assertEqual([], i.connected_ports[t])
 
         t1.connect_ports('a', 1, t2, 3)
         t2.connect_ports('a', 2, t1, 2)
         
-        self.assertEqual([1, 2], t1.connectedPorts['a'])
+        self.assertEqual([1, 2], t1.connected_ports['a'])
         
