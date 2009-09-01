@@ -31,9 +31,9 @@ def get_environment(dc, rack, switch):
         rack.insert(ts, 30)
 
     if switch.portFree('pwr-nema-5', 0):
-        switch.connectPorts('pwr-nema-5', 0, pwr, '.aa8')
+        switch.connect_ports('pwr-nema-5', 0, pwr, '.aa8')
     if ts.portFree('pwr-nema-5', 0):
-        ts.connectPorts('pwr-nema-5', 0, pwr, '.ab8')
+        ts.connect_ports('pwr-nema-5', 0, pwr, '.ab8')
 
     clusto.commit()
 
@@ -78,9 +78,9 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
 
     ru = rack.getRackAndU(server)['RU'][0]
     if server.portFree('pwr-nema-5', 0):
-        server.connectPorts('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
+        server.connect_ports('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
     if server.portFree('console-serial', 0):
-        server.connectPorts('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
+        server.connect_ports('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
 
     if portnum < 21:
         ifnum = 0
@@ -90,9 +90,9 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if not server.portFree('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
-            server.connectPorts('nic-eth', ifnum, switch, portnum)
+            server.connect_ports('nic-eth', ifnum, switch, portnum)
     else:
-        server.connectPorts('nic-eth', ifnum, switch, portnum)
+        server.connect_ports('nic-eth', ifnum, switch, portnum)
 
     ifaces = discover_interfaces(ipaddr)
     for name in ifaces:

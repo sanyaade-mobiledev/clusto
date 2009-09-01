@@ -71,7 +71,7 @@ class PortTests(testbase.ClustoTestBase):
 
         self.assertTrue(t1.portFree('a', 2))
 
-        t1.connectPorts('a', 1, t2, 1)
+        t1.connect_ports('a', 1, t2, 1)
 
         self.assertFalse(t1.portFree('a', 1))
 
@@ -79,7 +79,7 @@ class PortTests(testbase.ClustoTestBase):
         
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        t1.connectPorts('a', 1, t2, 3)
+        t1.connect_ports('a', 1, t2, 3)
 
         
         self.assertEqual(t2, t1.getConnected('a', 1))
@@ -90,21 +90,21 @@ class PortTests(testbase.ClustoTestBase):
 
         # try to work with ports that don't exist
         self.assertRaises(ConnectionException, t2.getConnected, 'b', 3)
-        self.assertRaises(ConnectionException, t2.connectPorts, 'b', 2, t1, 7)
-        self.assertRaises(ConnectionException, t2.connectPorts, 'z', 1, t1, 1)
+        self.assertRaises(ConnectionException, t2.connect_ports, 'b', 2, t1, 7)
+        self.assertRaises(ConnectionException, t2.connect_ports, 'z', 1, t1, 1)
 
 
         # try to connect ports that are already connected but in the reverse order
-        self.assertRaises(ConnectionException, t2.connectPorts, 'a', 4, t1, 1)
+        self.assertRaises(ConnectionException, t2.connect_ports, 'a', 4, t1, 1)
 
         # try to connect to a device that doesn't have ports
-        self.assertRaises(ConnectionException, t1.connectPorts, 'a', 2, p, 1)
+        self.assertRaises(ConnectionException, t1.connect_ports, 'a', 2, p, 1)
 
     def testDisconnectPort(self):
 
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        t1.connectPorts('a', 1, t2, 3)
+        t1.connect_ports('a', 1, t2, 3)
 
         self.assertEqual(t2, t1.getConnected('a', 1))
         
@@ -148,7 +148,7 @@ class PortTests(testbase.ClustoTestBase):
                          sorted(t1.portInfoTuples))
 
         
-        t1.connectPorts('a', 2, t2, 1)
+        t1.connect_ports('a', 2, t2, 1)
 
         self.assertEqual(sorted([('a', 0, None, None,),
                                  ('a', 1, t1, 2,),
@@ -184,8 +184,8 @@ class PortTests(testbase.ClustoTestBase):
             for t in i.portTypes:
                 self.assertEqual([], i.connectedPorts[t])
 
-        t1.connectPorts('a', 1, t2, 3)
-        t2.connectPorts('a', 2, t1, 2)
+        t1.connect_ports('a', 1, t2, 3)
+        t2.connect_ports('a', 2, t1, 2)
         
         self.assertEqual([1, 2], t1.connectedPorts['a'])
         

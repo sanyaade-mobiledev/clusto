@@ -56,7 +56,7 @@ class PortMixin:
 
         return num
 
-    def connectPorts(self, porttype, srcportnum, dstdev, dstportnum):
+    def connect_ports(self, porttype, srcportnum, dstdev, dstportnum):
         """connect a local port to a port on another device
         """
 
@@ -236,7 +236,7 @@ class PortMixin:
     @property
     def portInfoTuples(self):
         """return port information as a list of tuples that are suitble for use
-        as *args to connectPorts
+        as *args to connect_ports
 
         format:
           [ ('porttype', portnum, <connected device>, <port connected to>), ... ]
