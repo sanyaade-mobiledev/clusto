@@ -79,7 +79,7 @@ class PortMixin:
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
             self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
             
@@ -101,7 +101,7 @@ class PortMixin:
             
             otherportnum = self.getPortAttrs(porttype, portnum, 'otherportnum')
             
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             try:
                 dev.delPortAttr(porttype, otherportnum, 'connection')
                 dev.delPortAttr(porttype, otherportnum, 'otherportnum')

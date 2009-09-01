@@ -156,7 +156,7 @@ def rename(oldname, newname):
 tl = threading.local()
 tl.TRANSACTIONCOUNTER = 0
 
-def beginTransaction():
+def begin_transaction():
     """Start a transaction
 
     If already in a transaction start a savepoint transaction.
@@ -198,7 +198,7 @@ def disconnect():
 def deleteEntity(entity):
     """Delete an entity and all it's attributes and references"""
     try:
-        beginTransaction()
+        begin_transaction()
         SESSION.delete(entity)
         commit()
     except Exception, x:

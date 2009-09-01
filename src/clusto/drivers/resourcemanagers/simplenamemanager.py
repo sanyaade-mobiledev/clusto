@@ -67,7 +67,7 @@ class SimpleEntityNameManager(SimpleNameManager):
             raise TypeError("thing is not a Driver class")
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
             if not resource:
                 name, num = self.allocator()

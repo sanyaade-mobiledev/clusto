@@ -511,7 +511,7 @@ class Driver(object):
 
         clusto.flush()
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             for i in self.attr_query(*args, **kwargs):
                 self.entity._attrs.remove(i)
                 i.delete()

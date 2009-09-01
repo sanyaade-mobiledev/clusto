@@ -49,7 +49,7 @@ class IPMixin:
                 raise Exception("both portype and portnum need to be specified or set to None")
             
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
             if not self.hasIP(ip):
                 if not ipman:

@@ -57,7 +57,7 @@ class ResourceManager(Driver):
         """
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             if not isinstance(thing, Driver):
                 raise TypeError("thing is not of type Driver")
 
@@ -110,7 +110,7 @@ class ResourceManager(Driver):
         """deallocates a resource from the given thing."""
 
 
-        clusto.beginTransaction()
+        clusto.begin_transaction()
         try:
             if resource is ():                      
                 for res in self.resources(thing):

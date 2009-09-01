@@ -47,7 +47,7 @@ class TestClusto(testbase.ClustoTestBase):
 
     def testTransactionRollback(self):
 
-        clusto.beginTransaction()
+        clusto.begin_transaction()
         
         d1 = Entity('d1')
 
@@ -62,7 +62,7 @@ class TestClusto(testbase.ClustoTestBase):
     def testTransactionRollback2(self):
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
             c1 = Entity('c1')
             
@@ -80,7 +80,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         d1 = Entity('d1')
 
-        clusto.beginTransaction()
+        clusto.begin_transaction()
         d2 = Entity('d2')
         clusto.rollbackTransaction()
 
@@ -92,12 +92,12 @@ class TestClusto(testbase.ClustoTestBase):
         d1 = Driver('d1')
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
             d2 = Driver('d2')
 
             try:
-                clusto.beginTransaction()
+                clusto.begin_transaction()
                 d2.add_attr('foo', 'bar')
 
                 clusto.commit()
@@ -119,7 +119,7 @@ class TestClusto(testbase.ClustoTestBase):
     def testTransactionCommit(self):
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             
             c1 = Entity('c1')
             clusto.commit()
