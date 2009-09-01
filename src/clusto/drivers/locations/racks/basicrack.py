@@ -14,7 +14,7 @@ class BasicRack(Location):
                    'maxu':45}
     
 
-    def _ensureRackU(self, rackU):
+    def _ensure_rack_u(self, rackU):
         if not isinstance(rackU, int) and not isinstance(rackU, (list, tuple)):
             raise TypeError("a rackU must be an Integer or list/tuple of Integers.")
 
@@ -55,7 +55,7 @@ class BasicRack(Location):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
 
-        rackU = self._ensureRackU(rackU)
+        rackU = self._ensure_rack_u(rackU)
 
         rau = self.getRackAndU(device)
 
@@ -78,7 +78,7 @@ class BasicRack(Location):
         if not isinstance(rackU, int):
             raise TypeError("RackU must be a single integer. Got: %s" % str(rackU))
 
-        rackU = self._ensureRackU(rackU)[0]
+        rackU = self._ensure_rack_u(rackU)[0]
         
         owners = self.contents(number=rackU, subkey='ru')
 
