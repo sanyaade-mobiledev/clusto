@@ -58,7 +58,7 @@ class PoolTests(testbase.ClustoTestBase):
         p1.insert(d2)
 
 
-        self.assertEqual(sorted(Pool.getPools(d1)),
+        self.assertEqual(sorted(Pool.get_pools(d1)),
                          sorted([p1,p2]))
 
     def testGetPoolsMultiLevel(self):
@@ -78,11 +78,11 @@ class PoolTests(testbase.ClustoTestBase):
         p3.insert(p4)
         p4.insert(d3)
 
-        self.assertEqual(sorted(Pool.getPools(d1, allPools=True)),
+        self.assertEqual(sorted(Pool.get_pools(d1, allPools=True)),
                          sorted([p1,p2]))
 
                 
-        self.assertEqual(sorted(set(Pool.getPools(d3, allPools=True))),
+        self.assertEqual(sorted(set(Pool.get_pools(d3, allPools=True))),
                          sorted([p1, p3, p4]))
 
     def testPoolsIterator(self):
@@ -112,10 +112,10 @@ class PoolTests(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual([x.name for x in Pool.getPools(d1)],
+        self.assertEqual([x.name for x in Pool.get_pools(d1)],
                          [u'A', u'B', u'C', u'A1', u'B2', u'B1', u'A1', u'C1'])
 
-        self.assertEqual([x.name for x in Pool.getPools(d1, allPools=False)],
+        self.assertEqual([x.name for x in Pool.get_pools(d1, allPools=False)],
                          [u'A', u'B', u'C'])
 
 

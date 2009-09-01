@@ -49,7 +49,7 @@ class Pool(Driver):
         return self in d.contents()
 
     @classmethod
-    def getPools(cls, obj, allPools=True):
+    def get_pools(cls, obj, allPools=True):
 
         d = cls.ensure_driver(obj, "obj must be either an Entity or a Driver.")
 
@@ -59,7 +59,7 @@ class Pool(Driver):
 
         if allPools:
             for i in pools:
-                pools.extend(Pool.getPools(i, allPools=True))
+                pools.extend(Pool.get_pools(i, allPools=True))
 
         return pools
             
