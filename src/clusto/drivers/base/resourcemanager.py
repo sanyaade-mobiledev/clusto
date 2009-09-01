@@ -173,7 +173,7 @@ class ResourceManager(Driver):
 
         return len(self.references(self._attr_name, self, subkey='manager'))
 
-    def getResourceNum(self, thing, resource):
+    def get_resource_number(self, thing, resource):
         """Retrun the resource number for the given resource on the given Entity"""
 
         resource, number = self.ensure_type(resource)
