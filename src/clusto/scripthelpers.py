@@ -109,7 +109,7 @@ def get_clusto_config(filename=None):
     return config
 
 
-def initScript(name=os.path.basename(sys.argv[0]), configfile=None):
+def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
     """Initialize the clusto environment for clusto scripts.
 
     Connects to the clusto database, returns a python SafeConfigParser and a
@@ -223,7 +223,7 @@ def runscript(scriptclass):
 
     (options, argv) = script.parser.parse_args(sys.argv)
 
-    config, logger = initScript()
+    config, logger = init_script()
 
     try:
         if (script.num_args != None and script.num_args != (len(argv)-1)) or script.num_args_min > (len(argv)-1):

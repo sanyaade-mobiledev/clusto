@@ -22,7 +22,7 @@ def main(argv, config=None):
     
     (options, args) = parser.parse_args(argv)
 
-    config, log = clusto.scripthelpers.initScript()
+    config, log = clusto.scripthelpers.init_script()
     
     try: 
         ## do your work here
