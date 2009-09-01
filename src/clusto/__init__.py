@@ -195,7 +195,7 @@ def commit():
 def disconnect():
     SESSION.close()
 
-def deleteEntity(entity):
+def delete_entity(entity):
     """Delete an entity and all it's attributes and references"""
     try:
         begin_transaction()

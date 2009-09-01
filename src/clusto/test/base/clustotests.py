@@ -202,7 +202,7 @@ class TestClusto(testbase.ClustoTestBase):
 
 
 
-        clusto.deleteEntity(e1)
+        clusto.delete_entity(e1)
 
 
         self.assertEqual([], clusto.get_entities(names=['e1']))

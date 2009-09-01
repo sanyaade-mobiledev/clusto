@@ -263,7 +263,7 @@ class ClustoApp(object):
         except LookupError:
             return Response(status=404, body='404 Not Found\n')
 
-        clusto.deleteEntity(obj.entity)
+        clusto.delete_entity(obj.entity)
         clusto.commit()
         return Response(status=200, body='200 OK\nObject deleted\n')
 
