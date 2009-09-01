@@ -383,7 +383,7 @@ class Driver(object):
             result = (attr for attr in result if attr.is_relation and attr.value.entity.driver in cdl)
 
         if clusto_types:
-            ctl = [clusto.get_typeName(n) for n in clusto_types]
+            ctl = [clusto.get_type_name(n) for n in clusto_types]
             result = (attr for attr in result if attr.is_relation and attr.value.entity.type in ctl)
             
         if sort_by_keys:
@@ -442,7 +442,7 @@ class Driver(object):
             result = (attr for attr in result if attr.entity.driver in cdl)
 
         if clusto_types:
-            ctl = [clusto.get_typeName(n) for n in clusto_types]
+            ctl = [clusto.get_type_name(n) for n in clusto_types]
             result = (attr for attr in result if attr.entity.type in ctl)
 
 

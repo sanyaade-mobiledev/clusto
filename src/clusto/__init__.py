@@ -65,7 +65,7 @@ def get_driver_name(name):
     else:
         return name.driver
 
-def get_typeName(name):
+def get_type_name(name):
 
     if isinstance(name, str):
         if name in TYPELIST:
@@ -111,7 +111,7 @@ def getEntities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
         query = query.filter(Entity.name.in_(names))
 
     if clusto_types:
-        ctl = [get_typeName(n) for n in clusto_types]
+        ctl = [get_type_name(n) for n in clusto_types]
         query = query.filter(Entity.type.in_(ctl))
 
     if clusto_drivers:
