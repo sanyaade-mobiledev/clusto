@@ -74,7 +74,7 @@ class PortMixin:
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
         
-            if not dev.portFree(porttype, num):
+            if not dev.port_free(porttype, num):
                 msg = "port %s%d on %s is already in use"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
@@ -95,7 +95,7 @@ class PortMixin:
 
         portnum = self._ensure_portnum(porttype, portnum)
 
-        if not self.portFree(porttype, portnum):
+        if not self.port_free(porttype, portnum):
 
             dev = self.getConnected(porttype, portnum)
             
@@ -145,7 +145,7 @@ class PortMixin:
         else:
             return False
 
-    def portFree(self, porttype, portnum):
+    def port_free(self, porttype, portnum):
         """return true if the given porttype and portnum are not in use"""
         
         portnum = self._ensure_portnum(porttype, portnum)

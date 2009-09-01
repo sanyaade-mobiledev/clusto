@@ -30,9 +30,9 @@ def get_environment(dc, rack, switch):
     if not ts in rack:
         rack.insert(ts, 30)
 
-    if switch.portFree('pwr-nema-5', 0):
+    if switch.port_free('pwr-nema-5', 0):
         switch.connect_ports('pwr-nema-5', 0, pwr, '.aa8')
-    if ts.portFree('pwr-nema-5', 0):
+    if ts.port_free('pwr-nema-5', 0):
         ts.connect_ports('pwr-nema-5', 0, pwr, '.ab8')
 
     clusto.commit()
@@ -77,9 +77,9 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         rack.insert(server, SWITCHPORT_TO_RU[portnum])
 
     ru = rack.getRackAndU(server)['RU'][0]
-    if server.portFree('pwr-nema-5', 0):
+    if server.port_free('pwr-nema-5', 0):
         server.connect_ports('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
-    if server.portFree('console-serial', 0):
+    if server.port_free('console-serial', 0):
         server.connect_ports('console-serial', 0, ts, RU_TO_SWITCHPORT[ru])
 
     if portnum < 21:
@@ -87,7 +87,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     else:
         ifnum = 1
 
-    if not server.portFree('nic-eth', ifnum):
+    if not server.port_free('nic-eth', ifnum):
         if not server.getConnected('nic-eth', ifnum) == switch:
             server.disconnectPort('nic-eth', ifnum)
             server.connect_ports('nic-eth', ifnum, switch, portnum)
