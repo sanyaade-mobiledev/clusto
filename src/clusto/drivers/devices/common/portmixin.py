@@ -225,7 +225,7 @@ class PortMixin:
         """
 
         portinfo = {}
-        for ptype in self.portTypes:
+        for ptype in self.port_types:
             portinfo[ptype]={}
             for n in range(self._portmeta[ptype]['numports']):
                 portinfo[ptype][n] = {'connection': self.get_port_attrs(ptype, n, 'connection'),
@@ -264,7 +264,7 @@ class PortMixin:
         """Return a list of connected ports"""
 
         pdict = {}
-        for ptype in self.portTypes:
+        for ptype in self.port_types:
 
             portlist = [a.number for a in self.attrs(self._port_key(ptype), 
                                                      subkey='connection')]
@@ -274,7 +274,7 @@ class PortMixin:
         return pdict
 
     @property
-    def portTypes(self):
+    def port_types(self):
         return self._portmeta.keys()
 
 

@@ -39,10 +39,10 @@ class PortTests(testbase.ClustoTestBase):
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         
-        self.assertEqual(sorted(t1.portTypes), 
+        self.assertEqual(sorted(t1.port_types), 
                          sorted(['a', 'b']))
 
-        self.assertEqual(sorted(t2.portTypes), 
+        self.assertEqual(sorted(t2.port_types), 
                          sorted(['a', 'z']))
 
     def testPortExists(self):
@@ -170,10 +170,10 @@ class PortTests(testbase.ClustoTestBase):
                          sorted(t2.free_ports))
 
         self.assertEqual(sorted(['a', 'b']),
-                         sorted(t1.portTypes))
+                         sorted(t1.port_types))
 
         self.assertEqual(sorted(['a', 'z']),
-                         sorted(t2.portTypes))
+                         sorted(t2.port_types))
 
 
     def testConnectedPorts(self):
@@ -181,7 +181,7 @@ class PortTests(testbase.ClustoTestBase):
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         for i in [t1, t2]:
-            for t in i.portTypes:
+            for t in i.port_types:
                 self.assertEqual([], i.connected_ports[t])
 
         t1.connect_ports('a', 1, t2, 3)
