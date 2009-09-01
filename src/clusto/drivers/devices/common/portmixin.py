@@ -63,13 +63,13 @@ class PortMixin:
 
         for dev, num in [(self, srcportnum), (dstdev, dstportnum)]:
 
-            if not hasattr(dev, 'portExists'):
+            if not hasattr(dev, 'port_exists'):
                 msg = "%s has no ports."
                 raise ConnectionException(msg % (dev.name))
 
             num = dev._ensure_portnum(porttype, num)
 
-            if not dev.portExists(porttype, num):
+            if not dev.port_exists(porttype, num):
                 msg = "port %s:%d doesn't exist on %s"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
@@ -118,7 +118,7 @@ class PortMixin:
 
         portnum = self._ensure_portnum(porttype, portnum)
 
-        if not self.portExists(porttype, portnum):
+        if not self.port_exists(porttype, portnum):
             msg = "port %s:%d doesn't exist on %s"
             raise ConnectionException(msg % (porttype, portnum, self.name))
             
@@ -130,10 +130,10 @@ class PortMixin:
         """test if the ports you're trying to connect are compatible.
         """
 
-        return (self.portExists(porttype, srcportnum) 
-                and dstdev.portExists(porttype, dstportnum))
+        return (self.port_exists(porttype, srcportnum) 
+                and dstdev.port_exists(porttype, dstportnum))
  
-    def portExists(self, porttype, portnum):
+    def port_exists(self, porttype, portnum):
         """return true if the given port exists on this device"""
         
         if ((porttype in self._portmeta)):
@@ -150,7 +150,7 @@ class PortMixin:
         
         portnum = self._ensure_portnum(porttype, portnum)
 
-        if (not self.portExists(porttype, portnum) or
+        if (not self.port_exists(porttype, portnum) or
             self.has_attr(key=self._port_key(porttype), number=portnum, 
                          subkey='connection')):
             return False

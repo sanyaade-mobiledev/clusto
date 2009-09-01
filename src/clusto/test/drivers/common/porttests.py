@@ -49,13 +49,13 @@ class PortTests(testbase.ClustoTestBase):
         
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        self.assertTrue(t1.portExists('a', 3))
-        self.assertTrue(t1.portExists('a', 0))
-        self.assertFalse(t1.portExists('a', 5))
-        self.assertFalse(t1.portExists('z', 3))
+        self.assertTrue(t1.port_exists('a', 3))
+        self.assertTrue(t1.port_exists('a', 0))
+        self.assertFalse(t1.port_exists('a', 5))
+        self.assertFalse(t1.port_exists('z', 3))
 
-        self.assertTrue(t2.portExists('z', 0))
-        self.assertFalse(t2.portExists('z', 1))
+        self.assertTrue(t2.port_exists('z', 0))
+        self.assertFalse(t2.port_exists('z', 1))
 
     def testPortsConnectable(self):
         
