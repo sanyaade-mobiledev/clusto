@@ -37,7 +37,7 @@ class PortMixin:
                   }
 
 
-    def _portKey(self, porttype):
+    def _port_key(self, porttype):
         
         return 'port-' + porttype
     
@@ -151,7 +151,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         if (not self.portExists(porttype, portnum) or
-            self.has_attr(key=self._portKey(porttype), number=portnum, 
+            self.has_attr(key=self._port_key(porttype), number=portnum, 
                          subkey='connection')):
             return False
         else:
@@ -163,7 +163,7 @@ class PortMixin:
 
         portnum = self._ensurePortNum(porttype, portnum)
 
-        self.add_attr(key=self._portKey(porttype),
+        self.add_attr(key=self._port_key(porttype),
                      number=portnum,
                      subkey=key,
                      value=value)
@@ -173,7 +173,7 @@ class PortMixin:
 
         portnum = self._ensurePortNum(porttype, portnum)
 
-        self.set_attr(key=self._portKey(porttype),
+        self.set_attr(key=self._port_key(porttype),
                      number=portnum,
                      subkey=key,
                      value=value)
@@ -185,12 +185,12 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         if value is ():
-            self.del_attrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key)
         else:
 
-            self.del_attrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key,
                           value=value)
@@ -201,7 +201,7 @@ class PortMixin:
 
         portnum = self._ensurePortNum(porttype, portnum)
 
-        attr = self.attrs(key=self._portKey(porttype),
+        attr = self.attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key)
 
@@ -266,7 +266,7 @@ class PortMixin:
         pdict = {}
         for ptype in self.portTypes:
 
-            portlist = [a.number for a in self.attrs(self._portKey(ptype), 
+            portlist = [a.number for a in self.attrs(self._port_key(ptype), 
                                                      subkey='connection')]
             portlist.sort()
             pdict[ptype] = portlist
