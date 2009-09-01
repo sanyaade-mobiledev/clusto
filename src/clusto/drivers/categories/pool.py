@@ -38,7 +38,7 @@ class Pool(Driver):
         self.add_attr("_contains", d, number=True)
         
 
-    def isParent(self, thing):
+    def is_parent(self, thing):
         """
         Is this pool the parent of the given entity
         """
