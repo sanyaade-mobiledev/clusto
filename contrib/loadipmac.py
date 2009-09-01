@@ -76,7 +76,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if not server in rack:
         rack.insert(server, SWITCHPORT_TO_RU[portnum])
 
-    ru = rack.getRackAndU(server)['RU'][0]
+    ru = rack.get_rack_and_u(server)['RU'][0]
     if server.port_free('pwr-nema-5', 0):
         server.connect_ports('pwr-nema-5', 0, pwr, RU_TO_PWRPORT[ru])
     if server.port_free('console-serial', 0):

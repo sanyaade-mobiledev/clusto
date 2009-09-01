@@ -32,7 +32,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         r = clusto.get_by_name('r1')
         s = clusto.get_by_name('s1')
         
-        self.assertEqual(BasicRack.getRackAndU(s)['RU'], [1])
+        self.assertEqual(BasicRack.get_rack_and_u(s)['RU'], [1])
 
         self.assertEqual(r.getDeviceIn(12),
                          clusto.get_by_name('sw1'))
@@ -92,7 +92,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         sw.connect_ports('nic-eth', 0, newserver, 0)
         sw.connect_ports('nic-eth', 2, p1, 0)
 
-        self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
+        self.assertEqual(BasicRack.get_rack_and_u(newserver)['rack'], r)
 
         ipman = IPManager('subnet-10.0.0.1', netmask='255.255.255.0', basip='10.0.0.1')
         newserver.bind_ip_to_osport('10.0.0.10', 'eth0', porttype='nic-eth', portnum=0)

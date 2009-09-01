@@ -65,13 +65,13 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         s = clusto.get_by_name('s1')
 
-        res = BasicRack.getRackAndU(s)
+        res = BasicRack.get_rack_and_u(s)
 
         
         self.assertEqual(res['rack'].name, 'r1')
         self.assertEqual(res['RU'], [13])
 
-        res2 = BasicRack.getRackAndU(BasicServer('s2'))
+        res2 = BasicRack.get_rack_and_u(BasicServer('s2'))
         self.assertEqual(res2, None)
 
     def testCanOnlyAddToOneRack(self):
@@ -104,7 +104,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         s = clusto.get_by_name('s1')
 
-        self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
+        self.assertEqual(sorted(BasicRack.get_rack_and_u(s)['RU']),
                          [1,2,3])
 
         self.assertRaises(TypeError, r1.insert, s2, [1,2,4])
@@ -124,9 +124,9 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         s = clusto.get_by_name('s1')
 
-        self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
+        self.assertEqual(sorted(BasicRack.get_rack_and_u(s)['RU']),
                          [11])
 
-        self.assertEqual(sorted(BasicRack.getRackAndU(s2)['RU']),
+        self.assertEqual(sorted(BasicRack.get_rack_and_u(s2)['RU']),
                          [1])
 

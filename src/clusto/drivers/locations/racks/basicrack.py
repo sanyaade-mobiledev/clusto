@@ -57,7 +57,7 @@ class BasicRack(Location):
 
         rackU = self._ensure_rack_u(rackU)
 
-        rau = self.getRackAndU(device)
+        rau = self.get_rack_and_u(device)
 
         if rau != None:
             raise Exception("%s is already in rack %s"
@@ -93,7 +93,7 @@ class BasicRack(Location):
         return None
 
     @classmethod
-    def getRackAndU(cls, device):
+    def get_rack_and_u(cls, device):
         """
         Get the rack and rackU for a given device.
 
