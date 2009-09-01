@@ -207,7 +207,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual([], clusto.getEntities(names=['e1']))
 
-        self.assertEqual([], Driver.doAttrQuery(key='deltest*', glob=True))
+        self.assertEqual([], Driver.do_attr_query(key='deltest*', glob=True))
                          
 
 

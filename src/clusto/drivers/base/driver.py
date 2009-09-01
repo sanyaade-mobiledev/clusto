@@ -217,7 +217,7 @@ class Driver(object):
         return d
         
     @classmethod
-    def doAttrQuery(cls, key=(), value=(), number=(),
+    def do_attr_query(cls, key=(), value=(), number=(),
                     subkey=(), ignoreHidden=True, sortByKeys=True, 
                     glob=True, count=False, querybase=None, returnQuery=False,
                     entity=None):
@@ -292,7 +292,7 @@ class Driver(object):
         
         kwargs['entity'] = self.entity
 
-        return self.doAttrQuery(*args, **kwargs)
+        return self.do_attr_query(*args, **kwargs)
 
     @classmethod
     def attrFilter(cls, attrlist, key=(), value=(), number=(), 
@@ -625,7 +625,7 @@ class Driver(object):
     def getByAttr(cls, *args, **kwargs):
         """Get list of Drivers that have by attributes search """
         
-        attrlist = cls.doAttrQuery(*args, **kwargs)
+        attrlist = cls.do_attr_query(*args, **kwargs)
 
         objs = [Driver(x.entity) for x in attrlist]
 
