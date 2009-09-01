@@ -54,7 +54,7 @@ class TestClusto(testbase.ClustoTestBase):
         clusto.get_by_name('d1')
 
         d2 = Entity('d2')
-        clusto.rollbackTransaction()
+        clusto.rollback_transaction()
 
 
         self.assertRaises(LookupError, clusto.get_by_name, 'd1')
@@ -69,7 +69,7 @@ class TestClusto(testbase.ClustoTestBase):
             raise Exception()
         except Exception:
             
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
 
         c2 = Entity('c2')
         
@@ -82,7 +82,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         clusto.begin_transaction()
         d2 = Entity('d2')
-        clusto.rollbackTransaction()
+        clusto.rollback_transaction()
 
         clusto.get_by_name('d1')
         self.assertRaises(LookupError, clusto.get_by_name, 'd2')
@@ -103,14 +103,14 @@ class TestClusto(testbase.ClustoTestBase):
                 clusto.commit()
             
             except:
-                clusto.rollbackTransaction()
+                clusto.rollback_transaction()
 
             d1.add_attr('foo2', 'bar2')
 
             raise Exception()
             clusto.commit()
         except:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
 
         self.assertEqual(d1.attrs(), [])
         self.assertRaises(LookupError, clusto.get_by_name, 'd2')
@@ -124,7 +124,7 @@ class TestClusto(testbase.ClustoTestBase):
             c1 = Entity('c1')
             clusto.commit()
         except Exception:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
 
         clusto.get_by_name('c1')
 

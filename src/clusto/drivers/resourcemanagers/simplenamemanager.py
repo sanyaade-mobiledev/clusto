@@ -83,7 +83,7 @@ class SimpleEntityNameManager(SimpleNameManager):
 
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
         
         return newobj

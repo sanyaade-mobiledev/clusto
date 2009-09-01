@@ -87,7 +87,7 @@ class PortMixin:
             dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
 
     def disconnectPort(self, porttype, portnum):
@@ -109,7 +109,7 @@ class PortMixin:
                 self.delPortAttr(porttype, portnum, 'connection')
                 self.delPortAttr(porttype, portnum, 'otherportnum')
             except Exception, x:
-                clusto.rollbackTransaction()
+                clusto.rollback_transaction()
                 raise x
             
 

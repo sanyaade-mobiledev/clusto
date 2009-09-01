@@ -101,7 +101,7 @@ class ResourceManager(Driver):
                 attr = None
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
 
         return attr #resource
@@ -125,7 +125,7 @@ class ResourceManager(Driver):
                     
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
     def available(self, resource, number=True):
         """return True if resource is available, False otherwise.

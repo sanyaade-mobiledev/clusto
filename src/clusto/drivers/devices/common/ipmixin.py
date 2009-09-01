@@ -72,7 +72,7 @@ class IPMixin:
 
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
         
 

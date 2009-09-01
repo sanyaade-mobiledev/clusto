@@ -172,7 +172,7 @@ def begin_transaction():
         tl.TRANSACTIONCOUNTER += 1
         return SESSION.begin()
 
-def rollbackTransaction():
+def rollback_transaction():
     """Rollback a transaction"""
     global tl
 
@@ -202,7 +202,7 @@ def deleteEntity(entity):
         SESSION.delete(entity)
         commit()
     except Exception, x:
-        rollbackTransaction()
+        rollback_transaction()
         raise x
     
 

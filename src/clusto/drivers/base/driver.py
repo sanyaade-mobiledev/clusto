@@ -517,7 +517,7 @@ class Driver(object):
                 i.delete()
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
 
 

@@ -17,7 +17,7 @@ class ClustoTestResult(unittest.TestResult):
         returned by sys.exc_info().
         """
         print >>sys.stderr, "ERROR HERE!"
-        clusto.rollbackTransaction()
+        clusto.rollback_transaction()
         self.errors.append((test, self._exc_info_to_string(err, test)))
         
 
