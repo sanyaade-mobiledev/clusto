@@ -244,7 +244,7 @@ def get_server(ipaddr):
 
 def simple_ipbind(device, porttype='nic-eth', portnum=0):
     try:
-        ip = IPManager.getIPs(device)
+        ip = IPManager.get_ips(device)
     except:
         ip = None
 
@@ -264,7 +264,7 @@ def simple_ipbind(device, porttype='nic-eth', portnum=0):
 
     if ip:
         try:
-            if not IPManager.getIPs(device):
+            if not IPManager.get_ips(device):
                 device.bindIPtoPort(ip, porttype, portnum)
                 clusto.commit()
         except ResourceException:

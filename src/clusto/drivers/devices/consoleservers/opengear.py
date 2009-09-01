@@ -17,7 +17,7 @@ class OpenGearCM4148(BasicConsoleServer):
         if porttype != 'console-serial':
             raise DriverException("Cannot connect to a non-serial port")
 
-        host = IPManager.getIPs(self)
+        host = IPManager.get_ips(self)
         if len(host) == 0:
             host = self.name
         else:

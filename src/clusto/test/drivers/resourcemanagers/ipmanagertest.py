@@ -52,6 +52,6 @@ class IPManagerTest(testbase.ClustoTestBase):
         ip1.allocate(s1)
         ip2.allocate(s1)
 
-        self.assertEqual(sorted(IPManager.getIPs(s1)),
+        self.assertEqual(sorted(IPManager.get_ips(s1)),
                          sorted(['192.168.1.2', '10.0.128.2']))
         

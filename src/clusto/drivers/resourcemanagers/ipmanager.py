@@ -139,7 +139,7 @@ class IPManager(ResourceManager):
         return ipman
         
     @classmethod
-    def getIPs(cls, device):
+    def get_ips(cls, device):
 
         ret = [str(IPy.IP(x.value+cls.__int_ip_const))
                for x in cls.resources(device)]
