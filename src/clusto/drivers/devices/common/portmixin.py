@@ -90,7 +90,7 @@ class PortMixin:
             clusto.rollback_transaction()
             raise x
 
-    def disconnectPort(self, porttype, portnum):
+    def disconnect_port(self, porttype, portnum):
         """disconnect both sides of a port"""
 
         portnum = self._ensure_portnum(porttype, portnum)

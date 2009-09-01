@@ -108,7 +108,7 @@ class PortTests(testbase.ClustoTestBase):
 
         self.assertEqual(t2, t1.getConnected('a', 1))
         
-        t2.disconnectPort('a', 3)
+        t2.disconnect_port('a', 3)
 
         self.assertEqual(None, t1.getConnected('a', 1))
         self.assertEqual(None, t2.getConnected('a', 3))
