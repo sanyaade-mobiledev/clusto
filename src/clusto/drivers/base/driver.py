@@ -197,7 +197,7 @@ class Driver(object):
             object.__setattr__(self, name, value)
         
     @classmethod
-    def ensureDriver(self, obj, msg=None):
+    def ensure_driver(self, obj, msg=None):
         """Ensure that the given argument is a Driver.
 
         If the object is an Entity it will be turned into a Driver and then
@@ -558,7 +558,7 @@ class Driver(object):
 
         """
         
-        d = self.ensureDriver(thing, 
+        d = self.ensure_driver(thing, 
                               "Can only insert an Entity or a Driver. "
                               "Tried to insert %s." % str(type(thing)))
 

@@ -28,7 +28,7 @@ class Pool(Driver):
         A given entity can only be in a Pool one time.
         """
         
-        d = self.ensureDriver(thing, 
+        d = self.ensure_driver(thing, 
                                "Can only insert an Entity or a Driver. "
                                "Tried to insert %s." % str(type(thing)))
 
@@ -43,7 +43,7 @@ class Pool(Driver):
         Is this pool the parent of the given entity
         """
         
-        d = self.ensureDriver(thing, 
+        d = self.ensure_driver(thing, 
                                "Can only be the parent of a Driver or Entity.")
         
         return self in d.contents()
@@ -51,7 +51,7 @@ class Pool(Driver):
     @classmethod
     def getPools(cls, obj, allPools=True):
 
-        d = cls.ensureDriver(obj, "obj must be either an Entity or a Driver.")
+        d = cls.ensure_driver(obj, "obj must be either an Entity or a Driver.")
 
 
         pools = [Driver(a.entity) for a in d.parents()
