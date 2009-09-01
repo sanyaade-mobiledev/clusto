@@ -18,7 +18,7 @@ class ResourceManager(Driver):
     _clusto_type = "resourcemanager"
     _driver_name = "resourcemanager"
 
-    _attrName = "resource"
+    _attr_name = "resource"
     _recordAllocations = True
     
 
@@ -72,21 +72,21 @@ class ResourceManager(Driver):
 
             if self._recordAllocations:
                 if number == True:
-                    attr = thing.add_attr(Attribute(self._attrName,
+                    attr = thing.add_attr(Attribute(self._attr_name,
                                                    resource,
                                                    number=select([func.count('*')],
-                                                                 and_(ATTR_TABLE.c.key==self._attrName,
+                                                                 and_(ATTR_TABLE.c.key==self._attr_name,
                                                                       ATTR_TABLE.c.number!=None,
                                                                       ATTR_TABLE.c.subkey==None,
                                                                       )).as_scalar(), 
                                                    ))
                 else:
-                    attr = thing.add_attr(self._attrName, resource, number=number)
+                    attr = thing.add_attr(self._attr_name, resource, number=number)
                     
                 clusto.flush()
                 n=select(['number'], ATTR_TABLE.c.attr_id==attr.attr_id).as_scalar()
 
-                a=Attribute(self._attrName,
+                a=Attribute(self._attr_name,
                             self.entity,
                             number=n,
                             subkey='manager',
@@ -114,14 +114,14 @@ class ResourceManager(Driver):
         try:
             if resource is ():                      
                 for res in self.resources(thing):
-                    thing.del_attrs(self._attrName, number=number)
+                    thing.del_attrs(self._attr_name, number=number)
 
             elif resource and not self.available(resource, number):
                 resource, number = self.ensureType(resource, number)
 
-                res = thing.attrs(self._attrName, self, subkey='manager', number=number)
+                res = thing.attrs(self._attr_name, self, subkey='manager', number=number)
                 for a in res: 
-                    thing.del_attrs(self._attrName, number=a.number)
+                    thing.del_attrs(self._attr_name, number=a.number)
                     
             clusto.commit()
         except Exception, x:
@@ -145,7 +145,7 @@ class ResourceManager(Driver):
 
         resource, number = self.ensureType(resource, number)
 
-        return Driver.get_by_attr(self._attrName, resource, number=number)
+        return Driver.get_by_attr(self._attr_name, resource, number=number)
 
     @classmethod
     def resources(cls, thing):
@@ -155,13 +155,13 @@ class ResourceManager(Driver):
         A resource is a resource attribute in a resource manager.
         """
         
-        attrs = [x for x in thing.attrs(cls._attrName, subkey='manager') 
+        attrs = [x for x in thing.attrs(cls._attr_name, subkey='manager') 
                  if isinstance(Driver(x.value), cls)]
 
         res = []
 
         for attr in attrs:
-            t=thing.attrs(cls._attrName, number=attr.number, subkey=None)
+            t=thing.attrs(cls._attr_name, number=attr.number, subkey=None)
             res.extend(t)
 
 
@@ -171,13 +171,13 @@ class ResourceManager(Driver):
     def count(self):
         """Return the number of resources used."""
 
-        return len(self.references(self._attrName, self, subkey='manager'))
+        return len(self.references(self._attr_name, self, subkey='manager'))
 
     def getResourceNum(self, thing, resource):
         """Retrun the resource number for the given resource on the given Entity"""
 
         resource, number = self.ensureType(resource)
-        res = thing.attrs(self._attrName, number=number, value=resource)
+        res = thing.attrs(self._attr_name, number=number, value=resource)
 
         if res:
             return res[0].number
@@ -190,4 +190,4 @@ class ResourceManager(Driver):
         
         resource, number = self.ensureType(resource)
 
-        return thing.attrs(self._attrName, number=number, value=resource)
+        return thing.attrs(self._attr_name, number=number, value=resource)

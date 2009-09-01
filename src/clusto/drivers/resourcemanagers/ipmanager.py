@@ -19,7 +19,7 @@ class IPManager(ResourceManager):
                    'netmask': '255.255.255.255',
                    'baseip': None }
 
-    _attrName = "ip"
+    _attr_name = "ip"
 
     __int_ip_const = 2147483648
     
@@ -60,7 +60,7 @@ class IPManager(ResourceManager):
 
         resource, number = self.ensureType(resource, number)
 
-        thing.add_attr(self._attrName, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
+        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
         
                      
     def allocator(self):
