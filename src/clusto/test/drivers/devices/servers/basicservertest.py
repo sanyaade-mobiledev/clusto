@@ -43,31 +43,31 @@ class BasicServerTest(testbase.ClustoTestBase):
         self.assertEqual(s2.hostname, "newname")
         
 
-    def testFQDN(self):
+    def testfqdn(self):
 
         s1 = clusto.get_by_name('bs1')
         s2 = clusto.get_by_name('bs2')
 
-        self.assertEqual(s1.FQDNs, [])
+        self.assertEqual(s1.fqdns, [])
 
-        s2.addFQDN("test.example.com")
+        s2.addfqdn("test.example.com")
 
         self.assertEqual(["test.example.com"],
-                         s2.FQDNs)
+                         s2.fqdns)
 
-        s2.addFQDN("test2.example.com")
+        s2.addfqdn("test2.example.com")
         
         clusto.flush()
 
         self.assertEqual(sorted(["test.example.com",
                                  "test2.example.com"]),
-                         sorted(s2.FQDNs))
+                         sorted(s2.fqdns))
 
-        s2.removeFQDN("test.example.com")
+        s2.removefqdn("test.example.com")
 
         
         self.assertEqual(["test2.example.com"],
-                         s2.FQDNs)
+                         s2.fqdns)
 
 
     def testBindingIPtoOSPort(self):

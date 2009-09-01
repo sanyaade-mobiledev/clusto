@@ -32,19 +32,19 @@ class Device(Driver):
     hostname = property(_get_hostname, _set_hostname)
 
     @property
-    def FQDNs(self):
+    def fqdns(self):
         """return the fully qualified domain names for this device"""
 
         return self.attr_values("fqdn")
 
 
-    def addFQDN(self, fqdn):
+    def addfqdn(self, fqdn):
         """add a fully qualified domain name"""
         
         if not self.has_attr("fqdn", number=True, value=fqdn):
             self.add_attr("fqdn", number=True, value=fqdn)
 
-    def removeFQDN(self, fqdn):
+    def removefqdn(self, fqdn):
         """remove a fully qualified domain name"""
         
         self.del_attrs("fqdn", number=True, value=fqdn)

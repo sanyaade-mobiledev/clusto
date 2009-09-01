@@ -226,7 +226,7 @@ def get_server(ipaddr):
         return server
 
     if not fqdn in [x.value for x in server.attrs('fqdn')]:
-        server.addFQDN(fqdn)
+        server.addfqdn(fqdn)
 
     try:
         fqdn = socket.gethostbyaddr(ipaddr)[0]
@@ -234,7 +234,7 @@ def get_server(ipaddr):
             if fqdn.find('.') == -1:
                 fqdn += '.digg.internal'
             if fqdn and not fqdn in [x.value for x in server.attrs('fqdn')]:
-                server.addFQDN(fqdn)
+                server.addfqdn(fqdn)
     except:
         pass
         
