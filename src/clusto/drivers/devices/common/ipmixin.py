@@ -13,7 +13,7 @@ from clusto.exceptions import ConnectionException,  ResourceException
 
 class IPMixin:
 
-    def addIP(self, ip=None, ipman=None):
+    def add_ip(self, ip=None, ipman=None):
 
         if not ip and not ipman:
             raise ResourceException('If no ip is specified then an ipmanager must be specified')

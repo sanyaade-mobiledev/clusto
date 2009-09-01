@@ -84,15 +84,15 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         s1 = clusto.get_by_name('bs1')
 
-        self.assertRaises(ResourceException, s1.addIP, '10.0.0.100')
+        self.assertRaises(ResourceException, s1.add_ip, '10.0.0.100')
 
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1')
 
-        s1.addIP('10.0.0.100')
+        s1.add_ip('10.0.0.100')
         
         self.assertTrue(s1.hasIP('10.0.0.100'))
 
-        s1.addIP(ipman=ipm)
+        s1.add_ip(ipman=ipm)
 
         self.assertTrue(s1.hasIP('10.0.0.1'))
 
@@ -101,7 +101,7 @@ class BasicServerTest(testbase.ClustoTestBase):
         s1 = clusto.get_by_name('bs1')
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 
-        s1.addIP(ipman=ipm)
+        s1.add_ip(ipman=ipm)
 
         self.assertTrue(s1.hasIP('10.0.0.2'))
         
