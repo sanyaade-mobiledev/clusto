@@ -112,7 +112,7 @@ class BasicRack(Location):
         if rack:
             rack = rack.pop()
             return {'rack':Driver(rack.entity),  
-                    'RU':[x.number for x in rack.contentAttrs(value=device,
+                    'RU':[x.number for x in rack.content_attrs(value=device,
                                                               subkey='ru')]}
         else:
             

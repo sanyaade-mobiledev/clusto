@@ -593,7 +593,7 @@ class Driver(object):
 
         self.del_attrs("_contains", d, ignore_hidden=False)
 
-    def contentAttrs(self, *args, **kwargs):
+    def content_attrs(self, *args, **kwargs):
         """Return the attributes referring to this Thing's contents
 
         """
@@ -612,7 +612,7 @@ class Driver(object):
         
         """
         
-        return [attr.value for attr in self.contentAttrs(*args, **kwargs)]
+        return [attr.value for attr in self.content_attrs(*args, **kwargs)]
 
     def parents(self, **kwargs):        
         """Return a list of Things that contain _this_ Thing. """
