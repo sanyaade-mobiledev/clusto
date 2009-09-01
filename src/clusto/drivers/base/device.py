@@ -25,11 +25,11 @@ class Device(Driver):
         else:
             return self.entity.name
         
-    def _setHostname(self, name):
+    def _set_hostname(self, name):
 
         self.set_attr("hostname", value=name)
 
-    hostname = property(_get_hostname, _setHostname)
+    hostname = property(_get_hostname, _set_hostname)
 
     @property
     def FQDNs(self):
