@@ -108,7 +108,7 @@ class IPManager(ResourceManager):
         raise ResourceNotAvailableException("out of available ips.")
 
     @classmethod
-    def getIPManager(cls, ip):
+    def get_ip_manager(cls, ip):
         """return a valid ip manager for the given ip.
 
         @param ip: the ip
@@ -148,5 +148,5 @@ class IPManager(ResourceManager):
 
     @classmethod
     def getDevice(self, ip):
-        subnet = IPManager.getIPManager(ip)
+        subnet = IPManager.get_ip_manager(ip)
         return subnet.owners(ip)

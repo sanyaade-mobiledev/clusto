@@ -115,7 +115,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         porttype = match['porttype']
 
         #subnet.allocate(server, n['inet addr'])
-        subnet = IPManager.getIPManager(n['inet addr'])
+        subnet = IPManager.get_ip_manager(n['inet addr'])
         if not server in subnet.owners(n['inet addr']):
             server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
         server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])

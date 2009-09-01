@@ -21,7 +21,7 @@ class IPMixin:
         elif ip:
             
             if not ipman:
-                ipman = IPManager.getIPManager(ip)
+                ipman = IPManager.get_ip_manager(ip)
 
             return ipman.allocate(self, ip)
         else:
@@ -31,7 +31,7 @@ class IPMixin:
         
     def has_ip(self, ip):
 
-        ipman = IPManager.getIPManager(ip)
+        ipman = IPManager.get_ip_manager(ip)
 
         return self in ipman.owners(ip)
     
@@ -53,7 +53,7 @@ class IPMixin:
 
             if not self.has_ip(ip):
                 if not ipman:
-                    ipman = IPManager.getIPManager(ip)
+                    ipman = IPManager.get_ip_manager(ip)
 
                 ipman.allocate(self, ip)
 

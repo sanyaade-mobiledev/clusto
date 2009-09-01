@@ -113,7 +113,7 @@ def main():
 
         ipaddr = ipaddr.split('/')[0]
         print repr(ipaddr)
-        subnet = IPManager.getIPManager(ipaddr)
+        subnet = IPManager.get_ip_manager(ipaddr)
 
         if device in subnet.owners(ipaddr):
             continue
