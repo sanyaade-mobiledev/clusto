@@ -148,7 +148,7 @@ class PortInfoAPI(EntityAPI):
         result = {}
         result['object'] = self.url
         result['ports'] = []
-        for port in self.obj.port_infoTuples:
+        for port in self.obj.port_info_tuples:
             porttype, portnum, otherobj, othernum = [unclusto(x) for x in port]
             result['ports'].append({
                 'type': porttype,

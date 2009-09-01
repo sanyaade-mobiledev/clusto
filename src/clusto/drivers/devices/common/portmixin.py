@@ -234,7 +234,7 @@ class PortMixin:
         return portinfo
 
     @property
-    def port_infoTuples(self):
+    def port_info_tuples(self):
         """return port information as a list of tuples that are suitble for use
         as *args to connect_ports
 
@@ -257,7 +257,7 @@ class PortMixin:
     @property
     def freePorts(self):
         
-        return [(pinfo[0], pinfo[1]) for pinfo in self.port_infoTuples if pinfo[3] == None]
+        return [(pinfo[0], pinfo[1]) for pinfo in self.port_info_tuples if pinfo[3] == None]
 
     @property
     def connectedPorts(self):
