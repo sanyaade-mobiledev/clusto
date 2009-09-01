@@ -167,7 +167,7 @@ class PortTests(testbase.ClustoTestBase):
                                  ('a', 2),
                                  ('a', 3),
                                  ('z', 0),]),
-                         sorted(t2.freePorts))
+                         sorted(t2.free_ports))
 
         self.assertEqual(sorted(['a', 'b']),
                          sorted(t1.portTypes))

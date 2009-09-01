@@ -255,7 +255,7 @@ class PortMixin:
 
     
     @property
-    def freePorts(self):
+    def free_ports(self):
         
         return [(pinfo[0], pinfo[1]) for pinfo in self.port_info_tuples if pinfo[3] == None]
 
