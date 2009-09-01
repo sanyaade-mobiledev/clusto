@@ -120,7 +120,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
             server.bindIPtoPort(n['inet addr'], 'nic-%s' % porttype, num)
         server.setPortAttr('nic-%s' % porttype, num, 'mac-address', n['hwaddr'])
 
-    if not 'uniqueid' in server.attrKeys():
+    if not 'uniqueid' in server.attr_keys():
         for key, value in get_facts(ipaddr):
             if key == 'fqdn': continue
             server.addAttr(key, value)

@@ -462,7 +462,7 @@ class Driver(object):
         return refs
 
                    
-    def attrKeys(self, *args, **kwargs):
+    def attr_keys(self, *args, **kwargs):
 
         return [x.key for x in self.attrs(*args, **kwargs)]
 
