@@ -20,7 +20,7 @@ def main():
         return
 
     ip = sys.argv[1]
-    #device = IPManager.getDevice(ip)
+    #device = IPManager.get_device(ip)
     #if not device:
     #    device = clusto.get_entities(attrs=[{'key': 'ipaddress', 'value': ip}])
     #if not device:
@@ -77,7 +77,7 @@ def main():
 
     if not device:
         for iface, macaddr, ipaddr in iplist:
-            device = IPManager.getDevice(ipaddr.split('/', 1)[0])
+            device = IPManager.get_device(ipaddr.split('/', 1)[0])
             if device:
                 device = device[0]
                 print 'Found by IPManager'

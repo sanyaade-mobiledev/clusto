@@ -187,7 +187,7 @@ def get_server(ipaddr):
     fqdn = None
 
     try:
-        return IPManager.getDevice(ipaddr)[0]
+        return IPManager.get_device(ipaddr)[0]
     except: pass
 
     try:

@@ -147,6 +147,6 @@ class IPManager(ResourceManager):
         return ret
 
     @classmethod
-    def getDevice(self, ip):
+    def get_device(self, ip):
         subnet = IPManager.get_ip_manager(ip)
         return subnet.owners(ip)
