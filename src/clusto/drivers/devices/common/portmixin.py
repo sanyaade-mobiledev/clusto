@@ -158,7 +158,7 @@ class PortMixin:
             return True
         
 
-    def addPortAttr(self, porttype, portnum, key, value):
+    def add_port_attr(self, porttype, portnum, key, value):
         """add an attribute on the given port"""
 
         portnum = self._ensure_portnum(porttype, portnum)
