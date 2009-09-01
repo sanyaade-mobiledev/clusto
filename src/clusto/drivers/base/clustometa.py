@@ -15,7 +15,7 @@ class ClustoMeta(Driver):
 
     _properties = {'version':None}
 
-    _clustoType = "clustometa"
+    _clusto_type = "clustometa"
     _driverName = "clustometa"
 
 

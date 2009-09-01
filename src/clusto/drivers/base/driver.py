@@ -20,7 +20,7 @@ class Driver(object):
     its Attributes. It provides many helper functions includeing attribute
     setters and accessors, attribute querying, and a handful of conventions.
 
-    Every driver defines a _clustoType and a _driverName member variable.
+    Every driver defines a _clusto_type and a _driverName member variable.
     Upon creation these become the type and driver for the Entity and provides
     a mechanism for choosing the correct driver for a given Entity.
 
@@ -58,7 +58,7 @@ class Driver(object):
     
     __metaclass__ = ClustoDriver
 
-    _clustoType = "generic"
+    _clusto_type = "generic"
     _driverName = "entity"
 
     _properties = dict()
@@ -107,7 +107,7 @@ class Driver(object):
 
             self.entity = Entity(nameDriverEntity)
             self.entity.driver = self._driverName
-            self.entity.type = self._clustoType
+            self.entity.type = self._clusto_type
 
         else:
             raise TypeError("Could not create driver from given arguments.")
@@ -233,7 +233,7 @@ class Driver(object):
         if isinstance(cls, Driver):
             query = query.filter(and_(Attribute.entity_id==Entity.entity_id,
                                       Entity.driver == cls._driverName,
-                                      Entity.type == cls._clustoType))
+                                      Entity.type == cls._clusto_type))
 
         if entity:
             query = query.filter_by(entity_id=entity.entity_id)
@@ -299,7 +299,7 @@ class Driver(object):
                    subkey=(), ignoreHidden=True, 
                    sortByKeys=True, 
                    regex=False, 
-                   clustoTypes=None,
+                   clusto_types=None,
                    clustoDrivers=None,
                    ):
         """Filter attribute lists. (Uses generator comprehension)
@@ -323,7 +323,7 @@ class Driver(object):
         if regex is True then treat the key, subkey, and value query
         parameters as regular expressions.
 
-        clustoTypes is a list of types that the entities referenced by
+        clusto_types is a list of types that the entities referenced by
         relation attributes must match.
 
         clustoDrivers is a list of drivers that the entities referenced by
@@ -382,8 +382,8 @@ class Driver(object):
             cdl = [clusto.getDriverName(n) for n in clustoDrivers]
             result = (attr for attr in result if attr.isRelation and attr.value.entity.driver in cdl)
 
-        if clustoTypes:
-            ctl = [clusto.getTypeName(n) for n in clustoTypes]
+        if clusto_types:
+            ctl = [clusto.getTypeName(n) for n in clusto_types]
             result = (attr for attr in result if attr.isRelation and attr.value.entity.type in ctl)
             
         if sortByKeys:
@@ -425,15 +425,15 @@ class Driver(object):
 
         Accepts the same arguments as attrs().
 
-        The semantics of clustoTypes and clustoDrivers changes to match the
-        clustoType or clustoDriver of the Entity that owns the attribute as
+        The semantics of clusto_types and clustoDrivers changes to match the
+        clusto_type or clustoDriver of the Entity that owns the attribute as
         opposed to the Entity the attribute refers to.
         """
 
         
         clustoDrivers = kwargs.pop('clustoDrivers', None)
             
-        clustoTypes = kwargs.pop('clustoTypes', None)
+        clusto_types = kwargs.pop('clusto_types', None)
         
         result = self.attrFilter(self.entity._references, *args, **kwargs)
 
@@ -441,8 +441,8 @@ class Driver(object):
             cdl = [clusto.getDriverName(n) for n in clustoDrivers]
             result = (attr for attr in result if attr.entity.driver in cdl)
 
-        if clustoTypes:
-            ctl = [clusto.getTypeName(n) for n in clustoTypes]
+        if clusto_types:
+            ctl = [clusto.getTypeName(n) for n in clusto_types]
             result = (attr for attr in result if attr.entity.type in ctl)
 
 

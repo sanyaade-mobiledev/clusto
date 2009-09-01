@@ -74,7 +74,7 @@ def getTypeName(name):
             raise NameError("driver name %s doesn't exist." % name)
 
     elif isinstance(name, type):
-        return name._clustoType
+        return name._clusto_type
     else:
         return name.type
         
@@ -88,7 +88,7 @@ def getDriver(entity, ignoreDriverColumn=False):
 
     return Driver
 
-def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
+def getEntities(names=(), clusto_types=(), clustoDrivers=(), attrs=()):
     """Get entities matching the given criteria
 
     @param names: list of names to match
@@ -110,8 +110,8 @@ def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
     if names:
         query = query.filter(Entity.name.in_(names))
 
-    if clustoTypes:
-        ctl = [getTypeName(n) for n in clustoTypes]
+    if clusto_types:
+        ctl = [getTypeName(n) for n in clusto_types]
         query = query.filter(Entity.type.in_(ctl))
 
     if clustoDrivers:

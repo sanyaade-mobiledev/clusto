@@ -23,7 +23,7 @@ class ClustoDriver(type):
         
 
         DRIVERLIST[cls._driverName] = cls
-        TYPELIST[cls._clustoType] = cls
+        TYPELIST[cls._clusto_type] = cls
 
         # setup properties
         if not isinstance(cls._properties, dict):

@@ -7,7 +7,7 @@ class BasicConsoleServer(PortMixin, Device):
     Basic console server Driver
     """
 
-    _clustoType = 'consoleserver'
+    _clusto_type = 'consoleserver'
     _driverName = 'basicconsoleserver'
 
     

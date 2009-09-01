@@ -216,7 +216,7 @@ class ClustoApp(object):
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']
         result = []
-        for obj in clusto.getEntities(clustoTypes=(objtype,)):
+        for obj in clusto.getEntities(clusto_types=(objtype,)):
             result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))
 

@@ -6,7 +6,7 @@ class BasicServer(IPMixin, PortMixin, Device):
     server
     """
 
-    _clustoType = "server"
+    _clusto_type = "server"
     _driverName = "basicserver"
 
     _properties = {'model':None,

@@ -165,7 +165,7 @@ class PoolTests(testbase.ClustoTestBase):
         p1.insert(BasicServer('s2'))
         p1.insert(BasicNetworkSwitch('sw1'))
 
-        self.assertEqual(p1.contents(clustoTypes=[BasicNetworkSwitch]),
+        self.assertEqual(p1.contents(clusto_types=[BasicNetworkSwitch]),
                          [clusto.getByName('sw1')])
 
     def testAddToPoolMultipleTimes(self):

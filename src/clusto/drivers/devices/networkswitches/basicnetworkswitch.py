@@ -7,7 +7,7 @@ class BasicNetworkSwitch(IPMixin, PortMixin, Device):
     Basic network switch driver
     """
 
-    _clustoType = 'networkswitch'
+    _clusto_type = 'networkswitch'
     _driverName = 'basicnetworkswitch'
 
 

@@ -3,7 +3,7 @@ from clusto.drivers.base import Driver
 
 class Location(Driver):
 
-    _clustoType = "location"
+    _clusto_type = "location"
     _driverName = "location"
 
 

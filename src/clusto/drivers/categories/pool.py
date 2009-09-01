@@ -13,7 +13,7 @@ class Pool(Driver):
     """
     
     _driverName = "pool"
-    _clustoType = "pool"
+    _clusto_type = "pool"
 
 
     def insert(self, thing):

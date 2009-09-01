@@ -151,7 +151,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         tl = [Location, BasicDatacenter]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clustoTypes=tl)]),
+                                 for n in clusto.getEntities(clusto_types=tl)]),
                          sorted(['l1','dc1']))
 
     def testGetEntitesWithAttrs(self):

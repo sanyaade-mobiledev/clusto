@@ -7,7 +7,7 @@ class BasicRack(Location):
     Basic rack driver.
     """
 
-    _clustoType = "rack"
+    _clusto_type = "rack"
     _driverName = "basicrack"
 
     _properties = {'minu':1,
@@ -100,7 +100,7 @@ class BasicRack(Location):
         returns a tuple of (rack, u-number)
         """
 
-        rack = set(device.parents(clustoTypes=[cls]))
+        rack = set(device.parents(clusto_types=[cls]))
 
 
         if len(rack) > 1:

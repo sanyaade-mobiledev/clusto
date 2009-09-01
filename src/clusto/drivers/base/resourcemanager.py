@@ -15,7 +15,7 @@ class ResourceManager(Driver):
     """
     
 
-    _clustoType = "resourcemanager"
+    _clusto_type = "resourcemanager"
     _driverName = "resourcemanager"
 
     _attrName = "resource"
