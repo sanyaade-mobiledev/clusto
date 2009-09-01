@@ -33,7 +33,7 @@ class addAttr(ClustoScript):
         value = argv[3]
 
     
-        thing = clusto.getByName(thingname)
+        thing = clusto.get_by_name(thingname)
 
         if options.replace:
             thing.delAttrs(keyname)

@@ -36,7 +36,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testPortTypes(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         
         self.assertEqual(sorted(t1.portTypes), 
@@ -47,7 +47,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testPortExists(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         self.assertTrue(t1.portExists('a', 3))
         self.assertTrue(t1.portExists('a', 0))
@@ -59,7 +59,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testPortsConnectable(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         self.assertTrue(t1.portsConnectable('a', 1, t2, 3))
         self.assertFalse(t1.portsConnectable('a', 1, t2, 5))
@@ -67,7 +67,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testPortFree(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         self.assertTrue(t1.portFree('a', 2))
 
@@ -77,7 +77,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testConnectPorts(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         t1.connectPorts('a', 1, t2, 3)
 
@@ -102,7 +102,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testDisconnectPort(self):
 
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         t1.connectPorts('a', 1, t2, 3)
 
@@ -119,7 +119,7 @@ class PortTests(testbase.ClustoTestBase):
         
     def testPortAttrs(self):
 
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         t1.setPortAttr('a', 0, 'macaddr', 'foo')
         self.assertEqual('foo', t1.getPortAttrs('a', 0, 'macaddr'))
@@ -137,7 +137,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testPortInfo(self):
         
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         self.assertEqual(sorted([('a', 0, None, None,),
                                  ('a', 1, None, None,),
@@ -178,7 +178,7 @@ class PortTests(testbase.ClustoTestBase):
 
     def testConnectedPorts(self):
 
-        t1, t2, p = map(clusto.getByName, ['t1', 't2', 'p'])
+        t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         for i in [t1, t2]:
             for t in i.portTypes:

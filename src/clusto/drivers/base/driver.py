@@ -96,7 +96,7 @@ class Driver(object):
         elif isinstance(name_driver_entity, (str, unicode)):
 
             try:
-                existing = clusto.getByName(name_driver_entity)
+                existing = clusto.get_by_name(name_driver_entity)
             except LookupError, x:
                 existing = None
             

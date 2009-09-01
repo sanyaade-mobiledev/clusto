@@ -14,8 +14,8 @@ class BasicServerTest(testbase.ClustoTestBase):
         
     def testBasicServerCreation(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
         self.assertEqual(s1.model, '7000')
         self.assertEqual(s1.manufacturer, 'ibm')
@@ -25,8 +25,8 @@ class BasicServerTest(testbase.ClustoTestBase):
         
     def testHostname(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
         s2.hostname = "testname"
 
@@ -45,8 +45,8 @@ class BasicServerTest(testbase.ClustoTestBase):
 
     def testFQDN(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
         self.assertEqual(s1.FQDNs, [])
 
@@ -72,8 +72,8 @@ class BasicServerTest(testbase.ClustoTestBase):
 
     def testBindingIPtoOSPort(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
                 
         ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
 
@@ -82,7 +82,7 @@ class BasicServerTest(testbase.ClustoTestBase):
         
     def testAddingIP(self):
 
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
 
         self.assertRaises(ResourceException, s1.addIP, '10.0.0.100')
 
@@ -98,7 +98,7 @@ class BasicServerTest(testbase.ClustoTestBase):
 
     def testAddingIPfromIPManagerWithGateway(self):
                         
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 
         s1.addIP(ipman=ipm)
@@ -108,7 +108,7 @@ class BasicServerTest(testbase.ClustoTestBase):
 
     def testBindingIPtoOSPort(self):
 
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
 
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 

@@ -90,7 +90,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        d = clusto.getByName('d1')
+        d = clusto.get_by_name('d1')
         
         self.assertEqual(len(d.references()), 1)
         self.assertEqual(len(d.attrs()), 2)
@@ -321,7 +321,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
         
         clusto.flush()
 
-        d = clusto.getByName('d1')
+        d = clusto.get_by_name('d1')
 
         self.assertEqual(d.attrItems(ignoreHidden=False),
                          [(('_contains', 0, None), d2)])
@@ -335,7 +335,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
         
         clusto.flush()
 
-        d = clusto.getByName('d1')
+        d = clusto.get_by_name('d1')
         d.remove(d2)
 
         clusto.flush()
@@ -473,9 +473,9 @@ class TestDriverQueries(testbase.ClustoTestBase):
 
     def testAttrAndQueryEqual(self):
 
-        d1 = clusto.getByName('d1')
-        d2 = clusto.getByName('d2')
-        d3 = clusto.getByName('d3')
+        d1 = clusto.get_by_name('d1')
+        d2 = clusto.get_by_name('d2')
+        d3 = clusto.get_by_name('d3')
 
         self.assertEqual(d1.attrs('a'), d1.attrQuery('a'))
 
@@ -510,7 +510,7 @@ class TestDriverQueries(testbase.ClustoTestBase):
 
     def testDoAttrQuery(self):
 
-        d1 = clusto.getByName('d1')
-        d2 = clusto.getByName('d2')
+        d1 = clusto.get_by_name('d1')
+        d2 = clusto.get_by_name('d2')
         self.assertEqual(set(Driver.getByAttr(key='a*')),
                          set([d1,d2]))

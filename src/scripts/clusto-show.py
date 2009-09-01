@@ -27,7 +27,7 @@ class showthing(ClustoScript):
 
         thingname = argv[1]
 
-        thing = clusto.getByName(thingname)
+        thing = clusto.get_by_name(thingname)
 
         print thing
 

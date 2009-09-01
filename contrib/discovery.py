@@ -74,7 +74,7 @@ SSH_CMD = ['ssh', '-o', 'StrictHostKeyChecking no', '-o', 'PasswordAuthenticatio
 
 def get_or_create(objtype, name):
     try:
-        return clusto.getByName(name)
+        return clusto.get_by_name(name)
     except LookupError:
         return objtype(name)
 
@@ -191,7 +191,7 @@ def get_server(ipaddr):
     except: pass
 
     try:
-        names = clusto.getByName('servernames')
+        names = clusto.get_by_name('servernames')
     except:
         names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=0)
     hostname = get_hostname(ipaddr)

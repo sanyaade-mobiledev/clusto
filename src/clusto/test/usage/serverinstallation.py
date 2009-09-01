@@ -29,27 +29,27 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
     def testServerRackLocation(self):
 
-        r = clusto.getByName('r1')
-        s = clusto.getByName('s1')
+        r = clusto.get_by_name('r1')
+        s = clusto.get_by_name('s1')
         
         self.assertEqual(BasicRack.getRackAndU(s)['RU'], [1])
 
         self.assertEqual(r.getDeviceIn(12),
-                         clusto.getByName('sw1'))
+                         clusto.get_by_name('sw1'))
 
         self.assertEqual(r.getDeviceIn(10),
-                         clusto.getByName('p1'))
+                         clusto.get_by_name('p1'))
 
         self.assertEqual(r.getDeviceIn(11),
-                         clusto.getByName('p1'))
+                         clusto.get_by_name('p1'))
         
         
 
     def testPortConnections(self):
 
-        s = clusto.getByName('s1')
-        sw = clusto.getByName('sw1')
-        p1 = clusto.getByName('p1')
+        s = clusto.get_by_name('s1')
+        sw = clusto.get_by_name('sw1')
+        p1 = clusto.get_by_name('p1')
 
         sw.connectPorts('nic-eth', 0, s, 0)
         
@@ -78,9 +78,9 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         newserver = servernames.allocate(BasicServer)
         
 
-        sw = clusto.getByName('sw1')
-        p1 = clusto.getByName('p1')
-        r = clusto.getByName('r1')
+        sw = clusto.get_by_name('sw1')
+        p1 = clusto.get_by_name('p1')
+        r = clusto.get_by_name('r1')
 
         self.assertEqual('server0001', newserver.name)
 

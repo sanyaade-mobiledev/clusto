@@ -14,15 +14,15 @@ class BasicRackTest(testbase.ClustoTestBase):
 
     def testAddingToRack(self):
 
-        r1 = clusto.getByName('r1')
+        r1 = clusto.get_by_name('r1')
 
         s1 = BasicServer('s1')
 
         r1.insert(s1, 1)
 
 
-        rt = clusto.getByName('r1')
-        st = clusto.getByName('s1')
+        rt = clusto.get_by_name('r1')
+        st = clusto.get_by_name('s1')
 
         self.assertEqual(len(r1.contents(subkey='ru')), 1)
 
@@ -32,7 +32,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
     def testMaxRackPosition(self):
 
-        r1 = clusto.getByName('r1')
+        r1 = clusto.get_by_name('r1')
 
         self.assertRaises(TypeError, r1.insert, BasicServer('s1'), 400)
 
@@ -42,7 +42,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
     def testGettingThingInRack(self):
 
-        r1 = clusto.getByName('r1')
+        r1 = clusto.get_by_name('r1')
 
         r1.insert(BasicServer('s1'), 40)
 
@@ -55,7 +55,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
     def testGettingRackAndU(self):
 
-        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+        r1, r2 = [clusto.get_by_name(r) for r in ['r1','r2']]
 
         s=BasicServer('s1')
         clusto.flush()
@@ -63,7 +63,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        s = clusto.getByName('s1')
+        s = clusto.get_by_name('s1')
 
         res = BasicRack.getRackAndU(s)
 
@@ -80,7 +80,7 @@ class BasicRackTest(testbase.ClustoTestBase):
         """
 
         
-        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+        r1, r2 = [clusto.get_by_name(r) for r in ['r1','r2']]
 
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
@@ -93,7 +93,7 @@ class BasicRackTest(testbase.ClustoTestBase):
         you should be able to add a device to multiple adjacent RUs
         """
 
-        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+        r1, r2 = [clusto.get_by_name(r) for r in ['r1','r2']]
 
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
@@ -102,7 +102,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        s = clusto.getByName('s1')
+        s = clusto.get_by_name('s1')
 
         self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
                          [1,2,3])
@@ -111,7 +111,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
     def testAddingToDoubleDigitLocationThenSingleDigitLocation(self):
 
-        r1, r2 = [clusto.getByName(r) for r in ['r1','r2']]
+        r1, r2 = [clusto.get_by_name(r) for r in ['r1','r2']]
 
         s1 = BasicServer('s1')
         s2 = BasicServer('s2')
@@ -122,7 +122,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        s = clusto.getByName('s1')
+        s = clusto.get_by_name('s1')
 
         self.assertEqual(sorted(BasicRack.getRackAndU(s)['RU']),
                          [11])

@@ -20,13 +20,13 @@ class IPManagerTest(testbase.ClustoTestBase):
 
     def testBadIPAllocation(self):
         
-        ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
+        ip1, ip2, s1 = map(clusto.get_by_name, ['a1', 'b1', 's1'])
 
         self.assertRaises(ResourceTypeException, ip1.allocate, s1, '10.2.3.4')
 
     def testNewIP(self):
         
-        ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
+        ip1, ip2, s1 = map(clusto.get_by_name, ['a1', 'b1', 's1'])
 
         num = 50
         for i in range(num):
@@ -40,14 +40,14 @@ class IPManagerTest(testbase.ClustoTestBase):
 
     def testGetIPManager(self):
 
-        ip1, ip2 = map(clusto.getByName, ['a1', 'b1'])
+        ip1, ip2 = map(clusto.get_by_name, ['a1', 'b1'])
 
         self.assertEqual(ip1, IPManager.getIPManager('192.168.1.23'))
         self.assertEqual(ip2, IPManager.getIPManager('10.0.129.22'))
 
     def testGetIP(self):
 
-        ip1, ip2, s1 = map(clusto.getByName, ['a1', 'b1', 's1'])
+        ip1, ip2, s1 = map(clusto.get_by_name, ['a1', 'b1', 's1'])
 
         ip1.allocate(s1)
         ip2.allocate(s1)

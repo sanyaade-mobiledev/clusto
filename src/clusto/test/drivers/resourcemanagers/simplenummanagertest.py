@@ -20,7 +20,7 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
 
     def testAllocateNum(self):
 
-        ngen = clusto.getByName('numgen1')
+        ngen = clusto.get_by_name('numgen1')
         
         d = Driver('foo')
         s1 = ngen.allocate(d)
@@ -38,7 +38,7 @@ class SimpleNumManagerTests(testbase.ClustoTestBase):
         
         d = Driver('foo')
 
-        ngen = clusto.getByName('numgen2')
+        ngen = clusto.get_by_name('numgen2')
 
         s1 = ngen.allocate(d)
         s1 = ngen.allocate(d)

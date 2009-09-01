@@ -135,8 +135,8 @@ def bind_vservers():
         switchport = switchport[0]
         rack_name, portnum = switchport.value.rsplit(',', 1)
         portnum = int(portnum)
-        rack = clusto.getByName(rack_name)
-        switch = clusto.getByName(rack_name + '-sw1')
+        rack = clusto.get_by_name(rack_name)
+        switch = clusto.get_by_name(rack_name + '-sw1')
         print repr(switch)
         for device in rack.contents():
             if device.driver == 'basicserver':

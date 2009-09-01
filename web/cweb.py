@@ -102,7 +102,7 @@ class EntityAPI(object):
         For example: /pool/examplepool/insert?object=/server/exampleserver
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.insert(device)
         clusto.commit()
         return self.show(request)
@@ -117,7 +117,7 @@ class EntityAPI(object):
         For example: /pool/examplepool/remove?object=/server/exampleserver
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.remove(device)
         clusto.commit()
         return self.show(request)
@@ -170,7 +170,7 @@ class RackAPI(EntityAPI):
         Example: /rack/examplerack/insert?object=/server/exampleserver&ru=6
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
         clusto.commit()
         return self.contents(request)
@@ -239,7 +239,7 @@ class ClustoApp(object):
         objtype, objname = name.split('/', 1)
 
         try:
-            obj = clusto.getByName(objname)
+            obj = clusto.get_by_name(objname)
             if obj:
                 return Response(status=409, body='409 Conflict\nObject already exists\n')
         except LookupError: pass
@@ -259,7 +259,7 @@ class ClustoApp(object):
         objtype, objname = name.split('/', 1)
 
         try:
-            obj = clusto.getByName(objname)
+            obj = clusto.get_by_name(objname)
         except LookupError:
             return Response(status=404, body='404 Not Found\n')
 
@@ -270,7 +270,7 @@ class ClustoApp(object):
     def get_action(self, request, match):
         group = match.groupdict()
         try:
-            obj = clusto.getByName(group['name'])
+            obj = clusto.get_by_name(group['name'])
         except LookupError:
             return Response(status=404, body='404 Not Found\n')
 
@@ -282,7 +282,7 @@ class ClustoApp(object):
         action = group.get('action', 'show')
         handler = self.types.get(group['objtype'], EntityAPI)
         if not obj:
-            obj = clusto.getByName(group['name'])
+            obj = clusto.get_by_name(group['name'])
         h = handler(obj)
         if hasattr(h, action):
             f = getattr(h, action)

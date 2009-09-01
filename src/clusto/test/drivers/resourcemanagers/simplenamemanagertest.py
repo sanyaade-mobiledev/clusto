@@ -28,19 +28,19 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
         clusto.flush()
 
     def testNamedDriverCreation(self):
-        ngen = clusto.getByName('foonamegen')
+        ngen = clusto.get_by_name('foonamegen')
         
         s1 = ngen.allocate(Driver)
 
         clusto.flush()
 
-        d1 = clusto.getByName('foo0001')
+        d1 = clusto.get_by_name('foo0001')
 
         self.assertEquals(s1.name, d1.name)
         
     def testAllocateName(self):
 
-        ngen = clusto.getByName('foonamegen')
+        ngen = clusto.get_by_name('foonamegen')
         
         s1 = ngen.allocate(Driver)
         s2 = ngen.allocate(Driver)
@@ -56,7 +56,7 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
 
     def testNoLeadingZeros(self):
 
-        ngen = clusto.getByName('barnamegen')
+        ngen = clusto.get_by_name('barnamegen')
 
         s1 = ngen.allocate(Driver)
         s2 = ngen.allocate(Driver)
@@ -72,7 +72,7 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
 
     def testTooManyDigits(self):
         
-        ngen = clusto.getByName('barnamegen')
+        ngen = clusto.get_by_name('barnamegen')
 
         s1 = ngen.allocate(Driver)
         s2 = ngen.allocate(Driver)
@@ -86,18 +86,18 @@ class SimpleEntityNameManagerTests(testbase.ClustoTestBase):
 
     def testAllocateManyNames(self):
         
-        ngen = clusto.getByName('foonamegen')
+        ngen = clusto.get_by_name('foonamegen')
 
         for i in xrange(50):
             ngen.allocate(Driver)
 
-        self.assertRaises(LookupError, clusto.getByName, 'foo0051')
-        self.assertEqual(clusto.getByName('foo0050').name, 'foo0050')
+        self.assertRaises(LookupError, clusto.get_by_name, 'foo0051')
+        self.assertEqual(clusto.get_by_name('foo0050').name, 'foo0050')
 
 
     def testAllocateGivenName(self):
 
-        ngen = clusto.getByName('foonamegen')
+        ngen = clusto.get_by_name('foonamegen')
 
         d = ngen.allocate(Driver, 'testname')
 
@@ -116,7 +116,7 @@ class SimpleNameManagerTests(testbase.ClustoTestBase):
 
     def testAllocateManyNames(self):
         
-        ngen = clusto.getByName('foonamegen')
+        ngen = clusto.get_by_name('foonamegen')
 
         d = Driver('foo')
 

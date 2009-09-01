@@ -64,7 +64,7 @@ def main():
 
     device = None
     try:
-        device = clusto.getByName(hostname)
+        device = clusto.get_by_name(hostname)
         print 'Found by hostname'
     except LookupError:
         pass

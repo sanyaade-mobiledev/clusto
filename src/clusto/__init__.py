@@ -128,7 +128,7 @@ def getEntities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     return [Driver(entity) for entity in query.all()]
 
     
-def getByName(name):
+def get_by_name(name):
     try:
         entity = SESSION.query(Entity).filter_by(name=name).one()
 
@@ -148,7 +148,7 @@ def rename(oldname, newname):
     ACTIONS.
     """
 
-    old = getByName(oldname)
+    old = get_by_name(oldname)
 
     old.entity.name = newname
 

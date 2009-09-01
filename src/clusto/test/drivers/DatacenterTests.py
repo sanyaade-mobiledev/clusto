@@ -20,7 +20,7 @@ class RackTests(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        tp = clusto.getByName('foo1')
+        tp = clusto.get_by_name('foo1')
 
         theRack = tp.getConnectedByType(Rack)
 
@@ -53,7 +53,7 @@ class RackTests(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        rack = clusto.getByName(rackname)
+        rack = clusto.get_by_name(rackname)
         contents = rack.getRackContents()
         clusto.flush()
         
@@ -80,7 +80,7 @@ class Datacentertest(testbase.ClustoTestBase):
         d = Datacenter('d1', 'san francisco')
         clusto.flush()
 
-        z = clusto.getByName('d1')
+        z = clusto.get_by_name('d1')
 
         self.assert_(z.getAttr('location') == 'san francisco')
 
