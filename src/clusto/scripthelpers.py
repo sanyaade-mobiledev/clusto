@@ -15,7 +15,7 @@ scriptpaths = [os.path.realpath(os.path.join(os.curdir, 'scripts')),
                '/usr/bin',
                ] #+ filter(lambda x: not x.endswith('.egg'), sys.path)
 
-def listClustoScripts(path):
+def list_clusto_scripts(path):
     """
     Return a list of clusto scripts in the given path.
     """
@@ -60,7 +60,7 @@ def getCommand(cmdname):
 
     for path in scriptpaths:
 
-        scripts = listClustoScripts(path)
+        scripts = list_clusto_scripts(path)
 
         for s in scripts:
             if s.split('-')[1].split('.')[0] == cmdname:
