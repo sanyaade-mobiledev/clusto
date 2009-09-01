@@ -203,7 +203,7 @@ def get_server(ipaddr):
         else:
             fqdn = hostname + '.digg.internal'
 
-        server = clusto.getEntities(attrs=[{'key': 'fqdn', 'value': fqdn}])
+        server = clusto.get_entities(attrs=[{'key': 'fqdn', 'value': fqdn}])
 
         if server:
             server = server[0]

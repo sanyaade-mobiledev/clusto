@@ -128,7 +128,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     clusto.commit()
 
 def bind_vservers():
-    for vserver in clusto.getEntities(clustodrivers=(BasicVirtualServer,)):
+    for vserver in clusto.get_entities(clustodrivers=(BasicVirtualServer,)):
         switchport = vserver.attrs('switchport')
         if not switchport: continue
         print 'Binding', repr(vserver)
@@ -164,7 +164,7 @@ def main():
         except:
             print format_exc()
     #bind_vservers()
-    #pprint(clusto.getEntities())
+    #pprint(clusto.get_entities())
 
 if __name__ == '__main__':
     config = getClustoConfig()

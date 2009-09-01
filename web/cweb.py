@@ -216,7 +216,7 @@ class ClustoApp(object):
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']
         result = []
-        for obj in clusto.getEntities(clusto_types=(objtype,)):
+        for obj in clusto.get_entities(clusto_types=(objtype,)):
             result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))
 
@@ -297,7 +297,7 @@ class ClustoApp(object):
             return Response(status=400, body='400 Bad Request\nNo query specified\n')
 
         result = []
-        for obj in clusto.getEntities():
+        for obj in clusto.get_entities():
             if obj.name.find(query) != -1:
                 result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))

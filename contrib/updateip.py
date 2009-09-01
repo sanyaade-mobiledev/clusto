@@ -22,7 +22,7 @@ def main():
     ip = sys.argv[1]
     #device = IPManager.getDevice(ip)
     #if not device:
-    #    device = clusto.getEntities(attrs=[{'key': 'ipaddress', 'value': ip}])
+    #    device = clusto.get_entities(attrs=[{'key': 'ipaddress', 'value': ip}])
     #if not device:
     #    print 'Unable to find a device matching %s' % ip
     #    return
@@ -70,7 +70,7 @@ def main():
         pass
 
     if not device:
-        device = clusto.getEntities(attrs=[{'key': 'fqdn', 'value': fqdn}])
+        device = clusto.get_entities(attrs=[{'key': 'fqdn', 'value': fqdn}])
         if device:
             device = device[0]
             print 'Found by fqdn'
@@ -87,7 +87,7 @@ def main():
         attrs = []
         for iface, macaddr, ipaddr in iplist:
             attrs.append({'key': 'ipaddress', 'value': ipaddr.split('/', 1)[0]})
-        device = clusto.getEntities(attrs=attrs)
+        device = clusto.get_entities(attrs=attrs)
         if device:
             device = device[0]
             print 'Found by ipaddress attr'

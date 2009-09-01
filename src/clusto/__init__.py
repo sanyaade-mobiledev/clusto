@@ -88,7 +88,7 @@ def get_driver(entity, ignore_driver_column=False):
 
     return Driver
 
-def getEntities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
+def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     """Get entities matching the given criteria
 
     @param names: list of names to match

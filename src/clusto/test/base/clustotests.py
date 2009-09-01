@@ -140,18 +140,18 @@ class TestClusto(testbase.ClustoTestBase):
         namelist = ['e1', 'e2', 'dv1']
 
         self.assertEqual(sorted([n.name 
-                                 for n in clusto.getEntities(names=namelist)]),
+                                 for n in clusto.get_entities(names=namelist)]),
                          sorted(namelist))
 
         dl = [Driver]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clusto_drivers=dl)]),
+                                 for n in clusto.get_entities(clusto_drivers=dl)]),
                          sorted(['d1','e1','e2','e3']))
 
 
         tl = [Location, BasicDatacenter]
         self.assertEqual(sorted([n.name
-                                 for n in clusto.getEntities(clusto_types=tl)]),
+                                 for n in clusto.get_entities(clusto_types=tl)]),
                          sorted(['l1','dc1']))
 
     def testGetEntitesWithAttrs(self):
@@ -169,25 +169,25 @@ class TestClusto(testbase.ClustoTestBase):
 
 
 
-        self.assertEqual(clusto.getEntities(attrs=[{'key':'k2'}]),
+        self.assertEqual(clusto.get_entities(attrs=[{'key':'k2'}]),
                          [d1])
 
 
-        self.assertEqual(sorted(clusto.getEntities(attrs=[{'key':'k1'}])),
+        self.assertEqual(sorted(clusto.get_entities(attrs=[{'key':'k1'}])),
                          sorted([d1,d2]))
 
 
-        self.assertEqual(sorted(clusto.getEntities(attrs=[{'value':d4}])),
+        self.assertEqual(sorted(clusto.get_entities(attrs=[{'value':d4}])),
                          [d3])
 
 
-        self.assertEqual(clusto.getEntities(attrs=[{'value':67}]),
+        self.assertEqual(clusto.get_entities(attrs=[{'value':67}]),
                          [d1])
 
-        self.assertEqual(sorted(clusto.getEntities(attrs=[{'number':0}])),
+        self.assertEqual(sorted(clusto.get_entities(attrs=[{'number':0}])),
                          sorted([d3]))
 
-        self.assertEqual(clusto.getEntities(attrs=[{'subkey':'A'},
+        self.assertEqual(clusto.get_entities(attrs=[{'subkey':'A'},
                                                    {'value':'test'}]),
                          [d1])
 
@@ -205,7 +205,7 @@ class TestClusto(testbase.ClustoTestBase):
         clusto.deleteEntity(e1)
 
 
-        self.assertEqual([], clusto.getEntities(names=['e1']))
+        self.assertEqual([], clusto.get_entities(names=['e1']))
 
         self.assertEqual([], Driver.do_attr_query(key='deltest*', glob=True))
                          
