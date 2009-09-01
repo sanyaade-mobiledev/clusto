@@ -185,12 +185,12 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         if value is ():
-            self.delAttrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._portKey(porttype),
                           number=portnum,
                           subkey=key)
         else:
 
-            self.delAttrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._portKey(porttype),
                           number=portnum,
                           subkey=key,
                           value=value)

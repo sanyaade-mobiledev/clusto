@@ -36,7 +36,7 @@ class add_attr(ClustoScript):
         thing = clusto.get_by_name(thingname)
 
         if options.replace:
-            thing.delAttrs(keyname)
+            thing.del_attrs(keyname)
             
         thing.add_attr(keyname, value)
         clusto.flush()

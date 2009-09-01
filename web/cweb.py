@@ -88,7 +88,7 @@ class EntityAPI(object):
 
         Requires HTTP parameter "key"
         '''
-        self.obj.delAttrs(request.params['key'])
+        self.obj.del_attrs(request.params['key'])
         clusto.commit()
         return self.show(request)
 

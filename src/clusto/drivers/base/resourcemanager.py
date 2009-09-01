@@ -114,14 +114,14 @@ class ResourceManager(Driver):
         try:
             if resource is ():                      
                 for res in self.resources(thing):
-                    thing.delAttrs(self._attrName, number=number)
+                    thing.del_attrs(self._attrName, number=number)
 
             elif resource and not self.available(resource, number):
                 resource, number = self.ensureType(resource, number)
 
                 res = thing.attrs(self._attrName, self, subkey='manager', number=number)
                 for a in res: 
-                    thing.delAttrs(self._attrName, number=a.number)
+                    thing.del_attrs(self._attrName, number=a.number)
                     
             clusto.commit()
         except Exception, x:

@@ -506,7 +506,7 @@ class Driver(object):
 
         return attr
 
-    def delAttrs(self, *args, **kwargs):
+    def del_attrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"
 
         clusto.flush()
@@ -591,7 +591,7 @@ class Driver(object):
                             "Tried to remove %s." % str(type(thing)))
 
 
-        self.delAttrs("_contains", d, ignore_hidden=False)
+        self.del_attrs("_contains", d, ignore_hidden=False)
 
     def contentAttrs(self, *args, **kwargs):
         """Return the attributes referring to this Thing's contents

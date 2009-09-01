@@ -47,7 +47,7 @@ class Device(Driver):
     def removeFQDN(self, fqdn):
         """remove a fully qualified domain name"""
         
-        self.delAttrs("fqdn", number=True, value=fqdn)
+        self.del_attrs("fqdn", number=True, value=fqdn)
 
         
         
