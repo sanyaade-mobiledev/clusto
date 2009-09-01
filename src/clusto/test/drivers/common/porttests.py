@@ -61,9 +61,9 @@ class PortTests(testbase.ClustoTestBase):
         
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        self.assertTrue(t1.portsConnectable('a', 1, t2, 3))
-        self.assertFalse(t1.portsConnectable('a', 1, t2, 5))
-        self.assertFalse(t1.portsConnectable('b', 1, t2, 1))
+        self.assertTrue(t1.ports_connectable('a', 1, t2, 3))
+        self.assertFalse(t1.ports_connectable('a', 1, t2, 5))
+        self.assertFalse(t1.ports_connectable('b', 1, t2, 1))
 
     def testPortFree(self):
         

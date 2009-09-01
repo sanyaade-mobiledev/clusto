@@ -126,7 +126,7 @@ class PortMixin:
         return self.get_port_attrs(porttype, portnum, 'connection')
             
 
-    def portsConnectable(self, porttype, srcportnum, dstdev, dstportnum):
+    def ports_connectable(self, porttype, srcportnum, dstdev, dstportnum):
         """test if the ports you're trying to connect are compatible.
         """
 
