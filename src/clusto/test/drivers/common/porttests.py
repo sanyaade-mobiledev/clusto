@@ -130,7 +130,7 @@ class PortTests(testbase.ClustoTestBase):
         self.assertEqual(None, t2.getPortAttrs('z', 0, 'mac'))
         t2.set_port_attr('z', 0, 'mac', 'bar')
         self.assertEqual('bar', t2.getPortAttrs('z', 0, 'mac'))
-        t2.delPortAttr('z', 0, 'mac')
+        t2.del_port_attr('z', 0, 'mac')
         self.assertEqual(None, t2.getPortAttrs('z', 0, 'mac'))
         
 

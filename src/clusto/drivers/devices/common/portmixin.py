@@ -103,11 +103,11 @@ class PortMixin:
             
             clusto.begin_transaction()
             try:
-                dev.delPortAttr(porttype, otherportnum, 'connection')
-                dev.delPortAttr(porttype, otherportnum, 'otherportnum')
+                dev.del_port_attr(porttype, otherportnum, 'connection')
+                dev.del_port_attr(porttype, otherportnum, 'otherportnum')
                 
-                self.delPortAttr(porttype, portnum, 'connection')
-                self.delPortAttr(porttype, portnum, 'otherportnum')
+                self.del_port_attr(porttype, portnum, 'connection')
+                self.del_port_attr(porttype, portnum, 'otherportnum')
             except Exception, x:
                 clusto.rollback_transaction()
                 raise x
@@ -179,7 +179,7 @@ class PortMixin:
                      value=value)
 
 
-    def delPortAttr(self, porttype, portnum, key, value=()):
+    def del_port_attr(self, porttype, portnum, key, value=()):
         """delete an attribute on the given port"""
 
         portnum = self._ensure_portnum(porttype, portnum)
