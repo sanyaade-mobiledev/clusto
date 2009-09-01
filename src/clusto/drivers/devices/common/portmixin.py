@@ -151,7 +151,7 @@ class PortMixin:
         portnum = self._ensurePortNum(porttype, portnum)
 
         if (not self.portExists(porttype, portnum) or
-            self.hasAttr(key=self._portKey(porttype), number=portnum, 
+            self.has_attr(key=self._portKey(porttype), number=portnum, 
                          subkey='connection')):
             return False
         else:

@@ -223,9 +223,9 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
-        self.assertFalse(d1.hasAttr(key='foo', number=False))
-        self.assertTrue(d1.hasAttr(key='foo', number=True))
-        self.assertTrue(d1.hasAttr(key='foo', number=1, subkey='two'))
+        self.assertFalse(d1.has_attr(key='foo', number=False))
+        self.assertTrue(d1.has_attr(key='foo', number=True))
+        self.assertTrue(d1.has_attr(key='foo', number=1, subkey='two'))
 
     def testHiddenAttrs(self):
 

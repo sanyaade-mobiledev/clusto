@@ -68,7 +68,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     pprint(server)
 
     if server.driver == 'basicvirtualserver':
-        if not server.hasAttr('switchport'):
+        if not server.has_attr('switchport'):
             server.addAttr('switchport', '%s,%s' % (rack.name, portnum))
             clusto.commit()
         return

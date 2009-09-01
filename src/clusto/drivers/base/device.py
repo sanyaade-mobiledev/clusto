@@ -41,7 +41,7 @@ class Device(Driver):
     def addFQDN(self, fqdn):
         """add a fully qualified domain name"""
         
-        if not self.hasAttr("fqdn", number=True, value=fqdn):
+        if not self.has_attr("fqdn", number=True, value=fqdn):
             self.addAttr("fqdn", number=True, value=fqdn)
 
     def removeFQDN(self, fqdn):

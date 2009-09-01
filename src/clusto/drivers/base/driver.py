@@ -144,7 +144,7 @@ class Driver(object):
         return hash(self.entity.name)
 
     def __contains__(self, other):
-        return self.hasAttr(key="_contains", value=other)
+        return self.has_attr(key="_contains", value=other)
     
     def _choose_best_driver(self):
         """
@@ -178,7 +178,7 @@ class Driver(object):
 
     def __getattr__(self, name):
         if name in self._properties:                
-            if not self.hasAttr(name):
+            if not self.has_attr(name):
                 return self._properties[name]
             attr = self.attrQuery(name, subkey='property')
             if not attr:
@@ -540,7 +540,7 @@ class Driver(object):
         return attr        
 
     
-    def hasAttr(self, *args, **kwargs):
+    def has_attr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
         for i in self.attrQuery(*args, **kwargs):
