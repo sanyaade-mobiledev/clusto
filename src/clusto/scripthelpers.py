@@ -161,7 +161,7 @@ def setup_logging(config=None, name="clusto.script"):
     return log
 
 
-def setupClustoEnv(options):
+def setup_clusto_env(options):
     """
     Take clusto parameters and put it into the shell environment.
     """
