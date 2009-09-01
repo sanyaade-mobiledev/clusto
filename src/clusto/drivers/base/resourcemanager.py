@@ -40,7 +40,7 @@ class ResourceManager(Driver):
         """
         return (resource, number)
 
-    def additionalAttrs(self, thing, resource, number):
+    def additional_attrs(self, thing, resource, number):
         pass
     
     def allocate(self, thing, resource=(), number=True):
@@ -95,7 +95,7 @@ class ResourceManager(Driver):
 
                 a=thing.add_attr(a)
                                           
-                self.additionalAttrs(thing, resource, number)
+                self.additional_attrs(thing, resource, number)
                 
             else:
                 attr = None

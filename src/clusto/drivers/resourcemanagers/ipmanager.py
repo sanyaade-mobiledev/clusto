@@ -56,7 +56,7 @@ class IPManager(ResourceManager):
         return (int(ip.int()-self.__int_ip_const), True)
 
 
-    def additionalAttrs(self, thing, resource, number):
+    def additional_attrs(self, thing, resource, number):
 
         resource, number = self.ensure_type(resource, number)
 
