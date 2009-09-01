@@ -470,7 +470,7 @@ class Driver(object):
 
         return [x.keytuple for x in self.attrs(*args, **kwargs)]
 
-    def attrItems(self, *args, **kwargs):
+    def attr_items(self, *args, **kwargs):
         return self._itemize_attrs(self.attrs(*args, **kwargs))
 
     def addAttr(self, key, value=(), number=(), subkey=()):

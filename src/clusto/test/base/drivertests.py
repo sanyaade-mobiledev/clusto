@@ -18,16 +18,16 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1 = Driver('d1')
         d1.set_attr('foo', 'bar')
 
-        self.assertEqual(d1.attrItems(),
+        self.assertEqual(d1.attr_items(),
                          [(('foo', None, None), 'bar')])
 
         d1.set_attr('foo', 'bar2')
-        self.assertEqual(d1.attrItems(),
+        self.assertEqual(d1.attr_items(),
                          [(('foo', None, None), 'bar2')])
 
         d1.addAttr('foo', 'bar3')
 
-        self.assertEqual(sorted(d1.attrItems()),
+        self.assertEqual(sorted(d1.attr_items()),
                          sorted(
                          [(('foo', None, None), 'bar2'),
                           (('foo', None, None), 'bar3')]))
@@ -42,7 +42,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         d2.set_attr('a', 't1')
 
-        self.assertEqual(sorted(d2.attrItems()),
+        self.assertEqual(sorted(d2.attr_items()),
                          sorted([(('a', 0, 'foo'), 'bar1'),
                                  (('a', 1, 'foo'), 'bar1'),
                                  (('a', 2, 'foo'), 'bar1'),
@@ -55,13 +55,13 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr('foo', 'bar')
         d1.addAttr('foo', 'bar1', number=0)
 
-        self.assertEqual(sorted(d1.attrItems()),
+        self.assertEqual(sorted(d1.attr_items()),
                          [(('foo', None, None), 'bar'), 
                           (('foo', 0, None), 'bar1')])
 
 
 
-        self.assertEqual(d1.attrItems(number=True),
+        self.assertEqual(d1.attr_items(number=True),
                          [(('foo', 0, None), 'bar1')])
 
     def testGettingAttrValues(self):
@@ -109,12 +109,12 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(sorted(d1.attrItems()),
+        self.assertEqual(sorted(d1.attr_items()),
                          sorted([(('foo', None, None), 'bar'), 
                           (('foo', 5, None), 'bar1'), 
                           (('foo', 6, None), 'bar2')]))
 
-        self.assertEqual(sorted(d1.attrItems(number=True)),
+        self.assertEqual(sorted(d1.attr_items(number=True)),
                          sorted([(('foo', 5, None), 'bar1'), 
                           (('foo', 6, None), 'bar2')]))
 
@@ -129,12 +129,12 @@ class TestDriverAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(sorted(d1.attrItems()),
+        self.assertEqual(sorted(d1.attr_items()),
                          sorted([(('foo', None, None), 'bar'),
                                  (('foo', 0, None), 'bar1'),
                                  (('foo', 1, None), 'bar2')]))
 
-        self.assertEqual(sorted(d1.attrItems(number=True)),
+        self.assertEqual(sorted(d1.attr_items(number=True)),
                          sorted([(('foo', 0, None), 'bar1'),
                                  (('foo', 1, None), 'bar2')]))
 
@@ -156,7 +156,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar1', number=True, subkey='one')
         d1.addAttr(key='foo', value='bar2', number=True, subkey='two')
         
-        self.assertEqual(d1.attrItems(),
+        self.assertEqual(d1.attr_items(),
                          [(('foo', 0, 'one'), 'bar1'),
                           (('foo', 1, 'two'), 'bar2')])
 
@@ -169,10 +169,10 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
-        self.assertEqual(list(d1.attrItems(key='foo', number=2)),
+        self.assertEqual(list(d1.attr_items(key='foo', number=2)),
                          [(('foo',2,'three'), 'bar3')])
         
-        self.assertEqual(list(d1.attrItems(key='foo', number=0)),
+        self.assertEqual(list(d1.attr_items(key='foo', number=0)),
                          [(('foo',0,'one'), 'bar1')])
         
     def testGettingAttrsWithSpecificValues(self):
@@ -184,10 +184,10 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
 
-        self.assertEqual(list(d1.attrItems(value='bar3')),
+        self.assertEqual(list(d1.attr_items(value='bar3')),
                          [(('foo',2,'three'), 'bar3')])
         
-        self.assertEqual(list(d1.attrItems(value='bar1')),
+        self.assertEqual(list(d1.attr_items(value='bar1')),
                          [(('foo',0,'one'), 'bar1')])
         
 
@@ -203,14 +203,14 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.delAttrs(key='foo', value='bar4')
 
         
-        self.assertEqual(list(d1.attrItems(value='bar4')),
+        self.assertEqual(list(d1.attr_items(value='bar4')),
                          [])
 
-        self.assertEqual(list(d1.attrItems(value='bar3')),
+        self.assertEqual(list(d1.attr_items(value='bar3')),
                          [(('foo',2,'three'), 'bar3')])
 
         d1.delAttrs(key='foo', subkey='three', number=2)
-        self.assertEqual(list(d1.attrItems(value='bar3')),
+        self.assertEqual(list(d1.attr_items(value='bar3')),
                          [])
 
 
@@ -236,7 +236,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='_foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='_foo', value='bar4', number=True, subkey='four')
 
-        self.assertEqual(d1.attrItems(ignore_hidden=True),
+        self.assertEqual(d1.attr_items(ignore_hidden=True),
                          [(('foo',0,'one'), 'bar1'), (('foo',1,'two'), 'bar2')])
 
 
@@ -245,10 +245,10 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1 = Driver('d1')
 
         d1.addAttr('foo', 2)
-        self.assertEqual(d1.attrItems('foo'), [(('foo',None,None), 2)])
+        self.assertEqual(d1.attr_items('foo'), [(('foo',None,None), 2)])
         d1.addAttr('bar', 3)
-        self.assertEqual(d1.attrItems('foo'), [(('foo',None,None), 2)])
-        self.assertEqual(d1.attrItems('bar'), [(('bar',None,None), 3)])
+        self.assertEqual(d1.attr_items('foo'), [(('foo',None,None), 2)])
+        self.assertEqual(d1.attr_items('bar'), [(('bar',None,None), 3)])
 
 
     def testGetByAttr(self):
@@ -323,7 +323,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 
         d = clusto.get_by_name('d1')
 
-        self.assertEqual(d.attrItems(ignore_hidden=False),
+        self.assertEqual(d.attr_items(ignore_hidden=False),
                          [(('_contains', 0, None), d2)])
 
     def testRemove(self):
@@ -340,7 +340,7 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(d.attrItems(ignore_hidden=False),
+        self.assertEqual(d.attr_items(ignore_hidden=False),
                          [])
 
     def testContents(self):
