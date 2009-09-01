@@ -35,7 +35,7 @@ class Pool(Driver):
         if d in self:
             raise PoolException("%s is already in pool %s." % (d, self))
         
-        self.addAttr("_contains", d, number=True)
+        self.add_attr("_contains", d, number=True)
         
 
     def isParent(self, thing):

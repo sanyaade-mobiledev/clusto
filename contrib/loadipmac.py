@@ -69,7 +69,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
 
     if server.driver == 'basicvirtualserver':
         if not server.has_attr('switchport'):
-            server.addAttr('switchport', '%s,%s' % (rack.name, portnum))
+            server.add_attr('switchport', '%s,%s' % (rack.name, portnum))
             clusto.commit()
         return
 
@@ -123,7 +123,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
     if not 'uniqueid' in server.attr_keys():
         for key, value in get_facts(ipaddr):
             if key == 'fqdn': continue
-            server.addAttr(key, value)
+            server.add_attr(key, value)
 
     clusto.commit()
 

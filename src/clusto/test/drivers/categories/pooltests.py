@@ -123,10 +123,10 @@ class PoolTests(testbase.ClustoTestBase):
 
         d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
-        p1.addAttr('t1', 1)
-        p1.addAttr('t2', 2)
+        p1.add_attr('t1', 1)
+        p1.add_attr('t2', 2)
 
-        d1.addAttr('t3', 3)
+        d1.add_attr('t3', 3)
 
         p1.insert(d1)
         p1.insert(d2)
@@ -147,11 +147,11 @@ class PoolTests(testbase.ClustoTestBase):
 
         d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
-        p1.addAttr('t1', 1)
-        p1.addAttr('t2', 2)
+        p1.add_attr('t1', 1)
+        p1.add_attr('t2', 2)
 
         p1.insert(d1)
-        d1.addAttr('t1', 'foo')
+        d1.add_attr('t1', 'foo')
         clusto.flush()
 
         

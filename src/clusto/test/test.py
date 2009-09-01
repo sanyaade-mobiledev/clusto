@@ -72,9 +72,9 @@ class TestThingSchema(unittest.TestCase):
         s=Server.selectone(Server.c.name=='s4')
 
         #s.attrs.append(Attribute('g',1))
-        s.addAttr('g', 1)
-        s.addAttr('a', 2)
-        s.addAttr('b', 3)
+        s.add_attr('g', 1)
+        s.add_attr('a', 2)
+        s.add_attr('b', 3)
         
         ctx.current.flush()        
 
@@ -90,12 +90,12 @@ class TestThingSchema(unittest.TestCase):
     def testOutput(self):
 
         s1 = Server('s5')
-        s1.addAttr('version', 1)
-        s1.addAttr('model', 'amd')
+        s1.add_attr('version', 1)
+        s1.add_attr('model', 'amd')
         
                 
         s2 = Server('s6')
-        s2.addAttrs([('version', 2), ('vender', 'penguin computing')])
+        s2.add_attrs([('version', 2), ('vender', 'penguin computing')])
         
         s1.connect(s2)
         

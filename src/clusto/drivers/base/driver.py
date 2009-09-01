@@ -473,7 +473,7 @@ class Driver(object):
     def attr_items(self, *args, **kwargs):
         return self._itemize_attrs(self.attrs(*args, **kwargs))
 
-    def addAttr(self, key, value=(), number=(), subkey=()):
+    def add_attr(self, key, value=(), number=(), subkey=()):
         """add a key/value to the list of attributes
 
         if number is True, create an attribute with the next available
@@ -531,7 +531,7 @@ class Driver(object):
             raise DriverException("cannot set an attribute when args match more than one value")
 
         elif len(attrs) == 0:
-            attr = self.addAttr(key, value, number=number, subkey=subkey)
+            attr = self.add_attr(key, value, number=number, subkey=subkey)
 
         else:
             attr = attrs[0]
@@ -569,7 +569,7 @@ class Driver(object):
             raise TypeError("%s is already in %s and cannot be inserted into %s."
                             % (d.name, parent[0].entity.name, self.name))
 
-        self.addAttr("_contains", d, number=True)
+        self.add_attr("_contains", d, number=True)
         
     def remove(self, thing):
         """Remove the given Entity or Driver from this Entity. Such that:

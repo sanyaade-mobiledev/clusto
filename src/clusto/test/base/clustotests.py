@@ -98,14 +98,14 @@ class TestClusto(testbase.ClustoTestBase):
 
             try:
                 clusto.beginTransaction()
-                d2.addAttr('foo', 'bar')
+                d2.add_attr('foo', 'bar')
 
                 clusto.commit()
             
             except:
                 clusto.rollbackTransaction()
 
-            d1.addAttr('foo2', 'bar2')
+            d1.add_attr('foo2', 'bar2')
 
             raise Exception()
             clusto.commit()
@@ -161,11 +161,11 @@ class TestClusto(testbase.ClustoTestBase):
         d3 = Driver('d3')
         d4 = Driver('d4')
 
-        d1.addAttr('k1', 'test')
-        d2.addAttr('k1', 'testA')
+        d1.add_attr('k1', 'test')
+        d2.add_attr('k1', 'testA')
 
-        d1.addAttr('k2', number=1, subkey='A', value=67)
-        d3.addAttr('k3', number=True, value=d4)
+        d1.add_attr('k2', number=1, subkey='A', value=67)
+        d3.add_attr('k3', number=True, value=d4)
 
 
 
@@ -197,8 +197,8 @@ class TestClusto(testbase.ClustoTestBase):
 
         d = Driver(e1)
 
-        d.addAttr('deltest1', 'test')
-        d.addAttr('deltest1', 'testA')
+        d.add_attr('deltest1', 'test')
+        d.add_attr('deltest1', 'testA')
 
 
 

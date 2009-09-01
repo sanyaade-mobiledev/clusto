@@ -70,7 +70,7 @@ class BasicRack(Location):
                 raise TypeError("%s is already in RU %d" % (dev.name, U))
 
         for U in rackU:
-            self.addAttr("_contains", device, number=U, subkey='ru')
+            self.add_attr("_contains", device, number=U, subkey='ru')
 
         
     def getDeviceIn(self, rackU):

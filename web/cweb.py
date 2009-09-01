@@ -78,7 +78,7 @@ class EntityAPI(object):
         Optional parameters are "subkey" and "number"
         '''
         kwargs = dict(request.params.items())
-        self.obj.addAttr(**kwargs)
+        self.obj.add_attr(**kwargs)
         clusto.commit()
         return self.show(request)
 

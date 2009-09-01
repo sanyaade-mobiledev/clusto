@@ -60,7 +60,7 @@ class IPManager(ResourceManager):
 
         resource, number = self.ensureType(resource, number)
 
-        thing.addAttr(self._attrName, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
+        thing.add_attr(self._attrName, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
         
                      
     def allocator(self):

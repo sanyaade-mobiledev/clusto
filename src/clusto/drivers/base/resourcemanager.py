@@ -72,7 +72,7 @@ class ResourceManager(Driver):
 
             if self._recordAllocations:
                 if number == True:
-                    attr = thing.addAttr(Attribute(self._attrName,
+                    attr = thing.add_attr(Attribute(self._attrName,
                                                    resource,
                                                    number=select([func.count('*')],
                                                                  and_(ATTR_TABLE.c.key==self._attrName,
@@ -81,7 +81,7 @@ class ResourceManager(Driver):
                                                                       )).as_scalar(), 
                                                    ))
                 else:
-                    attr = thing.addAttr(self._attrName, resource, number=number)
+                    attr = thing.add_attr(self._attrName, resource, number=number)
                     
                 clusto.flush()
                 n=select(['number'], ATTR_TABLE.c.attr_id==attr.attr_id).as_scalar()
@@ -93,7 +93,7 @@ class ResourceManager(Driver):
                             )
                 
 
-                a=thing.addAttr(a)
+                a=thing.add_attr(a)
                                           
                 self.additionalAttrs(thing, resource, number)
                 

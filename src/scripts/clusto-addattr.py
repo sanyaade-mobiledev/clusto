@@ -15,7 +15,7 @@ from clusto.scripthelpers import *
 from sqlalchemy.exceptions import SQLError
 
 
-class addAttr(ClustoScript):
+class add_attr(ClustoScript):
 
     usage = "%prog [options] <thingname> <key> <value>"
     short_description = "add an attribute to a thing"
@@ -38,12 +38,12 @@ class addAttr(ClustoScript):
         if options.replace:
             thing.delAttrs(keyname)
             
-        thing.addAttr(keyname, value)
+        thing.add_attr(keyname, value)
         clusto.flush()
 
                     
 
 if __name__ == '__main__':
-    runscript(addAttr)
+    runscript(add_attr)
         
 
