@@ -186,7 +186,7 @@ class WeightedPoolTests(testbase.ClustoTestBase):
         p.insert(s)
         p.set_weight(s, 45)
 
-        self.assertEqual(45, p.getWeight(s))
+        self.assertEqual(45, p.get_weight(s))
 
     def testSetWeightNotInPool(self):
 
@@ -203,8 +203,8 @@ class WeightedPoolTests(testbase.ClustoTestBase):
 
         p.insert(s)
 
-        self.assertEqual(None, p.getWeight(s))
+        self.assertEqual(None, p.get_weight(s))
 
         p.defaultweight = 33
 
-        self.assertEqual(33, p.getWeight(s))
+        self.assertEqual(33, p.get_weight(s))

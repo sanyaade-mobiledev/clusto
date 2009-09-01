@@ -69,7 +69,7 @@ class WeightedPool(Pool):
     """Weighted Pool
 
     Just like a pool but allows its contents to have weights using the
-    set/getWeight functions.
+    set/get_weight functions.
 
     The property 'defaultweight' can be set to set a default weight items
     in the pool.
@@ -87,7 +87,7 @@ class WeightedPool(Pool):
 
         self.set_attr("weight", number=weight, value=thing)
 
-    def getWeight(self, thing):
+    def get_weight(self, thing):
 
         if thing not in self:            
             raise LookupError("%s is not in this pool." % thing)
