@@ -22,7 +22,7 @@ class SimpleNameManager(ResourceManager):
                    'next':1,
                    'leadingZeros':int(True)}
 
-    _recordAllocations = True
+    _record_allocations = True
     
     def allocator(self):
         clusto.flush()
@@ -47,7 +47,7 @@ class SimpleEntityNameManager(SimpleNameManager):
 
     _driver_name = "simpleentitynamemanager"
 
-    _recordAllocations = False
+    _record_allocations = False
 
 
     def allocate(self, clustotype, resource=None, number=True):

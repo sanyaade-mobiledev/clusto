@@ -19,7 +19,7 @@ class ResourceManager(Driver):
     _driver_name = "resourcemanager"
 
     _attr_name = "resource"
-    _recordAllocations = True
+    _record_allocations = True
     
 
 
@@ -70,7 +70,7 @@ class ResourceManager(Driver):
                 if not self.available(resource, number):
                     raise ResourceException("Requested resource is not available.")
 
-            if self._recordAllocations:
+            if self._record_allocations:
                 if number == True:
                     attr = thing.add_attr(Attribute(self._attr_name,
                                                    resource,

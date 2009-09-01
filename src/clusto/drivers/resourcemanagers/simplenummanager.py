@@ -17,7 +17,7 @@ class SimpleNumManager(ResourceManager):
                    'next':0,
                    }
 
-    _recordAllocations = True
+    _record_allocations = True
     
     def allocator(self):
 
