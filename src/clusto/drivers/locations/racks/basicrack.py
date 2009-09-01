@@ -8,7 +8,7 @@ class BasicRack(Location):
     """
 
     _clusto_type = "rack"
-    _driverName = "basicrack"
+    _driver_name = "basicrack"
 
     _properties = {'minu':1,
                    'maxu':45}

@@ -8,7 +8,7 @@ class BasicNetworkSwitch(IPMixin, PortMixin, Device):
     """
 
     _clusto_type = 'networkswitch'
-    _driverName = 'basicnetworkswitch'
+    _driver_name = 'basicnetworkswitch'
 
 
     _portmeta = {'pwr-nema-5' : {'numports':1},

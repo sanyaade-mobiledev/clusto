@@ -16,7 +16,7 @@ class ResourceManager(Driver):
     
 
     _clusto_type = "resourcemanager"
-    _driverName = "resourcemanager"
+    _driver_name = "resourcemanager"
 
     _attrName = "resource"
     _recordAllocations = True

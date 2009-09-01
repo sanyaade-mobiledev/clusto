@@ -7,7 +7,7 @@ from clusto.exceptions import ConnectionException
 
 class TestDev1(Driver, PortMixin):
     _clusto_type = "test1"
-    _driverName = "test1driver"
+    _driver_name = "test1driver"
 
     _portmeta = {'a' : {'numports':5},
                  'b' : {'numports':1}}
@@ -15,14 +15,14 @@ class TestDev1(Driver, PortMixin):
 class TestDev2(Driver, PortMixin):
 
     _clusto_type = "test2"
-    _driverName = "test2driver"
+    _driver_name = "test2driver"
 
     _portmeta = {'a' : {'numports':4},
                  'z' : {'numports':1}}
 
 class PortLess(Driver):
     _clusto_type = "portless"
-    _driverName = "portless"
+    _driver_name = "portless"
 
 class PortTests(testbase.ClustoTestBase):
     """Test the port framework"""

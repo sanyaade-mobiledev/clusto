@@ -61,7 +61,7 @@ def getDriverName(name):
         else:
             raise NameError("driver name %s doesn't exist." % name)
     elif isinstance(name, type):
-        return name._driverName
+        return name._driver_name
     else:
         return name.driver
 

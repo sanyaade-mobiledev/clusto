@@ -14,7 +14,7 @@ class PowerTowerXM(BasicPowerStrip):
     at the bottom right (.bb8).
     """
 
-    _driverName = "powertowerxm"
+    _driver_name = "powertowerxm"
 
     _properties = {'withslave':0}
 

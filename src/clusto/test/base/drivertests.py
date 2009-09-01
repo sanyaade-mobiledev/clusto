@@ -401,7 +401,7 @@ class TestDriver(testbase.ClustoTestBase):
 class TestDriver(Driver):
 
     _clusto_type = "tester"
-    _driverName = "testdriver"
+    _driver_name = "testdriver"
 
     _properties = {'propA': None,
                    'propB': 'foo',

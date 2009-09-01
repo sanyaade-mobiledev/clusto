@@ -7,7 +7,7 @@ class BasicServer(IPMixin, PortMixin, Device):
     """
 
     _clusto_type = "server"
-    _driverName = "basicserver"
+    _driver_name = "basicserver"
 
     _properties = {'model':None,
                    'manufacturer':None}
@@ -20,7 +20,7 @@ class BasicServer(IPMixin, PortMixin, Device):
     
 class BasicVirtualServer(BasicServer):
 
-    _driverName = "basicvirtualserver"
+    _driver_name = "basicvirtualserver"
 
     
     

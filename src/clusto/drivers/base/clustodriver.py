@@ -9,20 +9,20 @@ class ClustoDriver(type):
     """
     def __init__(cls, name, bases, dct):
 
-        if not hasattr(cls, '_driverName'):
-            raise DriverException("Driver %s missing _driverName attribute"
+        if not hasattr(cls, '_driver_name'):
+            raise DriverException("Driver %s missing _driver_name attribute"
                                   % cls.__name__)
 
-        if cls._driverName in DRIVERLIST:
-            raise KeyError("class '%s' is trying to add the driverName '%s' "
+        if cls._driver_name in DRIVERLIST:
+            raise KeyError("class '%s' is trying to add the driver_name '%s' "
                            "to the driver list but that name is already "
                            "claimed by the '%s' class."
                            % (cls.__name__,
-                              cls._driverName,
-                              DRIVERLIST[cls._driverName].__name__))
+                              cls._driver_name,
+                              DRIVERLIST[cls._driver_name].__name__))
         
 
-        DRIVERLIST[cls._driverName] = cls
+        DRIVERLIST[cls._driver_name] = cls
         TYPELIST[cls._clusto_type] = cls
 
         # setup properties

@@ -8,7 +8,7 @@ class BasicConsoleServer(PortMixin, Device):
     """
 
     _clusto_type = 'consoleserver'
-    _driverName = 'basicconsoleserver'
+    _driver_name = 'basicconsoleserver'
 
     
     _portmeta = { 'pwr-nema-5' : { 'numports':1, },

@@ -16,7 +16,7 @@ class SimpleNameManager(ResourceManager):
     
     """
 
-    _driverName = "simplenamemanager"
+    _driver_name = "simplenamemanager"
     _properties = {'basename':'',
                    'digits':2,
                    'next':1,
@@ -45,7 +45,7 @@ class SimpleNameManager(ResourceManager):
 
 class SimpleEntityNameManager(SimpleNameManager):    
 
-    _driverName = "simpleentitynamemanager"
+    _driver_name = "simpleentitynamemanager"
 
     _recordAllocations = False
 

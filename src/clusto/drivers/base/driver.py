@@ -20,7 +20,7 @@ class Driver(object):
     its Attributes. It provides many helper functions includeing attribute
     setters and accessors, attribute querying, and a handful of conventions.
 
-    Every driver defines a _clusto_type and a _driverName member variable.
+    Every driver defines a _clusto_type and a _driver_name member variable.
     Upon creation these become the type and driver for the Entity and provides
     a mechanism for choosing the correct driver for a given Entity.
 
@@ -59,7 +59,7 @@ class Driver(object):
     __metaclass__ = ClustoDriver
 
     _clusto_type = "generic"
-    _driverName = "entity"
+    _driver_name = "entity"
 
     _properties = dict()
 
@@ -106,7 +106,7 @@ class Driver(object):
 
 
             self.entity = Entity(nameDriverEntity)
-            self.entity.driver = self._driverName
+            self.entity.driver = self._driver_name
             self.entity.type = self._clusto_type
 
         else:
@@ -232,7 +232,7 @@ class Driver(object):
         ### This is bunk, gotta fix it
         if isinstance(cls, Driver):
             query = query.filter(and_(Attribute.entity_id==Entity.entity_id,
-                                      Entity.driver == cls._driverName,
+                                      Entity.driver == cls._driver_name,
                                       Entity.type == cls._clusto_type))
 
         if entity:

@@ -16,7 +16,7 @@ class ClustoMeta(Driver):
     _properties = {'version':None}
 
     _clusto_type = "clustometa"
-    _driverName = "clustometa"
+    _driver_name = "clustometa"
 
 
     def __new__(cls):

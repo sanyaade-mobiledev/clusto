@@ -8,7 +8,7 @@ class Device(Driver):
                    'manufacturer':None}
 
     _clustotype = "device"
-    _driverName = "device"
+    _driver_name = "device"
 
 
     @classmethod

@@ -8,7 +8,7 @@ class BasicPowerStrip(PortMixin, Device):
     """
 
     _clusto_type = "powerstrip"
-    _driverName = "basicpowerstrip"
+    _driver_name = "basicpowerstrip"
     
 
     

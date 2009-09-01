@@ -6,7 +6,7 @@ from subprocess import Popen
 
 class OpenGearCM4148(BasicConsoleServer):
 
-    _driverName = 'opengearcm4148'
+    _driver_name = 'opengearcm4148'
 
     _portmeta = { 'pwr-nema-5' : { 'numports':1, },
                   'nic-eth' : { 'numports':1, },

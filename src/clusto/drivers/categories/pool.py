@@ -12,7 +12,7 @@ class Pool(Driver):
     Pools 
     """
     
-    _driverName = "pool"
+    _driver_name = "pool"
     _clusto_type = "pool"
 
 
@@ -75,7 +75,7 @@ class WeightedPool(Pool):
     in the pool.
     """
 
-    _driverName = "weightedpool"
+    _driver_name = "weightedpool"
 
     
     _properties = {'defaultweight': None }

@@ -13,7 +13,7 @@ class IPManager(ResourceManager):
     """
 
 
-    _driverName="ipmanager"
+    _driver_name="ipmanager"
 
     _properties = {'gateway': None,
                    'netmask': '255.255.255.255',
