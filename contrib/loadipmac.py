@@ -141,7 +141,7 @@ def bind_vservers():
         for device in rack.contents():
             if device.driver == 'basicserver':
                 server = device
-                conn = server.portInfo['nic-eth'][0]
+                conn = server.port_info['nic-eth'][0]
                 if conn['connection'] == switch and conn['otherportnum'] == portnum:
                     if not vserver in server:
                         server.insert(vserver)

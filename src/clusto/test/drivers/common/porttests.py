@@ -145,7 +145,7 @@ class PortTests(testbase.ClustoTestBase):
                                  ('a', 3, None, None,),
                                  ('a', 4, None, None,),
                                  ('b', 0, None, None,),]),
-                         sorted(t1.portInfoTuples))
+                         sorted(t1.port_infoTuples))
 
         
         t1.connect_ports('a', 2, t2, 1)
@@ -155,13 +155,13 @@ class PortTests(testbase.ClustoTestBase):
                                  ('a', 2, None, None,),
                                  ('a', 3, None, None,),
                                  ('z', 0, None, None,),]),
-                         sorted(t2.portInfoTuples))
+                         sorted(t2.port_infoTuples))
 
-        self.assertEqual(t1, t2.portInfo['a'][1]['connection'])
-        self.assertEqual(2, t2.portInfo['a'][1]['otherportnum'])
+        self.assertEqual(t1, t2.port_info['a'][1]['connection'])
+        self.assertEqual(2, t2.port_info['a'][1]['otherportnum'])
 
-        self.assertEqual(None, t2.portInfo['a'][3]['connection'])
-        self.assertEqual(None, t2.portInfo['z'][0]['otherportnum'])
+        self.assertEqual(None, t2.port_info['a'][3]['connection'])
+        self.assertEqual(None, t2.port_info['z'][0]['otherportnum'])
 
         self.assertEqual(sorted([('a', 0),
                                  ('a', 2),

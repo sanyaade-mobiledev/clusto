@@ -217,11 +217,11 @@ class PortMixin:
             return None
             
     @property
-    def portInfo(self):
+    def port_info(self):
         """return a list of tuples containing port information for this device
         
         format:
-            portInfo[<porttype>][<portnum>][<portattr>]
+            port_info[<porttype>][<portnum>][<portattr>]
         """
 
         portinfo = {}
@@ -234,7 +234,7 @@ class PortMixin:
         return portinfo
 
     @property
-    def portInfoTuples(self):
+    def port_infoTuples(self):
         """return port information as a list of tuples that are suitble for use
         as *args to connect_ports
 
@@ -243,7 +243,7 @@ class PortMixin:
         """
         
         t = []
-        d = self.portInfo
+        d = self.port_info
         for porttype, numdict in d.iteritems():
             for num, stats in numdict.iteritems():
                 t.append((porttype, num, 
@@ -257,7 +257,7 @@ class PortMixin:
     @property
     def freePorts(self):
         
-        return [(pinfo[0], pinfo[1]) for pinfo in self.portInfoTuples if pinfo[3] == None]
+        return [(pinfo[0], pinfo[1]) for pinfo in self.port_infoTuples if pinfo[3] == None]
 
     @property
     def connectedPorts(self):
