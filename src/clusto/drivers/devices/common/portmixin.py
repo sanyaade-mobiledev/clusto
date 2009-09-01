@@ -41,7 +41,7 @@ class PortMixin:
         
         return 'port-' + porttype
     
-    def _ensurePortNum(self, porttype, num):
+    def _ensure_portnum(self, porttype, num):
 
 
         if not self._portmeta.has_key(porttype) \
@@ -67,7 +67,7 @@ class PortMixin:
                 msg = "%s has no ports."
                 raise ConnectionException(msg % (dev.name))
 
-            num = dev._ensurePortNum(porttype, num)
+            num = dev._ensure_portnum(porttype, num)
 
             if not dev.portExists(porttype, num):
                 msg = "port %s:%d doesn't exist on %s"
@@ -93,7 +93,7 @@ class PortMixin:
     def disconnectPort(self, porttype, portnum):
         """disconnect both sides of a port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         if not self.portFree(porttype, portnum):
 
@@ -116,7 +116,7 @@ class PortMixin:
     def getConnected(self, porttype, portnum):
         """return the device that the given porttype/portnum is connected to"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         if not self.portExists(porttype, portnum):
             msg = "port %s:%d doesn't exist on %s"
@@ -138,7 +138,7 @@ class PortMixin:
         
         if ((porttype in self._portmeta)):
             try:
-                portnum = self._ensurePortNum(porttype, portnum)
+                portnum = self._ensure_portnum(porttype, portnum)
                 return True
             except ConnectionException:
                 return False
@@ -148,7 +148,7 @@ class PortMixin:
     def portFree(self, porttype, portnum):
         """return true if the given porttype and portnum are not in use"""
         
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         if (not self.portExists(porttype, portnum) or
             self.has_attr(key=self._port_key(porttype), number=portnum, 
@@ -161,7 +161,7 @@ class PortMixin:
     def addPortAttr(self, porttype, portnum, key, value):
         """add an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         self.add_attr(key=self._port_key(porttype),
                      number=portnum,
@@ -171,7 +171,7 @@ class PortMixin:
     def set_port_attr(self, porttype, portnum, key, value):
         """set an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         self.set_attr(key=self._port_key(porttype),
                      number=portnum,
@@ -182,7 +182,7 @@ class PortMixin:
     def delPortAttr(self, porttype, portnum, key, value=()):
         """delete an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         if value is ():
             self.del_attrs(key=self._port_key(porttype),
@@ -199,7 +199,7 @@ class PortMixin:
     def getPortAttrs(self, porttype, portnum, key):
         """get an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         attr = self.attrs(key=self._port_key(porttype),
                           number=portnum,

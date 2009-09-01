@@ -34,7 +34,7 @@ class PowerTowerXM(BasicPowerStrip):
                 'bb6':29,'bb7':30,'bb8':31,
                 }
 
-    def _ensurePortNum(self, porttype, portnum):
+    def _ensure_portnum(self, porttype, portnum):
         """map powertower port names to clusto port numbers"""
 
         if not self._portmeta.has_key(porttype):
