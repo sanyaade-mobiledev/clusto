@@ -18,7 +18,8 @@ def test_types_delegate():
     assert status == 200
     data = json.loads(data)
     assert type(data) == list
-    assert type(data[0]) == str
+    if len(data) > 0:
+        assert type(data[0]) == str
     return True
 
 def test_action_delegate():
