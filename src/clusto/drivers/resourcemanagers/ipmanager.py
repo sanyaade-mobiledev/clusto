@@ -95,7 +95,7 @@ class IPManager(ResourceManager):
                     continue
 
                 if self.available(nextip):
-                    self.setAttr('_lastip', nextip)
+                    self.set_attr('_lastip', nextip)
                     return self.ensureType(nextip, True)
                 else:
                     nextip += 1

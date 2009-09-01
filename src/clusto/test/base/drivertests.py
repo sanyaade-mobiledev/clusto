@@ -16,12 +16,12 @@ class TestDriverAttributes(testbase.ClustoTestBase):
     def testSetAttrs(self):
 
         d1 = Driver('d1')
-        d1.setAttr('foo', 'bar')
+        d1.set_attr('foo', 'bar')
 
         self.assertEqual(d1.attrItems(),
                          [(('foo', None, None), 'bar')])
 
-        d1.setAttr('foo', 'bar2')
+        d1.set_attr('foo', 'bar2')
         self.assertEqual(d1.attrItems(),
                          [(('foo', None, None), 'bar2')])
 
@@ -32,7 +32,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
                          [(('foo', None, None), 'bar2'),
                           (('foo', None, None), 'bar3')]))
 
-        self.assertRaises(DriverException, d1.setAttr, 'foo', 'bar4')
+        self.assertRaises(DriverException, d1.set_attr, 'foo', 'bar4')
 
 
         d2 = Driver('d2')
@@ -40,7 +40,7 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d2.addAttr('a', number=1, subkey='foo', value='bar1')
         d2.addAttr('a', number=2, subkey='foo', value='bar1')
 
-        d2.setAttr('a', 't1')
+        d2.set_attr('a', 't1')
 
         self.assertEqual(sorted(d2.attrItems()),
                          sorted([(('a', 0, 'foo'), 'bar1'),
@@ -462,12 +462,12 @@ class TestDriverQueries(testbase.ClustoTestBase):
         d1.addAttr('a', 1, subkey='z', number=5)
         d1.addAttr('a', 1, subkey='z', number=6)
         
-        d1.setAttr('d2', d2)
-        d1.setAttr('d3', d3)
+        d1.set_attr('d2', d2)
+        d1.set_attr('d3', d3)
 
-        d2.setAttr('aaa', 1)
-        d2.setAttr('aab', 2)
-        d2.setAttr('aac', 3)
+        d2.set_attr('aaa', 1)
+        d2.set_attr('aab', 2)
+        d2.set_attr('aac', 3)
 
 
 

@@ -173,7 +173,7 @@ class PortMixin:
 
         portnum = self._ensurePortNum(porttype, portnum)
 
-        self.setAttr(key=self._portKey(porttype),
+        self.set_attr(key=self._portKey(porttype),
                      number=portnum,
                      subkey=key,
                      value=value)

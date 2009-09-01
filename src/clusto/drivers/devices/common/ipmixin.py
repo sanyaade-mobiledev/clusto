@@ -65,7 +65,7 @@ class IPMixin:
             if porttype is not None and portnum is not None:
                 self.setPortAttr(porttype, portnum, 'osportname', osportname)
 
-            self.setAttr(ipattrs[0].key,
+            self.set_attr(ipattrs[0].key,
                          number=ipattrs[0].number,
                          subkey='osportname',
                          value=osportname)

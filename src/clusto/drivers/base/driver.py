@@ -192,7 +192,7 @@ class Driver(object):
     def __setattr__(self, name, value):
 
         if name in self._properties:
-            self.setAttr(name, value, subkey='property')
+            self.set_attr(name, value, subkey='property')
         else:
             object.__setattr__(self, name, value)
         
@@ -521,7 +521,7 @@ class Driver(object):
             raise x
 
 
-    def setAttr(self, key, value, number=False, subkey=None):
+    def set_attr(self, key, value, number=False, subkey=None):
         """replaces all attributes with the given key"""        
         self._check_attr_name(key)
 

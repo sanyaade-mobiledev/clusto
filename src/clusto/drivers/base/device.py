@@ -27,7 +27,7 @@ class Device(Driver):
         
     def _setHostname(self, name):
 
-        self.setAttr("hostname", value=name)
+        self.set_attr("hostname", value=name)
 
     hostname = property(_getHostname, _setHostname)
 
