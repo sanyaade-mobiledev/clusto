@@ -34,13 +34,13 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         
         self.assertEqual(BasicRack.get_rack_and_u(s)['RU'], [1])
 
-        self.assertEqual(r.getDeviceIn(12),
+        self.assertEqual(r.get_device_in(12),
                          clusto.get_by_name('sw1'))
 
-        self.assertEqual(r.getDeviceIn(10),
+        self.assertEqual(r.get_device_in(10),
                          clusto.get_by_name('p1'))
 
-        self.assertEqual(r.getDeviceIn(11),
+        self.assertEqual(r.get_device_in(11),
                          clusto.get_by_name('p1'))
         
         

@@ -48,7 +48,7 @@ class BasicRackTest(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        s1 = r1.getDeviceIn(40)
+        s1 = r1.get_device_in(40)
 
         self.assertEqual(s1.name, 's1')
         

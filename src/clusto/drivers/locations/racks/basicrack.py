@@ -65,7 +65,7 @@ class BasicRack(Location):
 
         
         for U in rackU:
-            dev = self.getDeviceIn(U)
+            dev = self.get_device_in(U)
             if dev:
                 raise TypeError("%s is already in RU %d" % (dev.name, U))
 
@@ -73,7 +73,7 @@ class BasicRack(Location):
             self.add_attr("_contains", device, number=U, subkey='ru')
 
         
-    def getDeviceIn(self, rackU):
+    def get_device_in(self, rackU):
         
         if not isinstance(rackU, int):
             raise TypeError("RackU must be a single integer. Got: %s" % str(rackU))
