@@ -77,7 +77,7 @@ class BasicServerTest(testbase.ClustoTestBase):
                 
         ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
 
-        s1.bindIPtoOSPort('192.168.1.20', 'eth0', porttype='nic-eth', portnum=1)
+        s1.bind_ip_to_osport('192.168.1.20', 'eth0', porttype='nic-eth', portnum=1)
 
         
     def testAddingIP(self):
@@ -112,10 +112,10 @@ class BasicServerTest(testbase.ClustoTestBase):
 
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 
-        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', porttype='nic-eth')
-        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', portnum=0)
+        self.assertRaises(Exception, s1.bind_ip_to_osport, '10.0.0.100', 'eth0', porttype='nic-eth')
+        self.assertRaises(Exception, s1.bind_ip_to_osport, '10.0.0.100', 'eth0', portnum=0)
         
-        s1.bindIPtoOSPort('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
+        s1.bind_ip_to_osport('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
 
         self.assertEqual(IPManager.getDevice('10.0.0.100'), [s1])
         

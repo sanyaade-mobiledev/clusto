@@ -95,7 +95,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         self.assertEqual(BasicRack.getRackAndU(newserver)['rack'], r)
 
         ipman = IPManager('subnet-10.0.0.1', netmask='255.255.255.0', basip='10.0.0.1')
-        newserver.bindIPtoOSPort('10.0.0.10', 'eth0', porttype='nic-eth', portnum=0)
+        newserver.bind_ip_to_osport('10.0.0.10', 'eth0', porttype='nic-eth', portnum=0)
 
         ipvals = newserver.attrs(value='10.0.0.10')
         self.assertEqual(len(ipvals), 1)
