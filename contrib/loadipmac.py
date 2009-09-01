@@ -88,7 +88,7 @@ def import_ipmac(name, macaddr, ipaddr, portnum):
         ifnum = 1
 
     if not server.port_free('nic-eth', ifnum):
-        if not server.getConnected('nic-eth', ifnum) == switch:
+        if not server.get_connected('nic-eth', ifnum) == switch:
             server.disconnect_port('nic-eth', ifnum)
             server.connect_ports('nic-eth', ifnum, switch, portnum)
     else:

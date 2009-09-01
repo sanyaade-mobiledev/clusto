@@ -22,7 +22,7 @@ class RackTests(testbase.ClustoTestBase):
 
         tp = clusto.get_by_name('foo1')
 
-        theRack = tp.getConnectedByType(Rack)
+        theRack = tp.get_connectedByType(Rack)
 
         self.assert_(theRack[0].name == rackname)
 

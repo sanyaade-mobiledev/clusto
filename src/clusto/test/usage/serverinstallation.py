@@ -62,7 +62,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
                         dstdev=s,
                         dstportnum=0)
                         
-        self.assertEqual(s.getConnected('pwr-nema-5', 0),
+        self.assertEqual(s.get_connected('pwr-nema-5', 0),
                          p1)
 
 

@@ -97,7 +97,7 @@ class PortMixin:
 
         if not self.port_free(porttype, portnum):
 
-            dev = self.getConnected(porttype, portnum)
+            dev = self.get_connected(porttype, portnum)
             
             otherportnum = self.getPortAttrs(porttype, portnum, 'otherportnum')
             
@@ -113,7 +113,7 @@ class PortMixin:
                 raise x
             
 
-    def getConnected(self, porttype, portnum):
+    def get_connected(self, porttype, portnum):
         """return the device that the given porttype/portnum is connected to"""
 
         portnum = self._ensure_portnum(porttype, portnum)

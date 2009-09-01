@@ -82,14 +82,14 @@ class PortTests(testbase.ClustoTestBase):
         t1.connect_ports('a', 1, t2, 3)
 
         
-        self.assertEqual(t2, t1.getConnected('a', 1))
-        self.assertEqual(t1, t2.getConnected('a', 3))
+        self.assertEqual(t2, t1.get_connected('a', 1))
+        self.assertEqual(t1, t2.get_connected('a', 3))
 
-        self.assertEqual(None, t1.getConnected('b', 0))
+        self.assertEqual(None, t1.get_connected('b', 0))
 
 
         # try to work with ports that don't exist
-        self.assertRaises(ConnectionException, t2.getConnected, 'b', 3)
+        self.assertRaises(ConnectionException, t2.get_connected, 'b', 3)
         self.assertRaises(ConnectionException, t2.connect_ports, 'b', 2, t1, 7)
         self.assertRaises(ConnectionException, t2.connect_ports, 'z', 1, t1, 1)
 
@@ -106,12 +106,12 @@ class PortTests(testbase.ClustoTestBase):
 
         t1.connect_ports('a', 1, t2, 3)
 
-        self.assertEqual(t2, t1.getConnected('a', 1))
+        self.assertEqual(t2, t1.get_connected('a', 1))
         
         t2.disconnect_port('a', 3)
 
-        self.assertEqual(None, t1.getConnected('a', 1))
-        self.assertEqual(None, t2.getConnected('a', 3))
+        self.assertEqual(None, t1.get_connected('a', 1))
+        self.assertEqual(None, t2.get_connected('a', 3))
 
         self.assertTrue(t1.port_free('a', 1))
         self.assertTrue(t2.port_free('a', 3))
