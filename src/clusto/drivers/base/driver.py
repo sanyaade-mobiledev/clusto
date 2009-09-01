@@ -251,7 +251,7 @@ class Driver(object):
                 query = query.filter_by(subkey=subkey)
 
         if value is not ():
-            typename = Attribute.getType(value)
+            typename = Attribute.get_type(value)
 
             if typename == 'relation':
                 if isinstance(value, Driver):
@@ -383,7 +383,7 @@ class Driver(object):
             result = (attr for attr in result if attr.isRelation and attr.value.entity.driver in cdl)
 
         if clusto_types:
-            ctl = [clusto.getTypeName(n) for n in clusto_types]
+            ctl = [clusto.get_typeName(n) for n in clusto_types]
             result = (attr for attr in result if attr.isRelation and attr.value.entity.type in ctl)
             
         if sort_by_keys:
@@ -442,7 +442,7 @@ class Driver(object):
             result = (attr for attr in result if attr.entity.driver in cdl)
 
         if clusto_types:
-            ctl = [clusto.getTypeName(n) for n in clusto_types]
+            ctl = [clusto.get_typeName(n) for n in clusto_types]
             result = (attr for attr in result if attr.entity.type in ctl)
 
 
