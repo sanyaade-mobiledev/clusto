@@ -69,7 +69,7 @@ class IPManager(ResourceManager):
         if self.baseip is None:
             raise ResourceTypeException("Cannot generate an IP for an ipManager with no baseip")
 
-        lastip = self.attrQuery('_lastip')
+        lastip = self.attr_query('_lastip')
                 
         if not lastip:
             # I subtract self.__int_ip_const to keep in int range

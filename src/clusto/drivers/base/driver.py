@@ -180,7 +180,7 @@ class Driver(object):
         if name in self._properties:                
             if not self.has_attr(name):
                 return self._properties[name]
-            attr = self.attrQuery(name, subkey='property')
+            attr = self.attr_query(name, subkey='property')
             if not attr:
                 return None
             else:
@@ -287,7 +287,7 @@ class Driver(object):
 
         return query.all()
 
-    def attrQuery(self, *args, **kwargs):
+    def attr_query(self, *args, **kwargs):
         """Queries all attributes of *this* entity using the DB."""
         
         kwargs['entity'] = self.entity
@@ -512,7 +512,7 @@ class Driver(object):
         clusto.flush()
         try:
             clusto.beginTransaction()
-            for i in self.attrQuery(*args, **kwargs):
+            for i in self.attr_query(*args, **kwargs):
                 self.entity._attrs.remove(i)
                 i.delete()
             clusto.commit()
@@ -543,7 +543,7 @@ class Driver(object):
     def has_attr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
-        for i in self.attrQuery(*args, **kwargs):
+        for i in self.attr_query(*args, **kwargs):
             return True
 
         return False

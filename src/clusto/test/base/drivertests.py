@@ -277,20 +277,20 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         d1.addAttr(key='foo', value='bar3', number=True, subkey='three')
         d1.addAttr(key='foo', value='bar4', number=True, subkey='four')
         
-        self.assertEqual(d1.attrQuery(key='foo', number=2, count=True), 1)
+        self.assertEqual(d1.attr_query(key='foo', number=2, count=True), 1)
         
-        self.assertEqual(d1.attrQuery(key='foo', number=0, count=True), 1)
+        self.assertEqual(d1.attr_query(key='foo', number=0, count=True), 1)
 
-        self.assertEqual(d1.attrQuery(key='foo', number=False, count=True), 0)
-        self.assertEqual(d1.attrQuery(key='foo', count=True), 4)
+        self.assertEqual(d1.attr_query(key='foo', number=False, count=True), 0)
+        self.assertEqual(d1.attr_query(key='foo', count=True), 4)
 
-        self.assertEqual(d1.attrQuery(subkey='four', count=True), 1)
+        self.assertEqual(d1.attr_query(subkey='four', count=True), 1)
 
 
         d1.delAttrs(key='foo', value='bar1', number=True, subkey='one')
         d1.addAttr(key='foo', value='bar5', number=True, subkey='five')
-        self.assertEqual(d1.attrQuery(key='foo', number=0, count=True), 0)
-        self.assertEqual(d1.attrQuery(key='foo', number=4, count=True), 1)
+        self.assertEqual(d1.attr_query(key='foo', number=0, count=True), 0)
+        self.assertEqual(d1.attr_query(key='foo', number=4, count=True), 1)
         
         
     def testAddAttributeDirectly(self):
@@ -477,35 +477,35 @@ class TestDriverQueries(testbase.ClustoTestBase):
         d2 = clusto.get_by_name('d2')
         d3 = clusto.get_by_name('d3')
 
-        self.assertEqual(d1.attrs('a'), d1.attrQuery('a'))
+        self.assertEqual(d1.attrs('a'), d1.attr_query('a'))
 
-        self.assertEqual(d1.attrs('a', 1), d1.attrQuery('a', 1))
+        self.assertEqual(d1.attrs('a', 1), d1.attr_query('a', 1))
 
         self.assertEqual(d1.attrs('a', 1, number=True), 
-                         d1.attrQuery('a', 1, number=True))
+                         d1.attr_query('a', 1, number=True))
 
         self.assertEqual(d1.attrs('a', 1, number=5), 
-                         d1.attrQuery('a', 1, number=5))
+                         d1.attr_query('a', 1, number=5))
 
         self.assertEqual(d1.attrs(value='dee'), 
-                         d1.attrQuery(value='dee'))
+                         d1.attr_query(value='dee'))
 
 
         self.assertEqual(d1.attrs(value='_foo'), 
-                         d1.attrQuery(value='_foo'))
+                         d1.attr_query(value='_foo'))
 
         self.assertEqual(d1.attrs(key='_foo'), 
-                         d1.attrQuery(key='_foo'))
+                         d1.attr_query(key='_foo'))
 
         self.assertEqual(d1.attrs(key='a', subkey=None), 
-                         d1.attrQuery(key='a', subkey=None))
+                         d1.attr_query(key='a', subkey=None))
 
         self.assertEqual(d1.attrs(value=d2), 
-                         d1.attrQuery(value=d2))
+                         d1.attr_query(value=d2))
 
 
         self.assertEqual(d1.attrs(subkey='z'),
-                         d1.attrQuery(subkey='z'))
+                         d1.attr_query(subkey='z'))
 
 
     def testDoAttrQuery(self):
