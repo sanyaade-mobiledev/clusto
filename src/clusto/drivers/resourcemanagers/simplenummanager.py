@@ -12,12 +12,12 @@ class SimpleNumManager(ResourceManager):
     
     """
 
-    _driverName = "simplenummanager"
+    _driver_name = "simplenummanager"
     _properties = {'maxnum':None,
                    'next':0,
                    }
 
-    _recordAllocations = True
+    _record_allocations = True
     
     def allocator(self):
 

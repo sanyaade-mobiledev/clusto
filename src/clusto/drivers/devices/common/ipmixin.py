@@ -13,7 +13,7 @@ from clusto.exceptions import ConnectionException,  ResourceException
 
 class IPMixin:
 
-    def addIP(self, ip=None, ipman=None):
+    def add_ip(self, ip=None, ipman=None):
 
         if not ip and not ipman:
             raise ResourceException('If no ip is specified then an ipmanager must be specified')
@@ -21,7 +21,7 @@ class IPMixin:
         elif ip:
             
             if not ipman:
-                ipman = IPManager.getIPManager(ip)
+                ipman = IPManager.get_ip_manager(ip)
 
             return ipman.allocate(self, ip)
         else:
@@ -29,13 +29,13 @@ class IPMixin:
             
             
         
-    def hasIP(self, ip):
+    def has_ip(self, ip):
 
-        ipman = IPManager.getIPManager(ip)
+        ipman = IPManager.get_ip_manager(ip)
 
         return self in ipman.owners(ip)
     
-    def bindIPtoOSPort(self, ip, osportname, ipman=None, porttype=None, portnum=None):
+    def bind_ip_to_osport(self, ip, osportname, ipman=None, porttype=None, portnum=None):
         """bind an IP to an os port and optionally also asign the os port name
         to a physical port
 
@@ -49,30 +49,30 @@ class IPMixin:
                 raise Exception("both portype and portnum need to be specified or set to None")
             
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
-            if not self.hasIP(ip):
+            if not self.has_ip(ip):
                 if not ipman:
-                    ipman = IPManager.getIPManager(ip)
+                    ipman = IPManager.get_ip_manager(ip)
 
                 ipman.allocate(self, ip)
 
                 clusto.flush()
 
 
-            ipattrs = ipman.getResourceAttrs(self, ip)
+            ipattrs = ipman.get_resource_attrs(self, ip)
 
             if porttype is not None and portnum is not None:
-                self.setPortAttr(porttype, portnum, 'osportname', osportname)
+                self.set_port_attr(porttype, portnum, 'osportname', osportname)
 
-            self.setAttr(ipattrs[0].key,
+            self.set_attr(ipattrs[0].key,
                          number=ipattrs[0].number,
                          subkey='osportname',
                          value=osportname)
 
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
         
 

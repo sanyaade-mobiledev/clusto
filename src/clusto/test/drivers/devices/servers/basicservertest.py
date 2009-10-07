@@ -14,8 +14,8 @@ class BasicServerTest(testbase.ClustoTestBase):
         
     def testBasicServerCreation(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
         self.assertEqual(s1.model, '7000')
         self.assertEqual(s1.manufacturer, 'ibm')
@@ -25,8 +25,8 @@ class BasicServerTest(testbase.ClustoTestBase):
         
     def testHostname(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
         s2.hostname = "testname"
 
@@ -43,79 +43,79 @@ class BasicServerTest(testbase.ClustoTestBase):
         self.assertEqual(s2.hostname, "newname")
         
 
-    def testFQDN(self):
+    def testfqdn(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
 
-        self.assertEqual(s1.FQDNs, [])
+        self.assertEqual(s1.fqdns, [])
 
-        s2.addFQDN("test.example.com")
+        s2.add_fqdn("test.example.com")
 
         self.assertEqual(["test.example.com"],
-                         s2.FQDNs)
+                         s2.fqdns)
 
-        s2.addFQDN("test2.example.com")
+        s2.add_fqdn("test2.example.com")
         
         clusto.flush()
 
         self.assertEqual(sorted(["test.example.com",
                                  "test2.example.com"]),
-                         sorted(s2.FQDNs))
+                         sorted(s2.fqdns))
 
-        s2.removeFQDN("test.example.com")
+        s2.remove_fqdn("test.example.com")
 
         
         self.assertEqual(["test2.example.com"],
-                         s2.FQDNs)
+                         s2.fqdns)
 
 
     def testBindingIPtoOSPort(self):
 
-        s1 = clusto.getByName('bs1')
-        s2 = clusto.getByName('bs2')
+        s1 = clusto.get_by_name('bs1')
+        s2 = clusto.get_by_name('bs2')
                 
         ipm = IPManager('ipman', netmask='255.255.255.0', baseip='192.168.1.0')
 
-        s1.bindIPtoOSPort('192.168.1.20', 'eth0', porttype='nic-eth', portnum=1)
+        s1.bind_ip_to_osport('192.168.1.20', 'eth0', porttype='nic-eth', portnum=1)
 
         
     def testAddingIP(self):
 
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
 
-        self.assertRaises(ResourceException, s1.addIP, '10.0.0.100')
+        self.assertRaises(ResourceException, s1.add_ip, '10.0.0.100')
 
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1')
 
-        s1.addIP('10.0.0.100')
+        s1.add_ip('10.0.0.100')
         
-        self.assertTrue(s1.hasIP('10.0.0.100'))
+        self.assertTrue(s1.has_ip('10.0.0.100'))
 
-        s1.addIP(ipman=ipm)
+        s1.add_ip(ipman=ipm)
 
-        self.assertTrue(s1.hasIP('10.0.0.1'))
+        self.assertTrue(s1.has_ip('10.0.0.1'))
 
     def testAddingIPfromIPManagerWithGateway(self):
                         
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 
-        s1.addIP(ipman=ipm)
+        s1.add_ip(ipman=ipm)
 
-        self.assertTrue(s1.hasIP('10.0.0.2'))
+        self.assertTrue(s1.has_ip('10.0.0.2'))
         
 
     def testBindingIPtoOSPort(self):
 
-        s1 = clusto.getByName('bs1')
+        s1 = clusto.get_by_name('bs1')
 
         ipm = IPManager('ipman', netmask='255.255.0.0', baseip='10.0.0.1', gateway='10.0.0.1')
 
-        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', porttype='nic-eth')
-        self.assertRaises(Exception, s1.bindIPtoOSPort, '10.0.0.100', 'eth0', portnum=0)
+        self.assertRaises(Exception, s1.bind_ip_to_osport, '10.0.0.100', 'eth0', porttype='nic-eth')
+        self.assertRaises(Exception, s1.bind_ip_to_osport, '10.0.0.100', 'eth0', portnum=0)
         
-        s1.bindIPtoOSPort('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
+        s1.bind_ip_to_osport('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
 
-        self.assertEqual(IPManager.getDevice('10.0.0.100'), [s1])
+        self.assertEqual(IPManager.get_device('10.0.0.100'), [s1])
         

@@ -8,11 +8,11 @@ import re
 
 from webob import Request, Response
 from ncore.daemon import become_daemon
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import Driver
 import clusto
 
-config = getClustoConfig()
+config = get_clusto_config()
 clusto.connect(config.get('clusto', 'dsn'))
 
 config = json.load(file('web.conf', 'r'))
@@ -79,7 +79,7 @@ class EntityAPI(object):
         Optional parameters are "subkey" and "number"
         '''
         kwargs = dict(request.params.items())
-        self.obj.addAttr(**kwargs)
+        self.obj.add_attr(**kwargs)
         clusto.commit()
         return self.show(request)
 
@@ -89,7 +89,7 @@ class EntityAPI(object):
 
         Requires HTTP parameter "key"
         '''
-        self.obj.delAttrs(request.params['key'])
+        self.obj.del_attrs(request.params['key'])
         clusto.commit()
         return self.show(request)
 
@@ -103,7 +103,7 @@ class EntityAPI(object):
         For example: /pool/examplepool/insert?object=/server/exampleserver
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.insert(device)
         clusto.commit()
         return self.show(request)
@@ -118,7 +118,7 @@ class EntityAPI(object):
         For example: /pool/examplepool/remove?object=/server/exampleserver
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.remove(device)
         clusto.commit()
         return self.show(request)
@@ -131,7 +131,7 @@ class EntityAPI(object):
         result['object'] = self.url
 
         attrs = []
-        for x in self.obj.attrs(ignoreHidden=False):
+        for x in self.obj.attrs(ignore_hidden=False):
             attrs.append(unclusto(x))
         result['attrs'] = attrs
         result['contents'] = [unclusto(x) for x in self.obj.contents()]
@@ -149,7 +149,7 @@ class PortInfoAPI(EntityAPI):
         result = {}
         result['object'] = self.url
         result['ports'] = []
-        for port in self.obj.portInfoTuples:
+        for port in self.obj.port_info_tuples:
             porttype, portnum, otherobj, othernum = [unclusto(x) for x in port]
             result['ports'].append({
                 'type': porttype,
@@ -171,7 +171,7 @@ class RackAPI(EntityAPI):
         Example: /rack/examplerack/insert?object=/server/exampleserver&ru=6
         '''
         device = request.params['object'].strip('/').split('/')[1]
-        device = clusto.getByName(device)
+        device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
         clusto.commit()
         return self.contents(request)
@@ -217,7 +217,7 @@ class ClustoApp(object):
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']
         result = []
-        for obj in clusto.getEntities(clustoTypes=(objtype,)):
+        for obj in clusto.get_entities(clusto_types=(objtype,)):
             result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))
 
@@ -240,7 +240,7 @@ class ClustoApp(object):
         objtype, objname = name.split('/', 1)
 
         try:
-            obj = clusto.getByName(objname)
+            obj = clusto.get_by_name(objname)
             if obj:
                 return Response(status=409, body='409 Conflict\nObject already exists\n')
         except LookupError: pass
@@ -260,18 +260,18 @@ class ClustoApp(object):
         objtype, objname = name.split('/', 1)
 
         try:
-            obj = clusto.getByName(objname)
+            obj = clusto.get_by_name(objname)
         except LookupError:
             return Response(status=404, body='404 Not Found\n')
 
-        clusto.deleteEntity(obj.entity)
+        clusto.delete_entity(obj.entity)
         clusto.commit()
         return Response(status=200, body='200 OK\nObject deleted\n')
 
     def get_action(self, request, match):
         group = match.groupdict()
         try:
-            obj = clusto.getByName(group['name'])
+            obj = clusto.get_by_name(group['name'])
         except LookupError:
             return Response(status=404, body='404 Not Found\n')
 
@@ -283,7 +283,7 @@ class ClustoApp(object):
         action = group.get('action', 'show')
         handler = self.types.get(group['objtype'], EntityAPI)
         if not obj:
-            obj = clusto.getByName(group['name'])
+            obj = clusto.get_by_name(group['name'])
         h = handler(obj)
         if hasattr(h, action):
             f = getattr(h, action)
@@ -298,7 +298,7 @@ class ClustoApp(object):
             return Response(status=400, body='400 Bad Request\nNo query specified\n')
 
         result = []
-        for obj in clusto.getEntities():
+        for obj in clusto.get_entities():
             if obj.name.find(query) != -1:
                 result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))

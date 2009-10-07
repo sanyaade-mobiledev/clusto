@@ -37,11 +37,11 @@ class PortMixin:
                   }
 
 
-    def _portKey(self, porttype):
+    def _port_key(self, porttype):
         
         return 'port-' + porttype
     
-    def _ensurePortNum(self, porttype, num):
+    def _ensure_portnum(self, porttype, num):
 
 
         if not self._portmeta.has_key(porttype) \
@@ -56,152 +56,152 @@ class PortMixin:
 
         return num
 
-    def connectPorts(self, porttype, srcportnum, dstdev, dstportnum):
+    def connect_ports(self, porttype, srcportnum, dstdev, dstportnum):
         """connect a local port to a port on another device
         """
 
 
         for dev, num in [(self, srcportnum), (dstdev, dstportnum)]:
 
-            if not hasattr(dev, 'portExists'):
+            if not hasattr(dev, 'port_exists'):
                 msg = "%s has no ports."
                 raise ConnectionException(msg % (dev.name))
 
-            num = dev._ensurePortNum(porttype, num)
+            num = dev._ensure_portnum(porttype, num)
 
-            if not dev.portExists(porttype, num):
+            if not dev.port_exists(porttype, num):
                 msg = "port %s:%d doesn't exist on %s"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
         
-            if not dev.portFree(porttype, num):
+            if not dev.port_free(porttype, num):
                 msg = "port %s%d on %s is already in use"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
         try:
-            clusto.beginTransaction()
-            self.setPortAttr(porttype, srcportnum, 'connection', dstdev)
-            self.setPortAttr(porttype, srcportnum, 'otherportnum', dstportnum)
+            clusto.begin_transaction()
+            self.set_port_attr(porttype, srcportnum, 'connection', dstdev)
+            self.set_port_attr(porttype, srcportnum, 'otherportnum', dstportnum)
             
-            dstdev.setPortAttr(porttype, dstportnum, 'connection', self)
-            dstdev.setPortAttr(porttype, dstportnum, 'otherportnum', srcportnum)
+            dstdev.set_port_attr(porttype, dstportnum, 'connection', self)
+            dstdev.set_port_attr(porttype, dstportnum, 'otherportnum', srcportnum)
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
 
-    def disconnectPort(self, porttype, portnum):
+    def disconnect_port(self, porttype, portnum):
         """disconnect both sides of a port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        if not self.portFree(porttype, portnum):
+        if not self.port_free(porttype, portnum):
 
-            dev = self.getConnected(porttype, portnum)
+            dev = self.get_connected(porttype, portnum)
             
-            otherportnum = self.getPortAttrs(porttype, portnum, 'otherportnum')
+            otherportnum = self.get_port_attrs(porttype, portnum, 'otherportnum')
             
-            clusto.beginTransaction()
+            clusto.begin_transaction()
             try:
-                dev.delPortAttr(porttype, otherportnum, 'connection')
-                dev.delPortAttr(porttype, otherportnum, 'otherportnum')
+                dev.del_port_attr(porttype, otherportnum, 'connection')
+                dev.del_port_attr(porttype, otherportnum, 'otherportnum')
                 
-                self.delPortAttr(porttype, portnum, 'connection')
-                self.delPortAttr(porttype, portnum, 'otherportnum')
+                self.del_port_attr(porttype, portnum, 'connection')
+                self.del_port_attr(porttype, portnum, 'otherportnum')
             except Exception, x:
-                clusto.rollbackTransaction()
+                clusto.rollback_transaction()
                 raise x
             
 
-    def getConnected(self, porttype, portnum):
+    def get_connected(self, porttype, portnum):
         """return the device that the given porttype/portnum is connected to"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        if not self.portExists(porttype, portnum):
+        if not self.port_exists(porttype, portnum):
             msg = "port %s:%d doesn't exist on %s"
             raise ConnectionException(msg % (porttype, portnum, self.name))
             
 
-        return self.getPortAttrs(porttype, portnum, 'connection')
+        return self.get_port_attrs(porttype, portnum, 'connection')
             
 
-    def portsConnectable(self, porttype, srcportnum, dstdev, dstportnum):
+    def ports_connectable(self, porttype, srcportnum, dstdev, dstportnum):
         """test if the ports you're trying to connect are compatible.
         """
 
-        return (self.portExists(porttype, srcportnum) 
-                and dstdev.portExists(porttype, dstportnum))
+        return (self.port_exists(porttype, srcportnum) 
+                and dstdev.port_exists(porttype, dstportnum))
  
-    def portExists(self, porttype, portnum):
+    def port_exists(self, porttype, portnum):
         """return true if the given port exists on this device"""
         
         if ((porttype in self._portmeta)):
             try:
-                portnum = self._ensurePortNum(porttype, portnum)
+                portnum = self._ensure_portnum(porttype, portnum)
                 return True
             except ConnectionException:
                 return False
         else:
             return False
 
-    def portFree(self, porttype, portnum):
+    def port_free(self, porttype, portnum):
         """return true if the given porttype and portnum are not in use"""
         
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        if (not self.portExists(porttype, portnum) or
-            self.hasAttr(key=self._portKey(porttype), number=portnum, 
+        if (not self.port_exists(porttype, portnum) or
+            self.has_attr(key=self._port_key(porttype), number=portnum, 
                          subkey='connection')):
             return False
         else:
             return True
         
 
-    def addPortAttr(self, porttype, portnum, key, value):
+    def add_port_attr(self, porttype, portnum, key, value):
         """add an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        self.addAttr(key=self._portKey(porttype),
+        self.add_attr(key=self._port_key(porttype),
                      number=portnum,
                      subkey=key,
                      value=value)
 
-    def setPortAttr(self, porttype, portnum, key, value):
+    def set_port_attr(self, porttype, portnum, key, value):
         """set an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        self.setAttr(key=self._portKey(porttype),
+        self.set_attr(key=self._port_key(porttype),
                      number=portnum,
                      subkey=key,
                      value=value)
 
 
-    def delPortAttr(self, porttype, portnum, key, value=()):
+    def del_port_attr(self, porttype, portnum, key, value=()):
         """delete an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
         if value is ():
-            self.delAttrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key)
         else:
 
-            self.delAttrs(key=self._portKey(porttype),
+            self.del_attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key,
                           value=value)
             
                      
-    def getPortAttrs(self, porttype, portnum, key):
+    def get_port_attrs(self, porttype, portnum, key):
         """get an attribute on the given port"""
 
-        portnum = self._ensurePortNum(porttype, portnum)
+        portnum = self._ensure_portnum(porttype, portnum)
 
-        attr = self.attrs(key=self._portKey(porttype),
+        attr = self.attrs(key=self._port_key(porttype),
                           number=portnum,
                           subkey=key)
 
@@ -217,33 +217,33 @@ class PortMixin:
             return None
             
     @property
-    def portInfo(self):
+    def port_info(self):
         """return a list of tuples containing port information for this device
         
         format:
-            portInfo[<porttype>][<portnum>][<portattr>]
+            port_info[<porttype>][<portnum>][<portattr>]
         """
 
         portinfo = {}
-        for ptype in self.portTypes:
+        for ptype in self.port_types:
             portinfo[ptype]={}
             for n in range(self._portmeta[ptype]['numports']):
-                portinfo[ptype][n] = {'connection': self.getPortAttrs(ptype, n, 'connection'),
-                                      'otherportnum': self.getPortAttrs(ptype, n, 'otherportnum')}
+                portinfo[ptype][n] = {'connection': self.get_port_attrs(ptype, n, 'connection'),
+                                      'otherportnum': self.get_port_attrs(ptype, n, 'otherportnum')}
 
         return portinfo
 
     @property
-    def portInfoTuples(self):
+    def port_info_tuples(self):
         """return port information as a list of tuples that are suitble for use
-        as *args to connectPorts
+        as *args to connect_ports
 
         format:
           [ ('porttype', portnum, <connected device>, <port connected to>), ... ]
         """
         
         t = []
-        d = self.portInfo
+        d = self.port_info
         for porttype, numdict in d.iteritems():
             for num, stats in numdict.iteritems():
                 t.append((porttype, num, 
@@ -255,18 +255,18 @@ class PortMixin:
 
     
     @property
-    def freePorts(self):
+    def free_ports(self):
         
-        return [(pinfo[0], pinfo[1]) for pinfo in self.portInfoTuples if pinfo[3] == None]
+        return [(pinfo[0], pinfo[1]) for pinfo in self.port_info_tuples if pinfo[3] == None]
 
     @property
-    def connectedPorts(self):
+    def connected_ports(self):
         """Return a list of connected ports"""
 
         pdict = {}
-        for ptype in self.portTypes:
+        for ptype in self.port_types:
 
-            portlist = [a.number for a in self.attrs(self._portKey(ptype), 
+            portlist = [a.number for a in self.attrs(self._port_key(ptype), 
                                                      subkey='connection')]
             portlist.sort()
             pdict[ptype] = portlist
@@ -274,7 +274,7 @@ class PortMixin:
         return pdict
 
     @property
-    def portTypes(self):
+    def port_types(self):
         return self._portmeta.keys()
 
 

@@ -6,7 +6,7 @@ class BasicDatacenter(Location):
     Basic datacenter driver
     """
 
-    _clustoType = "datacenter"
-    _driverName = "basicdatacenter"
+    _clusto_type = "datacenter"
+    _driver_name = "basicdatacenter"
 
     

@@ -74,7 +74,7 @@ SSH_CMD = ['ssh', '-o', 'StrictHostKeyChecking no', '-o', 'PasswordAuthenticatio
 
 def get_or_create(objtype, name):
     try:
-        return clusto.getByName(name)
+        return clusto.get_by_name(name)
     except LookupError:
         return objtype(name)
 
@@ -187,11 +187,11 @@ def get_server(ipaddr):
     fqdn = None
 
     try:
-        return IPManager.getDevice(ipaddr)[0]
+        return IPManager.get_device(ipaddr)[0]
     except: pass
 
     try:
-        names = clusto.getByName('servernames')
+        names = clusto.get_by_name('servernames')
     except:
         names = SimpleEntityNameManager('servernames', basename='s', digits=4, startingnum=0)
     hostname = get_hostname(ipaddr)
@@ -203,7 +203,7 @@ def get_server(ipaddr):
         else:
             fqdn = hostname + '.digg.internal'
 
-        server = clusto.getEntities(attrs=[{'key': 'fqdn', 'value': fqdn}])
+        server = clusto.get_entities(attrs=[{'key': 'fqdn', 'value': fqdn}])
 
         if server:
             server = server[0]
@@ -226,7 +226,7 @@ def get_server(ipaddr):
         return server
 
     if not fqdn in [x.value for x in server.attrs('fqdn')]:
-        server.addFQDN(fqdn)
+        server.add_fqdn(fqdn)
 
     try:
         fqdn = socket.gethostbyaddr(ipaddr)[0]
@@ -234,7 +234,7 @@ def get_server(ipaddr):
             if fqdn.find('.') == -1:
                 fqdn += '.digg.internal'
             if fqdn and not fqdn in [x.value for x in server.attrs('fqdn')]:
-                server.addFQDN(fqdn)
+                server.add_fqdn(fqdn)
     except:
         pass
         
@@ -244,7 +244,7 @@ def get_server(ipaddr):
 
 def simple_ipbind(device, porttype='nic-eth', portnum=0):
     try:
-        ip = IPManager.getIPs(device)
+        ip = IPManager.get_ips(device)
     except:
         ip = None
 
@@ -264,7 +264,7 @@ def simple_ipbind(device, porttype='nic-eth', portnum=0):
 
     if ip:
         try:
-            if not IPManager.getIPs(device):
+            if not IPManager.get_ips(device):
                 device.bindIPtoPort(ip, porttype, portnum)
                 clusto.commit()
         except ResourceException:

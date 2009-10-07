@@ -3,6 +3,6 @@ from basicrack import BasicRack
 
 class APCRack(BasicRack):
 
-    _driverName = "apcrack"
+    _driver_name = "apcrack"
 
     

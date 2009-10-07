@@ -33,7 +33,7 @@ def checkDBcompatibility(dbver):
     if dbver == VERSION:
         return True
 
-def initclusto():
+def init_clusto():
     """Initialize a clusto database. """
     METADATA.create_all(METADATA.bind)
     c = ClustoMeta()
@@ -52,7 +52,7 @@ def clear():
 
     SESSION.expunge_all()
 
-def getDriverName(name):
+def get_driver_name(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
 
     if isinstance(name, str):
@@ -61,11 +61,11 @@ def getDriverName(name):
         else:
             raise NameError("driver name %s doesn't exist." % name)
     elif isinstance(name, type):
-        return name._driverName
+        return name._driver_name
     else:
         return name.driver
 
-def getTypeName(name):
+def get_type_name(name):
 
     if isinstance(name, str):
         if name in TYPELIST:
@@ -74,21 +74,21 @@ def getTypeName(name):
             raise NameError("driver name %s doesn't exist." % name)
 
     elif isinstance(name, type):
-        return name._clustoType
+        return name._clusto_type
     else:
         return name.type
         
 
-def getDriver(entity, ignoreDriverColumn=False):
+def get_driver(entity, ignore_driver_column=False):
     """Return the driver to use for a given entity """
 
-    if not ignoreDriverColumn:
+    if not ignore_driver_column:
         if entity.driver in DRIVERLIST:
             return DRIVERLIST[entity.driver]
 
     return Driver
 
-def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
+def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     """Get entities matching the given criteria
 
     @param names: list of names to match
@@ -110,12 +110,12 @@ def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
     if names:
         query = query.filter(Entity.name.in_(names))
 
-    if clustoTypes:
-        ctl = [getTypeName(n) for n in clustoTypes]
+    if clusto_types:
+        ctl = [get_type_name(n) for n in clusto_types]
         query = query.filter(Entity.type.in_(ctl))
 
-    if clustoDrivers:
-        cdl = [getDriverName(n) for n in clustoDrivers]
+    if clusto_drivers:
+        cdl = [get_driver_name(n) for n in clusto_drivers]
         query = query.filter(Entity.driver.in_(cdl))
 
     if attrs:
@@ -128,7 +128,7 @@ def getEntities(names=(), clustoTypes=(), clustoDrivers=(), attrs=()):
     return [Driver(entity) for entity in query.all()]
 
     
-def getByName(name):
+def get_by_name(name):
     try:
         entity = SESSION.query(Entity).filter_by(name=name).one()
 
@@ -138,7 +138,7 @@ def getByName(name):
     except InvalidRequestError:
         raise LookupError(name + " does not exist.")
 
-getByAttr = drivers.base.Driver.getByAttr
+get_by_attr = drivers.base.Driver.get_by_attr
 
               
 def rename(oldname, newname):
@@ -148,7 +148,7 @@ def rename(oldname, newname):
     ACTIONS.
     """
 
-    old = getByName(oldname)
+    old = get_by_name(oldname)
 
     old.entity.name = newname
 
@@ -156,7 +156,7 @@ def rename(oldname, newname):
 tl = threading.local()
 tl.TRANSACTIONCOUNTER = 0
 
-def beginTransaction():
+def begin_transaction():
     """Start a transaction
 
     If already in a transaction start a savepoint transaction.
@@ -172,7 +172,7 @@ def beginTransaction():
         tl.TRANSACTIONCOUNTER += 1
         return SESSION.begin()
 
-def rollbackTransaction():
+def rollback_transaction():
     """Rollback a transaction"""
     global tl
 
@@ -195,14 +195,14 @@ def commit():
 def disconnect():
     SESSION.close()
 
-def deleteEntity(entity):
+def delete_entity(entity):
     """Delete an entity and all it's attributes and references"""
     try:
-        beginTransaction()
+        begin_transaction()
         SESSION.delete(entity)
         commit()
     except Exception, x:
-        rollbackTransaction()
+        rollback_transaction()
         raise x
     
 

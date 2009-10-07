@@ -16,13 +16,13 @@ class SimpleNameManager(ResourceManager):
     
     """
 
-    _driverName = "simplenamemanager"
+    _driver_name = "simplenamemanager"
     _properties = {'basename':'',
                    'digits':2,
                    'next':1,
                    'leadingZeros':int(True)}
 
-    _recordAllocations = True
+    _record_allocations = True
     
     def allocator(self):
         clusto.flush()
@@ -45,9 +45,9 @@ class SimpleNameManager(ResourceManager):
 
 class SimpleEntityNameManager(SimpleNameManager):    
 
-    _driverName = "simpleentitynamemanager"
+    _driver_name = "simpleentitynamemanager"
 
-    _recordAllocations = False
+    _record_allocations = False
 
 
     def allocate(self, clustotype, resource=None, number=True):
@@ -67,7 +67,7 @@ class SimpleEntityNameManager(SimpleNameManager):
             raise TypeError("thing is not a Driver class")
 
         try:
-            clusto.beginTransaction()
+            clusto.begin_transaction()
 
             if not resource:
                 name, num = self.allocator()
@@ -83,7 +83,7 @@ class SimpleEntityNameManager(SimpleNameManager):
 
             clusto.commit()
         except Exception, x:
-            clusto.rollbackTransaction()
+            clusto.rollback_transaction()
             raise x
         
         return newobj

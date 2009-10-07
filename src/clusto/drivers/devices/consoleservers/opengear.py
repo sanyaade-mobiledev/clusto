@@ -6,7 +6,7 @@ from subprocess import Popen
 
 class OpenGearCM4148(BasicConsoleServer):
 
-    _driverName = 'opengearcm4148'
+    _driver_name = 'opengearcm4148'
 
     _portmeta = { 'pwr-nema-5' : { 'numports':1, },
                   'nic-eth' : { 'numports':1, },
@@ -17,7 +17,7 @@ class OpenGearCM4148(BasicConsoleServer):
         if porttype != 'console-serial':
             raise DriverException("Cannot connect to a non-serial port")
 
-        host = IPManager.getIPs(self)
+        host = IPManager.get_ips(self)
         if len(host) == 0:
             host = self.name
         else:

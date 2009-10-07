@@ -18,7 +18,7 @@ class TestIP(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        ip2 = clusto.getByName('ipone')
+        ip2 = clusto.get_by_name('ipone')
 
         self.assertEqual(ip2.ip, '192.168.243.22')
         

@@ -13,13 +13,13 @@ class IPManager(ResourceManager):
     """
 
 
-    _driverName="ipmanager"
+    _driver_name="ipmanager"
 
     _properties = {'gateway': None,
                    'netmask': '255.255.255.255',
                    'baseip': None }
 
-    _attrName = "ip"
+    _attr_name = "ip"
 
     __int_ip_const = 2147483648
     
@@ -33,7 +33,7 @@ class IPManager(ResourceManager):
 
         return self.__ipy
 
-    def ensureType(self, resource, number=True):
+    def ensure_type(self, resource, number=True):
         """check that the given ip falls within the range managed by this manager"""
 
         try:
@@ -56,11 +56,11 @@ class IPManager(ResourceManager):
         return (int(ip.int()-self.__int_ip_const), True)
 
 
-    def additionalAttrs(self, thing, resource, number):
+    def additional_attrs(self, thing, resource, number):
 
-        resource, number = self.ensureType(resource, number)
+        resource, number = self.ensure_type(resource, number)
 
-        thing.addAttr(self._attrName, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
+        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
         
                      
     def allocator(self):
@@ -69,7 +69,7 @@ class IPManager(ResourceManager):
         if self.baseip is None:
             raise ResourceTypeException("Cannot generate an IP for an ipManager with no baseip")
 
-        lastip = self.attrQuery('_lastip')
+        lastip = self.attr_query('_lastip')
                 
         if not lastip:
             # I subtract self.__int_ip_const to keep in int range
@@ -95,8 +95,8 @@ class IPManager(ResourceManager):
                     continue
 
                 if self.available(nextip):
-                    self.setAttr('_lastip', nextip)
-                    return self.ensureType(nextip, True)
+                    self.set_attr('_lastip', nextip)
+                    return self.ensure_type(nextip, True)
                 else:
                     nextip += 1
             
@@ -108,7 +108,7 @@ class IPManager(ResourceManager):
         raise ResourceNotAvailableException("out of available ips.")
 
     @classmethod
-    def getIPManager(cls, ip):
+    def get_ip_manager(cls, ip):
         """return a valid ip manager for the given ip.
 
         @param ip: the ip
@@ -122,9 +122,9 @@ class IPManager(ResourceManager):
             ipman = ip.entity
             return Driver(ipman)
 
-        for ipmantest in clusto.getEntities(clustoDrivers=[cls]):
+        for ipmantest in clusto.get_entities(clusto_drivers=[cls]):
             try:
-                ipmantest.ensureType(ip)
+                ipmantest.ensure_type(ip)
             except ResourceTypeException:
                 continue
 
@@ -139,7 +139,7 @@ class IPManager(ResourceManager):
         return ipman
         
     @classmethod
-    def getIPs(cls, device):
+    def get_ips(cls, device):
 
         ret = [str(IPy.IP(x.value+cls.__int_ip_const))
                for x in cls.resources(device)]
@@ -147,6 +147,6 @@ class IPManager(ResourceManager):
         return ret
 
     @classmethod
-    def getDevice(self, ip):
-        subnet = IPManager.getIPManager(ip)
+    def get_device(self, ip):
+        subnet = IPManager.get_ip_manager(ip)
         return subnet.owners(ip)

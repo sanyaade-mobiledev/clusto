@@ -15,7 +15,7 @@ scriptpaths = [os.path.realpath(os.path.join(os.curdir, 'scripts')),
                '/usr/bin',
                ] #+ filter(lambda x: not x.endswith('.egg'), sys.path)
 
-def listClustoScripts(path):
+def list_clusto_scripts(path):
     """
     Return a list of clusto scripts in the given path.
     """
@@ -56,11 +56,11 @@ def runcmd(args):
     os.execvpe(cmdname, args, env=os.environ)
 
 
-def getCommand(cmdname):
+def get_command(cmdname):
 
     for path in scriptpaths:
 
-        scripts = listClustoScripts(path)
+        scripts = list_clusto_scripts(path)
 
         for s in scripts:
             if s.split('-')[1].split('.')[0] == cmdname:
@@ -69,13 +69,13 @@ def getCommand(cmdname):
 
     return None
 
-def getCommandHelp(cmdname):
+def get_command_help(cmdname):
 
-    fullpath = getCommand(cmdname)
+    fullpath = get_command(cmdname)
 
     return commands.getoutput(fullpath + " --help-description")
     
-def getClustoConfig(filename=None):
+def get_clusto_config(filename=None):
     """Find, parse, and return the configuration data needed by clusto.
 
     Gets the config path from the CLUSTOCONFIG environment variable otherwise
@@ -109,24 +109,24 @@ def getClustoConfig(filename=None):
     return config
 
 
-def initScript(name=os.path.basename(sys.argv[0]), configfile=None):
+def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
     """Initialize the clusto environment for clusto scripts.
 
     Connects to the clusto database, returns a python SafeConfigParser and a
     logger.
 
-    Uses getClustoConfig and setupLogging
+    Uses get_clusto_config and setup_logging
     """
-    config = getClustoConfig(filename=configfile)
+    config = get_clusto_config(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
-    clusto.initclusto()
+    clusto.init_clusto()
     
-    logger = setupLogging(config=config, name=name)
+    logger = setup_logging(config=config, name=name)
 
     return (config, logger)
 
 
-def setupLogging(config=None, name="clusto.script"):
+def setup_logging(config=None, name="clusto.script"):
     """Setup the default log level and return the logger
 
     The logger will try to log to /var/log and console.
@@ -161,7 +161,7 @@ def setupLogging(config=None, name="clusto.script"):
     return log
 
 
-def setupClustoEnv(options):
+def setup_clusto_env(options):
     """
     Take clusto parameters and put it into the shell environment.
     """
@@ -173,9 +173,9 @@ def setupClustoEnv(options):
         os.environ['CLUSTOCONFIG'] = options.configfile
 
     if os.environ.has_key('CLUSTOCONFIG'):
-        config = getClustoConfig(os.environ['CLUSTOCONFIG'])
+        config = get_clusto_config(os.environ['CLUSTOCONFIG'])
     else:
-        config = getClustoConfig()
+        config = get_clusto_config()
 
     if not os.environ.has_key('CLUSTODSN'):
         os.environ['CLUSTODSN'] = config.get('clusto','dsn')
@@ -223,7 +223,7 @@ def runscript(scriptclass):
 
     (options, argv) = script.parser.parse_args(sys.argv)
 
-    config, logger = initScript()
+    config, logger = init_script()
 
     try:
         if (script.num_args != None and script.num_args != (len(argv)-1)) or script.num_args_min > (len(argv)-1):

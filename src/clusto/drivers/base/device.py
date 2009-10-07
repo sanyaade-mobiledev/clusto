@@ -8,14 +8,14 @@ class Device(Driver):
                    'manufacturer':None}
 
     _clustotype = "device"
-    _driverName = "device"
+    _driver_name = "device"
 
 
     @classmethod
-    def getBySerialNumber(self, serialnum):
+    def get_by_serial_number(self, serialnum):
         pass
 
-    def _getHostname(self):
+    def _get_hostname(self):
         """return a hostname set for this device or its entity name"""
 
         hostname = self.attrs("hostname")
@@ -25,29 +25,29 @@ class Device(Driver):
         else:
             return self.entity.name
         
-    def _setHostname(self, name):
+    def _set_hostname(self, name):
 
-        self.setAttr("hostname", value=name)
+        self.set_attr("hostname", value=name)
 
-    hostname = property(_getHostname, _setHostname)
+    hostname = property(_get_hostname, _set_hostname)
 
     @property
-    def FQDNs(self):
+    def fqdns(self):
         """return the fully qualified domain names for this device"""
 
-        return self.attrValues("fqdn")
+        return self.attr_values("fqdn")
 
 
-    def addFQDN(self, fqdn):
+    def add_fqdn(self, fqdn):
         """add a fully qualified domain name"""
         
-        if not self.hasAttr("fqdn", number=True, value=fqdn):
-            self.addAttr("fqdn", number=True, value=fqdn)
+        if not self.has_attr("fqdn", number=True, value=fqdn):
+            self.add_attr("fqdn", number=True, value=fqdn)
 
-    def removeFQDN(self, fqdn):
+    def remove_fqdn(self, fqdn):
         """remove a fully qualified domain name"""
         
-        self.delAttrs("fqdn", number=True, value=fqdn)
+        self.del_attrs("fqdn", number=True, value=fqdn)
 
         
         

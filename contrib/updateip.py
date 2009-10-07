@@ -1,4 +1,4 @@
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import *
 from subprocess import Popen, PIPE, STDOUT
 import clusto
@@ -20,9 +20,9 @@ def main():
         return
 
     ip = sys.argv[1]
-    #device = IPManager.getDevice(ip)
+    #device = IPManager.get_device(ip)
     #if not device:
-    #    device = clusto.getEntities(attrs=[{'key': 'ipaddress', 'value': ip}])
+    #    device = clusto.get_entities(attrs=[{'key': 'ipaddress', 'value': ip}])
     #if not device:
     #    print 'Unable to find a device matching %s' % ip
     #    return
@@ -64,20 +64,20 @@ def main():
 
     device = None
     try:
-        device = clusto.getByName(hostname)
+        device = clusto.get_by_name(hostname)
         print 'Found by hostname'
     except LookupError:
         pass
 
     if not device:
-        device = clusto.getEntities(attrs=[{'key': 'fqdn', 'value': fqdn}])
+        device = clusto.get_entities(attrs=[{'key': 'fqdn', 'value': fqdn}])
         if device:
             device = device[0]
             print 'Found by fqdn'
 
     if not device:
         for iface, macaddr, ipaddr in iplist:
-            device = IPManager.getDevice(ipaddr.split('/', 1)[0])
+            device = IPManager.get_device(ipaddr.split('/', 1)[0])
             if device:
                 device = device[0]
                 print 'Found by IPManager'
@@ -87,7 +87,7 @@ def main():
         attrs = []
         for iface, macaddr, ipaddr in iplist:
             attrs.append({'key': 'ipaddress', 'value': ipaddr.split('/', 1)[0]})
-        device = clusto.getEntities(attrs=attrs)
+        device = clusto.get_entities(attrs=attrs)
         if device:
             device = device[0]
             print 'Found by ipaddress attr'
@@ -113,18 +113,18 @@ def main():
 
         ipaddr = ipaddr.split('/')[0]
         print repr(ipaddr)
-        subnet = IPManager.getIPManager(ipaddr)
+        subnet = IPManager.get_ip_manager(ipaddr)
 
         if device in subnet.owners(ipaddr):
             continue
         print repr((ipaddr, 'nic-' + iftype, ifnum, macaddr))
         device.bindIPtoPort(ipaddr, 'nic-' + iftype, ifnum)
-        device.setPortAttr('nic-' + iftype, ifnum, 'mac-address', macaddr)
+        device.set_port_attr('nic-' + iftype, ifnum, 'mac-address', macaddr)
     print repr(device)
     clusto.commit()
 
 if __name__ == '__main__':
-    config = getClustoConfig()
+    config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
-    clusto.initclusto()
+    clusto.init_clusto()
     main()

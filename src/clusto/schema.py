@@ -142,7 +142,7 @@ class Attribute(object):
         return val
 
     @property
-    def isRelation(self):
+    def is_relation(self):
         return self.datatype == 'relation'
     
     def getValueType(self, value=None):
@@ -152,7 +152,7 @@ class Attribute(object):
             else:
                 valtype = self.datatype
         else:
-            valtype = self.getType(value)
+            valtype = self.get_type(value)
         
         return valtype + "_value"
 
@@ -161,7 +161,7 @@ class Attribute(object):
         return (self.key, self.number, self.subkey)
 
     @classmethod
-    def getType(self, value):
+    def get_type(self, value):
 
         if isinstance(value, int):
             datatype = 'int'
@@ -187,7 +187,7 @@ class Attribute(object):
     def _set_value(self, value):
         
         if not isinstance(value, sqlalchemy.sql.ColumnElement):
-            self.datatype = self.getType(value)
+            self.datatype = self.get_type(value)
 
         setattr(self, self.getValueType(value), value)
 
@@ -218,7 +218,7 @@ class Attribute(object):
             args.append(Attribute.subkey==subkey)
 
         if value is not ():
-            valtype = Attribute.getType(value) + '_value'
+            valtype = Attribute.get_type(value) + '_value'
             if valtype == 'relation_value':
 
                 # get entity_id from Drivers too

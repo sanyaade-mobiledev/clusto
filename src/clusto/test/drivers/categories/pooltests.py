@@ -25,15 +25,15 @@ class PoolTests(testbase.ClustoTestBase):
         
         clusto.flush()
 
-        q = clusto.getByName('p3')
+        q = clusto.get_by_name('p3')
 
         self.assertTrue(isinstance(q, Pool))
 
-        self.assertFalse(isinstance(clusto.getByName('d3'), Pool))
+        self.assertFalse(isinstance(clusto.get_by_name('d3'), Pool))
 
     def testPoolMembers(self):
 
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
         
         p1.insert(d1)
         p1.insert(d2)
@@ -41,7 +41,7 @@ class PoolTests(testbase.ClustoTestBase):
         clusto.flush()
 
 
-        q = clusto.getByName('p1')
+        q = clusto.get_by_name('p1')
 
         membernames = sorted([x.name for x in p1.contents()])
 
@@ -49,7 +49,7 @@ class PoolTests(testbase.ClustoTestBase):
 
     def testGetPools(self):
 
-        d1, d2, p1 = [clusto.getByName(i) for i in ['d1', 'd2', 'p1']]
+        d1, d2, p1 = [clusto.get_by_name(i) for i in ['d1', 'd2', 'p1']]
 
         p2 = Pool('p2')
         
@@ -58,12 +58,12 @@ class PoolTests(testbase.ClustoTestBase):
         p1.insert(d2)
 
 
-        self.assertEqual(sorted(Pool.getPools(d1)),
+        self.assertEqual(sorted(Pool.get_pools(d1)),
                          sorted([p1,p2]))
 
     def testGetPoolsMultiLevel(self):
 
-        d1, d2, p1 = [clusto.getByName(i) for i in ['d1', 'd2', 'p1']]
+        d1, d2, p1 = [clusto.get_by_name(i) for i in ['d1', 'd2', 'p1']]
 
         p2 = Pool('p2')
         p3 = Pool('p3')
@@ -78,11 +78,11 @@ class PoolTests(testbase.ClustoTestBase):
         p3.insert(p4)
         p4.insert(d3)
 
-        self.assertEqual(sorted(Pool.getPools(d1, allPools=True)),
+        self.assertEqual(sorted(Pool.get_pools(d1, allPools=True)),
                          sorted([p1,p2]))
 
                 
-        self.assertEqual(sorted(set(Pool.getPools(d3, allPools=True))),
+        self.assertEqual(sorted(set(Pool.get_pools(d3, allPools=True))),
                          sorted([p1, p3, p4]))
 
     def testPoolsIterator(self):
@@ -90,7 +90,7 @@ class PoolTests(testbase.ClustoTestBase):
         
         A = Pool('A')
 
-        d1, d2 = [clusto.getByName(i) for i in ['d1', 'd2']]
+        d1, d2 = [clusto.get_by_name(i) for i in ['d1', 'd2']]
 
         B = Pool('B')
         C = Pool('C')
@@ -112,21 +112,21 @@ class PoolTests(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual([x.name for x in Pool.getPools(d1)],
+        self.assertEqual([x.name for x in Pool.get_pools(d1)],
                          [u'A', u'B', u'C', u'A1', u'B2', u'B1', u'A1', u'C1'])
 
-        self.assertEqual([x.name for x in Pool.getPools(d1, allPools=False)],
+        self.assertEqual([x.name for x in Pool.get_pools(d1, allPools=False)],
                          [u'A', u'B', u'C'])
 
 
     def testPoolAttrs(self):
 
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
-        p1.addAttr('t1', 1)
-        p1.addAttr('t2', 2)
+        p1.add_attr('t1', 1)
+        p1.add_attr('t2', 2)
 
-        d1.addAttr('t3', 3)
+        d1.add_attr('t3', 3)
 
         p1.insert(d1)
         p1.insert(d2)
@@ -134,30 +134,30 @@ class PoolTests(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        d2 = clusto.getByName('d2')
+        d2 = clusto.get_by_name('d2')
 
-        self.assertEqual(sorted(d2.attrs(mergeContainerAttrs=True)), sorted(p1.attrs()))
+        self.assertEqual(sorted(d2.attrs(merge_container_attrs=True)), sorted(p1.attrs()))
 
 
         self.assertEqual(sorted(['t1', 't2', 't3']),
-                         sorted([x.key for x in d1.attrs(mergeContainerAttrs=True)]))
+                         sorted([x.key for x in d1.attrs(merge_container_attrs=True)]))
 
 
     def testPoolAttrsOverride(self):
 
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
-        p1.addAttr('t1', 1)
-        p1.addAttr('t2', 2)
+        p1.add_attr('t1', 1)
+        p1.add_attr('t2', 2)
 
         p1.insert(d1)
-        d1.addAttr('t1', 'foo')
+        d1.add_attr('t1', 'foo')
         clusto.flush()
 
         
     def testFilterPoolContents(self):
         
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
         p1.insert(d1)
         p1.insert(d2)
@@ -165,12 +165,12 @@ class PoolTests(testbase.ClustoTestBase):
         p1.insert(BasicServer('s2'))
         p1.insert(BasicNetworkSwitch('sw1'))
 
-        self.assertEqual(p1.contents(clustoTypes=[BasicNetworkSwitch]),
-                         [clusto.getByName('sw1')])
+        self.assertEqual(p1.contents(clusto_types=[BasicNetworkSwitch]),
+                         [clusto.get_by_name('sw1')])
 
     def testAddToPoolMultipleTimes(self):
         
-        d1, d2, p1 = map(clusto.getByName, ('d1', 'd2', 'p1'))
+        d1, d2, p1 = map(clusto.get_by_name, ('d1', 'd2', 'p1'))
 
         p1.insert(d1)
 
@@ -184,16 +184,16 @@ class WeightedPoolTests(testbase.ClustoTestBase):
         p = WeightedPool('p')
 
         p.insert(s)
-        p.setWeight(s, 45)
+        p.set_weight(s, 45)
 
-        self.assertEqual(45, p.getWeight(s))
+        self.assertEqual(45, p.get_weight(s))
 
     def testSetWeightNotInPool(self):
 
         s = BasicServer('s')
         p = WeightedPool('p')
 
-        self.assertRaises(LookupError, p.setWeight, s, 45)
+        self.assertRaises(LookupError, p.set_weight, s, 45)
 
     def testDefaultWeight(self):
         
@@ -203,8 +203,8 @@ class WeightedPoolTests(testbase.ClustoTestBase):
 
         p.insert(s)
 
-        self.assertEqual(None, p.getWeight(s))
+        self.assertEqual(None, p.get_weight(s))
 
         p.defaultweight = 33
 
-        self.assertEqual(33, p.getWeight(s))
+        self.assertEqual(33, p.get_weight(s))

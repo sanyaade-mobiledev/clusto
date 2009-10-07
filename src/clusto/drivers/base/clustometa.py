@@ -15,8 +15,8 @@ class ClustoMeta(Driver):
 
     _properties = {'version':None}
 
-    _clustoType = "clustometa"
-    _driverName = "clustometa"
+    _clusto_type = "clustometa"
+    _driver_name = "clustometa"
 
 
     def __new__(cls):
@@ -31,7 +31,7 @@ class ClustoMeta(Driver):
 
         name = 'clustometa'
         try:
-            meta = clusto.getByName(name)
+            meta = clusto.get_by_name(name)
             self = meta
         except LookupError:
             super(ClustoMeta, self).__init__(name)

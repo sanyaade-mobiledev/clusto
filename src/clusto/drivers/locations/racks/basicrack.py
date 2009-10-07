@@ -7,14 +7,14 @@ class BasicRack(Location):
     Basic rack driver.
     """
 
-    _clustoType = "rack"
-    _driverName = "basicrack"
+    _clusto_type = "rack"
+    _driver_name = "basicrack"
 
     _properties = {'minu':1,
                    'maxu':45}
     
 
-    def _ensureRackU(self, rackU):
+    def _ensure_rack_u(self, rackU):
         if not isinstance(rackU, int) and not isinstance(rackU, (list, tuple)):
             raise TypeError("a rackU must be an Integer or list/tuple of Integers.")
 
@@ -55,9 +55,9 @@ class BasicRack(Location):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
 
-        rackU = self._ensureRackU(rackU)
+        rackU = self._ensure_rack_u(rackU)
 
-        rau = self.getRackAndU(device)
+        rau = self.get_rack_and_u(device)
 
         if rau != None:
             raise Exception("%s is already in rack %s"
@@ -65,27 +65,27 @@ class BasicRack(Location):
 
         
         for U in rackU:
-            dev = self.getDeviceIn(U)
+            dev = self.get_device_in(U)
             if dev:
                 raise TypeError("%s is already in RU %d" % (dev.name, U))
 
         for U in rackU:
-            self.addAttr("_contains", device, number=U, subkey='ru')
+            self.add_attr("_contains", device, number=U, subkey='ru')
 
         
-    def getDeviceIn(self, rackU):
+    def get_device_in(self, rackU):
         
         if not isinstance(rackU, int):
             raise TypeError("RackU must be a single integer. Got: %s" % str(rackU))
 
-        rackU = self._ensureRackU(rackU)[0]
+        rackU = self._ensure_rack_u(rackU)[0]
         
         owners = self.contents(number=rackU, subkey='ru')
 
         if len(owners) > 1:
-            raise Exception('Somehow there is more than one thing in %s.'
+            raise Exception('Somehow there is more than one thing in ru%d.'
                             'Only one of these should be in this space in the '
-                            'rack: %s' % (self.ruName(rackU),
+                            'rack: %s' % (rackU,
                                           ','.join([x.name for x in owners])))
         if owners:
             return owners[0]
@@ -93,14 +93,14 @@ class BasicRack(Location):
         return None
 
     @classmethod
-    def getRackAndU(cls, device):
+    def get_rack_and_u(cls, device):
         """
         Get the rack and rackU for a given device.
 
         returns a tuple of (rack, u-number)
         """
 
-        rack = set(device.parents(clustoTypes=[cls]))
+        rack = set(device.parents(clusto_types=[cls]))
 
 
         if len(rack) > 1:
@@ -112,7 +112,7 @@ class BasicRack(Location):
         if rack:
             rack = rack.pop()
             return {'rack':Driver(rack.entity),  
-                    'RU':[x.number for x in rack.contentAttrs(value=device,
+                    'RU':[x.number for x in rack.content_attrs(value=device,
                                                               subkey='ru')]}
         else:
             
