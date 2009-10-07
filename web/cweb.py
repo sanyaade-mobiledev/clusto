@@ -7,6 +7,7 @@ import new
 import re
 
 from webob import Request, Response
+from ncore.daemon import become_daemon
 from clusto.scripthelpers import getClustoConfig
 from clusto.drivers import Driver
 import clusto
@@ -316,6 +317,7 @@ class ClustoApp(object):
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server, WSGIRequestHandler
+    become_daemon(out_log='/tmp/cweb.log', err_log='/tmp/cweb.log')
 
     app = ClustoApp()
     
