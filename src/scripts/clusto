@@ -22,7 +22,7 @@ def main(argv):
 	args = ['help']
 	
     if args[0] != 'help':
-	config = setupClustoEnv(options)    
+	config = setup_clusto_env(options)    
     
     try:
 	print runcmd(args)

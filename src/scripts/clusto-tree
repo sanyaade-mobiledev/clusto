@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from clusto.scripthelpers import getClustoConfig
+from clusto.scripthelpers import get_clusto_config
 import clusto
 
 import sys
@@ -25,7 +25,7 @@ def print_obj(x, indent=0, attrs=['name']):
             value = getattr(x, attr, None)
 
         if not value:
-            value = [i.value for i in x.attrQuery(key=attr)]
+            value = [i.value for i in x.attr_query(key=attr)]
             if len(value) == 1:
                 value = value[0]
 
@@ -49,12 +49,12 @@ def main():
     else:
         attrs = ['name']
 
-    root = clusto.getByName(sys.argv[1])
+    root = clusto.get_by_name(sys.argv[1])
     print_obj(root, indent=0, attrs=attrs)
     print_tree(root, indent=1, attrs=attrs)
 
 if __name__ == '__main__':
-    config = getClustoConfig()
+    config = get_clusto_config()
     clusto.connect(config.get('clusto', 'dsn'))
     #clusto.initclusto()
     main()

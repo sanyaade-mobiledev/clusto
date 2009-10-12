@@ -9,7 +9,7 @@ parser = OptionParser(usage="usage: %prog")
 
 import clusto.scripthelpers
 
-config, logger = clusto.scripthelpers.initScript()
+config, logger = clusto.scripthelpers.init_script()
 
 from clusto import *
 
