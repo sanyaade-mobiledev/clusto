@@ -6,7 +6,7 @@ Server Technology Power Strips
 
 from basicpowerstrip import BasicPowerStrip
 
-class PowerTowerXM(BasicPowerStrip):
+class PowerTowerXM(IPMixin, BasicPowerStrip):
     """
     Provides support for Power Tower XL/XM
 

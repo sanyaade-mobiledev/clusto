@@ -13,6 +13,4 @@ class BasicPowerStrip(PortMixin, Device):
 
     
     _portmeta = { 'pwr-nema-5' : { 'numports':8, }, 
-                  'nic-eth': {'numports':1, },
-                  'console-serial': {'numports':1}
                   }
