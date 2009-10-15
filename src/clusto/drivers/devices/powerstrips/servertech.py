@@ -5,6 +5,8 @@ Server Technology Power Strips
 
 
 from basicpowerstrip import BasicPowerStrip
+from clusto.drivers.devices.common import IPMixin
+
 
 class PowerTowerXM(IPMixin, BasicPowerStrip):
     """
