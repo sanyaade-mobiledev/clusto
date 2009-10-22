@@ -4,8 +4,8 @@ Drivers for Penguin Computing Servers
 
 from basicserver import BasicServer
 
-class PenguinComputing(BasicServer):
-    _driver_name = "penguincomputing"
+class PenguinServer(BasicServer):
+    _driver_name = "penguinserver"
 
 
 

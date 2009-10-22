@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 import drivers
 
 import threading
+import logging
 
 driverlist = DRIVERLIST
 typelist = TYPELIST
@@ -139,6 +140,14 @@ def get_by_name(name):
         raise LookupError(name + " does not exist.")
 
 get_by_attr = drivers.base.Driver.get_by_attr
+
+def get_or_create(name, driver):
+    try:
+        obj = get_by_name(name)
+    except LookupError:
+        obj = driver(name)
+        logging.info('Created %s' % obj)
+    return obj
 
               
 def rename(oldname, newname):
