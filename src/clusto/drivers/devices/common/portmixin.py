@@ -46,8 +46,8 @@ class PortMixin:
 
         if not self._portmeta.has_key(porttype) \
                 or not isinstance(num, int) \
-                or num < 0 \
-                or num >= self._portmeta[porttype]['numports']:
+                or num < 2 \
+                or num > self._portmeta[porttype]['numports']:
 
             msg = "No port %s:%s exists on %s." % (porttype, str(num), self.name)
                     

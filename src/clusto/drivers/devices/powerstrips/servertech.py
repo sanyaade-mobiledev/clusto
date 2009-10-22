@@ -29,11 +29,11 @@ class PowerTowerXM(IPMixin, BasicPowerStrip):
 
 
 
-    _portmap = {'aa1':0,'aa2':1,'aa3':2,'aa4':3,'aa5':4,'aa6':5,'aa7':6,'aa8':7,
-                'ab1':8,'ab2':9,'ab3':10,'ab4':11,'ab5':12,'ab6':13,'ab7':14,
-                'ab8':15,'ba1':16,'ba2':17,'ba3':18,'ba4':19,'ba5':20,'ba6':21,
-                'ba7':22,'ba8':23,'bb1':24,'bb2':25,'bb3':26,'bb4':27,'bb5':28,
-                'bb6':29,'bb7':30,'bb8':31,
+    _portmap = {'aa1':1,'aa2':2,'aa3':3,'aa4':4,'aa5':5,'aa6':6,'aa7':7,'aa8':8,
+                'ab1':9,'ab2':10,'ab3':11,'ab4':12,'ab5':13,'ab6':14,'ab7':15,
+                'ab8':16,'ba1':17,'ba2':18,'ba3':19,'ba4':20,'ba5':21,'ba6':22,
+                'ba7':23,'ba8':24,'bb1':25,'bb2':26,'bb3':27,'bb4':28,'bb5':29,
+                'bb6':30,'bb7':31,'bb8':32,
                 }
 
     def _ensure_portnum(self, porttype, portnum):
