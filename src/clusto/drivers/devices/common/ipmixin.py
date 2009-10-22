@@ -34,7 +34,7 @@ class IPMixin:
         ipman = IPManager.get_ip_manager(ip)
 
         return self in ipman.owners(ip)
-    
+
     def bind_ip_to_osport(self, ip, osportname, ipman=None, porttype=None, portnum=None):
         """bind an IP to an os port and optionally also asign the os port name
         to a physical port

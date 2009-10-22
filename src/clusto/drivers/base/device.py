@@ -1,5 +1,6 @@
 
 from clusto.drivers.base import Driver
+import sys
 
 class Device(Driver):
 
@@ -49,5 +50,22 @@ class Device(Driver):
         
         self.del_attrs("fqdn", number=True, value=fqdn)
 
-        
-        
+    def power_reboot(self, captcha=True):
+        while captcha:
+            sys.stdout.write('Are you sure you want to reboot %s (yes/no)? ' % self.name)
+            line = sys.stdin.readline().rstrip('\r\n')
+            if line == 'yes':
+                captcha = False
+                continue
+            if line == 'no':
+                return
+            sys.stdout.write('"yes" or "no", please\n')
+
+        ports_rebooted = 0
+        for porttype, ports in self.port_info.items():
+            if not porttype.startswith('pwr-'): continue
+            for portnum, port in ports.items():
+                if not port['connection']: continue
+                port['connection'].reboot(porttype, port['otherportnum'])
+                ports_rebooted += 1
+        return ports_rebooted

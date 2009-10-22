@@ -1,8 +1,8 @@
 
 from clusto.drivers import Device
-from clusto.drivers.devices import PortMixin
+from clusto.drivers.devices import PortMixin, IPMixin
 
-class BasicConsoleServer(PortMixin, Device):
+class BasicConsoleServer(IPMixin, PortMixin, Device):
     """
     Basic console server Driver
     """

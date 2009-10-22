@@ -227,7 +227,7 @@ class PortMixin:
         portinfo = {}
         for ptype in self.port_types:
             portinfo[ptype]={}
-            for n in range(self._portmeta[ptype]['numports']):
+            for n in range(1, self._portmeta[ptype]['numports'] + 1):
                 portinfo[ptype][n] = {'connection': self.get_port_attrs(ptype, n, 'connection'),
                                       'otherportnum': self.get_port_attrs(ptype, n, 'otherportnum')}
 
