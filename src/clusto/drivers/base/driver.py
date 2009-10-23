@@ -138,7 +138,12 @@ class Driver(object):
 
     def __cmp__(self, other):
 
-        return cmp(self.name, other.name)
+        if hasattr(other, 'name'):
+            return cmp(self.name, other.name)
+        elif other is None:
+            return 1
+        else:
+            raise TypeError("Cannot compare %s with %s", type(self), type(other))
 
     def __hash__(self):
         return hash(self.entity.name)
