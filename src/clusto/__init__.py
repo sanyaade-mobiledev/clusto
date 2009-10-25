@@ -27,7 +27,7 @@ def connect(dsn, echo=False):
 
     @param dsn: the clusto database URI
     """
-    METADATA.bind = create_engine(dsn, echo=echo)
+    SESSION.configure(bind=create_engine(dsn, echo=echo))
 
 def checkDBcompatibility(dbver):
 
@@ -36,8 +36,10 @@ def checkDBcompatibility(dbver):
 
 def init_clusto():
     """Initialize a clusto database. """
-    METADATA.create_all(METADATA.bind)
+    METADATA.create_all(SESSION.bind)
     c = ClustoMeta()
+    flush()
+    commit()
 
 
 

@@ -40,7 +40,7 @@ class ClustoTestBase(unittest.TestCase):
 
         clusto.clear()
         clusto.disconnect()
-        clusto.METADATA.drop_all()
+        clusto.METADATA.drop_all(clusto.SESSION.bind)
 
 
 
