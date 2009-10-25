@@ -105,9 +105,10 @@ class Driver(object):
                                     % (name_driver_entity))
 
 
-            self.entity = Entity(name_driver_entity)
-            self.entity.driver = self._driver_name
-            self.entity.type = self._clusto_type
+            self.entity = Entity(name_driver_entity,
+                                 driver=self._driver_name,
+                                 clustotype=self._clusto_type)
+
 
         else:
             raise TypeError("Could not create driver from given arguments.")
