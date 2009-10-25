@@ -22,23 +22,45 @@ import datetime
 import clusto
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
-           'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
+           'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
+           'latest_version', 'CLUSTO_VERSIONING']
 
 
 METADATA = MetaData()
 
-SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True))
+
+CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
+                          Column('version', Integer, primary_key=True),
+                          Column('timestamp', TIMESTAMP, default=func.current_timestamp()),
+                          )
+
+
+class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
+
+    def before_commit(self, session):
+        session.execute(CLUSTO_VERSIONING.insert().values())
+        return EXT_CONTINUE
+        
+
+SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True,
+                                      extension=ClustoSession()))
+
+
+def latest_version():
+    return select([func.max(CLUSTO_VERSIONING.c.version)])
+
 
 
 ENTITY_TABLE = Table('entities', METADATA,
-                    Column('entity_id', Integer, primary_key=True),
-                    Column('name', String(128, convert_unicode=True,
-                           assert_unicode=None), unique=True,
-                           nullable=False, ),
-                    Column('type', String(32), nullable=False),
-                    Column('driver', String(32), nullable=False),
-                    mysql_engine='InnoDB'
-                    )
+                     Column('entity_id', Integer, primary_key=True),
+                     Column('name', String(128, convert_unicode=True,
+                                           assert_unicode=None), unique=True,
+                            nullable=False, ),
+                     Column('type', String(32), nullable=False),
+                     Column('driver', String(32), nullable=False),
+                     
+                     mysql_engine='InnoDB'
+                     )
 
 ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
@@ -59,7 +81,12 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
 
+                   mysql_engine='InnoDB'
+
                    )
+
+class ClustoVersioning(object):
+    pass
 
 class Attribute(object):
     """Attribute class holds key/value pair
@@ -313,6 +340,8 @@ class Entity(object):
     
 
 
+
+mapper(ClustoVersioning, CLUSTO_VERSIONING)
 mapper(Attribute, ATTR_TABLE,
        properties = {'relation_value': relation(Entity, lazy=True, 
                                                 primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
