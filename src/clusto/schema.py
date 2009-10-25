@@ -104,12 +104,12 @@ class Attribute(object):
     the values set by passing in 'value'.
     """
 
-    def __init__(self, key, value=None,
+    def __init__(self, entity, key, value=None,
                  subkey=None, number=None,
                  int_value=None, string_value=None,
                  datetime_value=None, relation_id=None, datatype=None):
 
-
+        self.entity = entity
         self.key = key
         
         self.value = value
@@ -324,6 +324,10 @@ class Entity(object):
         return str(self.name)
             
 
+    def add_attr(self, *args, **kwargs):
+
+        return Attribute(self, *args, **kwargs)
+        
     def delete(self):
         "Delete self and all references to self."
 

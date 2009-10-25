@@ -505,10 +505,8 @@ class Driver(object):
             subkey = None
 
 
-        attr = Attribute(key, value, subkey=subkey, number=number)
-        self.entity._attrs.append(attr)
+        return self.entity.add_attr(key, value, subkey=subkey, number=number)
 
-        return attr
 
     def del_attrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"

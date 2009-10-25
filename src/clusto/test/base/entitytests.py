@@ -73,8 +73,8 @@ class TestEntityAttributes(testbase.ClustoTestBase):
                 
         self.assertEqual(e.name, 'e2')
 
-        e._attrs.append(Attribute(key='one', value=1))
-        e._attrs.append(Attribute(key='two', value=2))
+        e.add_attr(key='one', value=1)
+        e.add_attr(key='two', value=2)
 
         clusto.flush()
 
@@ -94,7 +94,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
         d = datetime.datetime(2007,12,16,7,46)
         
-        e1._attrs.append(Attribute('somedate', d))
+        e1.add_attr('somedate', d)
 
         clusto.flush()
 
@@ -126,7 +126,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         e1 = SESSION.query(Entity).filter_by(name='e1').one()
         
         e4 = Entity('e4')
-        e4._attrs.append(Attribute(key='e1', value=e1))
+        e4.add_attr(key='e1', value=e1)
         
         clusto.flush()
 
@@ -141,7 +141,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
-        e2._attrs.append(Attribute(key='somestring', value='thestring'))
+        e2.add_attr(key='somestring', value='thestring')
 
         clusto.flush()
 
@@ -153,7 +153,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
     def testIntAttribute(self):
 
         e4 = Entity('e4')
-        e4._attrs.append(Attribute(key='someint', value=10))
+        e4.add_attr(key='someint', value=10)
 
         clusto.flush()
 
@@ -166,11 +166,11 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
-        e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-                                   value='thestring'))
+        e2.add_attr(key='somestring', number=1, subkey='foo',
+                                   value='thestring')
 
-        e2._attrs.append(Attribute(key='somestring', number=1, subkey='foo',
-                                   value='thestring'))
+        e2.add_attr(key='somestring', number=1, subkey='foo',
+                                   value='thestring')
 
 
         clusto.flush()
@@ -186,7 +186,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         e1 = SESSION.query(Entity).filter_by(name='e1').one()
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
-        e1._attrs.append(Attribute('pointer1', e2))
+        e1.add_attr('pointer1', e2)
 
         clusto.flush()
 
@@ -227,8 +227,8 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         e1 = SESSION.query(Entity).filter_by(name='e1').one()
         e2 = SESSION.query(Entity).filter_by(name='e2').one()
 
-        e1._attrs.append(Attribute('foo', 2))
-        e1._attrs.append(Attribute('foo', e2))
+        e1.add_attr('foo', 2)
+        e1.add_attr('foo', e2)
 
         clusto.flush()
         e1 = SESSION.query(Entity).filter_by(name='e1').one()
@@ -246,8 +246,8 @@ class TestEntityReferences(testbase.ClustoTestBase):
         e2 = Entity('e2')
         e3 = Entity('e3')
 
-        e3._attrs.append(Attribute(key='e1', value=e1))
-        e3._attrs.append(Attribute(key='e2', value=e2))
+        e3.add_attr(key='e1', value=e1)
+        e3.add_attr(key='e2', value=e2)
 
         clusto.flush()
     
