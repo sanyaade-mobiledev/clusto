@@ -2,7 +2,7 @@
 Clusto schema
 
 """
-VERSION = 2
+VERSION = 3
 from sqlalchemy import *
 
 from sqlalchemy.exceptions import InvalidRequestError
@@ -58,6 +58,8 @@ ENTITY_TABLE = Table('entities', METADATA,
                             nullable=False, ),
                      Column('type', String(32), nullable=False),
                      Column('driver', String(32), nullable=False),
+                     Column('version', Integer, nullable=False),
+                     Column('deleted_at_version', Integer, default=None),
                      
                      mysql_engine='InnoDB'
                      )
@@ -81,6 +83,8 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
 
+                   Column('version', Integer, nullable=False),
+                   Column('deleted_at_version', Integer, default=None),
                    mysql_engine='InnoDB'
 
                    )
@@ -131,7 +135,11 @@ class Attribute(object):
         if relation_id is not None: self.relation_id = relation_id
         if datatype is not None: self.datatype = datatype
 
+        self.version = latest_version()
         SESSION.add(self)
+        SESSION.flush()
+
+
         
     def __cmp__(self, other):
 
@@ -285,7 +293,9 @@ class Entity(object):
         self.driver = driver
         self.type = clustotype
 
+        self.version = latest_version()
         SESSION.add(self)
+        SESSION.flush()
         
     def __eq__(self, otherentity):
         """Am I the same as the Other Entity.
