@@ -490,8 +490,7 @@ class Driver(object):
         """
 
         if isinstance(key, Attribute):
-            self.entity._attrs.append(key)
-            return key
+            raise Exception("Unsupported Operation.  You can no longer add an attribute directly")
         
         self._check_attr_name(key)
         if subkey:
