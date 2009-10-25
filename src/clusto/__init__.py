@@ -164,6 +164,14 @@ def rename(oldname, newname):
 
     old.entity.name = newname
 
+def get_latest_version_number():
+    "Return the latest version number"
+
+    s = SESSION()
+
+    val = s.execute(latest_version()).fetchone()[0]
+    return val
+
 
 tl = threading.local()
 tl.TRANSACTIONCOUNTER = 0

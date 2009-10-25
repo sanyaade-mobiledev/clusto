@@ -13,10 +13,10 @@ class TestEntitySchema(testbase.ClustoTestBase):
 
     def testCreateEntityObject(self):
 
+        curver = clusto.get_latest_version_number()
+
         e1 = Entity('e1')
         e2 = Entity('e2')
-
-        clusto.flush()
 
         res = SESSION.query(Entity).filter_by(name='e1')
 
