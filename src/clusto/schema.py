@@ -155,13 +155,12 @@ class Attribute(object):
         self.value = value
 
         self.subkey = subkey
-
+        self.version = latest_version()
         if isinstance(number, bool) and number == True:
-            self.number = select([func.coalesce(select([func.max(ATTR_TABLE.c.number)+1], 
-                                                       and_(ATTR_TABLE.c.key==key,
-                                                            ATTR_TABLE.c.number!=None,
-                                                            )).as_scalar(), 0)])
-
+            counter = Counter.get(entity, key, default=-1)
+            self.number = counter.next()
+        elif isinstance(number, Counter):
+            self.number = counter.next()
         else:
             self.number = number
 
@@ -171,7 +170,7 @@ class Attribute(object):
         if relation_id is not None: self.relation_id = relation_id
         if datatype is not None: self.datatype = datatype
 
-        self.version = latest_version()
+
         SESSION.add(self)
         SESSION.flush()
 
