@@ -23,7 +23,7 @@ import clusto
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
-           'latest_version', 'CLUSTO_VERSIONING', 'Counter']
+           'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning']
 
 
 METADATA = MetaData()

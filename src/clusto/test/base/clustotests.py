@@ -7,6 +7,19 @@ from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter
 from sqlalchemy.exceptions import InvalidRequestError
 
+class TestClustoPlain(testbase.ClustoTestBase):
+
+    def testInitClustoIdempotent(self):
+        
+        clusto.init_clusto()
+        clusto.init_clusto()
+        clusto.init_clusto()
+        clusto.init_clusto()
+
+        self.assertEqual(SESSION.query(ClustoVersioning).count(), 3)
+                                       
+
+
 class TestClusto(testbase.ClustoTestBase):
     def data(self):
 
