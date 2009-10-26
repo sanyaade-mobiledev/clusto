@@ -23,7 +23,7 @@ import clusto
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
-           'latest_version', 'CLUSTO_VERSIONING']
+           'latest_version', 'CLUSTO_VERSIONING', 'Counter']
 
 
 METADATA = MetaData()
@@ -89,9 +89,34 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
 
                    )
 
+COUNTER_TABLE = Table('counters', METADATA,
+                      Column('counter_id', Integer, primary_key=True),
+                      Column('entity_id', Integer, ForeignKey('entities.entity_id'), nullable=False),
+                      Column('attr_key', String(256, convert_unicode=True, assert_unicode=None)),
+                      Column('value', Integer, default=0)
+                      )
+
 class ClustoVersioning(object):
     pass
 
+class Counter(object):
+
+    def __init__(self, entity, keyname, start=0):
+        self.entity = entity
+        self.attr_key = keyname
+
+        self.value = start
+
+        SESSION.add(self)
+        SESSION.flush()
+
+    def next(self):
+
+        self.value = Counter.value + 1
+        SESSION.flush()
+        return self.value
+    
+        
 class Attribute(object):
     """Attribute class holds key/value pair
 
@@ -356,6 +381,12 @@ class Entity(object):
 
 
 mapper(ClustoVersioning, CLUSTO_VERSIONING)
+
+mapper(Counter, COUNTER_TABLE,
+       properties = {'entity': relation(Entity, lazy=True, uselist=False)},
+           
+       )
+
 mapper(Attribute, ATTR_TABLE,
        properties = {'relation_value': relation(Entity, lazy=True, 
                                                 primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
