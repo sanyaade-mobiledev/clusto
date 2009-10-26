@@ -31,5 +31,20 @@ class TestClustoCounter(testbase.ClustoTestBase):
         c.next()
         self.assertEqual(c.value,2)
 
-        
+    def testGetCounter(self):
+
+        e = Entity('e1')
+
+        c = Counter.get(e, 'key1')
+
+        c.next()
+        self.assertEqual(c.value, 1)
+
+
+        d = Counter.get(e, 'key1', default=100)
+        d.next()
+        self.assertEqual(d.value, 2)
+
+        f = Counter.get(e, 'key2', default=20)
+        self.assertEqual(f.value, 20)
 

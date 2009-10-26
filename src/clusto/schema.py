@@ -115,7 +115,18 @@ class Counter(object):
         self.value = Counter.value + 1
         SESSION.flush()
         return self.value
-    
+
+    @classmethod
+    def get(cls, entity, keyname, default=0):
+
+        try:
+            ctr = SESSION.query(cls).filter(and_(cls.entity==entity,
+                                                 cls.attr_key==keyname)).one()
+
+        except sqlalchemy.orm.exc.NoResultFound:
+            ctr = cls(entity, keyname, default)
+
+        return ctr
         
 class Attribute(object):
     """Attribute class holds key/value pair
