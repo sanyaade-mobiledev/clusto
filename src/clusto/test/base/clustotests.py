@@ -34,7 +34,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         cm = clusto.get_by_name('clustometa')
 
-        self.assertEqual(cm.version, VERSION)
+        self.assertEqual(cm.schemaversion, VERSION)
         
     def testGetByName(self):
 

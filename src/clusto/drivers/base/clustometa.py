@@ -13,7 +13,7 @@ class ClustoMeta(Driver):
     Holds meta information about the clusto database
     """
 
-    _properties = {'version':None}
+    _properties = {'schemaversion':None}
 
     _clusto_type = "clustometa"
     _driver_name = "clustometa"
@@ -35,7 +35,7 @@ class ClustoMeta(Driver):
             self = meta
         except LookupError:
             super(ClustoMeta, self).__init__(name)
-            self.version = VERSION
+            self.schemaversion = VERSION
             
 
         
