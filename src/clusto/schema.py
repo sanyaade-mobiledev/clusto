@@ -252,13 +252,18 @@ class Attribute(object):
         if self.getValueType() == 'relation_value':
             return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
         else:
-            return getattr(self, self.getValueType())
+            val = getattr(self, self.getValueType())
+            if self.datatype == 'int':
+                return int(val)
+            else:
+                return val
 
     def _set_value(self, value):
         
         if not isinstance(value, sqlalchemy.sql.ColumnElement):
             self.datatype = self.get_type(value)
-
+            if self.datatype == 'int':
+                value = int(value)
         setattr(self, self.getValueType(value), value)
 
 
