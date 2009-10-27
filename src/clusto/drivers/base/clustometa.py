@@ -21,21 +21,22 @@ class ClustoMeta(Driver):
 
     def __new__(cls):
 
-        if not hasattr(cls, '__singleton'):
-            cls.__singleton = object.__new__(cls)
+        try:
+            cls.__singleton = clusto.get_by_name(cls._driver_name)
+        except LookupError:
+            cls.__singleton = Driver.__new__(cls, cls._driver_name)
+
 
         return cls.__singleton
 
 
     def __init__(self): #, name=None, entity=None, *args, **kwargs):
 
-        name = 'clustometa'
-        try:
-            meta = clusto.get_by_name(name)
-            self = meta
-        except LookupError:
-            super(ClustoMeta, self).__init__(name)
+        if not hasattr(self, 'entity'):
+            super(ClustoMeta, self).__init__(self._driver_name)
             self.schemaversion = VERSION
-            
+
+
+
 
         
