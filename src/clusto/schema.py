@@ -160,7 +160,7 @@ class Attribute(object):
             counter = Counter.get(entity, key, default=-1)
             self.number = counter.next()
         elif isinstance(number, Counter):
-            self.number = counter.next()
+            self.number = number.next()
         else:
             self.number = number
 
