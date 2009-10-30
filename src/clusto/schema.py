@@ -55,7 +55,7 @@ SESSION.version = latest_version()
 ENTITY_TABLE = Table('entities', METADATA,
                      Column('entity_id', Integer, primary_key=True),
                      Column('name', String(128, convert_unicode=True,
-                                           assert_unicode=None), unique=True,
+                                           assert_unicode=None),
                             nullable=False, ),
                      Column('type', String(32), nullable=False),
                      Column('driver', String(32), nullable=False),
@@ -194,7 +194,7 @@ class Attribute(object):
 
     def __repr__(self):
 
-        params = ('key','value','subkey','number','datatype',)
+        params = ('key','value','subkey','number','datatype','version', 'deleted_at_version')
                   #'int_value','string_value','datetime_value','relation_id')
                   
 
@@ -274,11 +274,8 @@ class Attribute(object):
     def delete(self):
         ### TODO this seems like a hack
         
-        try:
-            SESSION.delete(self)
-        except InvalidRequestError:
-            pass #SESSION.expunge(self)
-
+        self.deleted_at_version = latest_version()
+        
     @classmethod
     def queryarg(cls, key=None, value=(), subkey=(), number=()):
 
@@ -387,18 +384,20 @@ class Entity(object):
     def delete(self):
         "Delete self and all references to self."
 
+        clusto.begin_transaction()
         try:
-            SESSION.delete(self)
-        except InvalidRequestError:
-            SESSION.expunge(self)
-        #SESSION.delete(self)
+            self.deleted_at_version = latest_version() 
 
-        q = SESSION.query(Attribute).filter_by(relation_id=self.entity_id)
+            for i in self._references:
+                i.delete()
 
-        for i in q:
-            i.delete()
-    
-
+            for i in self._attrs:
+                i.delete()
+                
+            clusto.commit()
+        except Exception, x:
+            clusto.rollback_transaction()
+            raise x
 
     @classmethod
     def query(cls):
@@ -406,6 +405,7 @@ class Entity(object):
                                              cls.deleted_at_version>SESSION.version)).filter(cls.version<=SESSION.version)
 
     
+        
 mapper(ClustoVersioning, CLUSTO_VERSIONING)
 
 mapper(Counter, COUNTER_TABLE,

@@ -36,3 +36,21 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         self.assertEqual(clusto.get_latest_version_number(), curver + 3)
         
         
+    def testDeleteVersion(self):
+
+        curver = clusto.get_latest_version_number()
+
+        e1 = Entity('e1')
+        etest = clusto.get_by_name('e1')
+        e1.delete()
+
+
+        self.assertRaises(LookupError, clusto.get_by_name, 'e1')
+
+        e1a = Entity('e1')
+
+        etest = clusto.get_by_name('e1')
+
+        self.assertEqual(etest.entity.version, curver+2)
+
+
