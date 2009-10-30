@@ -357,7 +357,7 @@ class Entity(object):
 
     def __cmp__(self, other):
 
-        if not hasattr(otherentity, 'name'):
+        if not hasattr(other, 'name'):
             raise TypeError("Can only compare equality with an Entity-like "
                             "object.  Got a %s instead." 
                             % (type(other).__name__))
