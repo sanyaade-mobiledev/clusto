@@ -233,7 +233,7 @@ class Driver(object):
         if querybase:
             query = querybase 
         else:
-            query = SESSION.query(Attribute)
+            query = Attribute.query()
 
         ### This is bunk, gotta fix it
         if isinstance(cls, Driver):

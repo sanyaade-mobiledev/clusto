@@ -38,7 +38,7 @@ class TestClusto(testbase.ClustoTestBase):
         
     def testGetByName(self):
 
-        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name='e1').one()
 
         q = clusto.get_by_name('e1')
 
@@ -50,7 +50,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         clusto.rename('e1', 'f1')
 
-        q = SESSION.query(Entity)
+        q = Entity.query()
 
         self.assertEqual(q.filter_by(name='e1').count(), 0)
 
@@ -206,7 +206,7 @@ class TestClusto(testbase.ClustoTestBase):
 
     def testDeleteEntity(self):
 
-        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name='e1').one()
 
         d = Driver(e1)
 

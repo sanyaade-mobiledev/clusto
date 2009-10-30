@@ -50,6 +50,7 @@ def latest_version():
     return select([func.max(CLUSTO_VERSIONING.c.version)])
 
 
+SESSION.version = latest_version()
 
 ENTITY_TABLE = Table('entities', METADATA,
                      Column('entity_id', Integer, primary_key=True),
@@ -309,6 +310,11 @@ class Attribute(object):
 
         return and_(*args)
 
+    @classmethod
+    def query(cls):
+        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
+                                             cls.deleted_at_version>SESSION.version))
+
 class Entity(object):
     """
     The base object that can be stored and managed in clusto.
@@ -394,7 +400,12 @@ class Entity(object):
     
 
 
+    @classmethod
+    def query(cls):
+        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
+                                             cls.deleted_at_version>SESSION.version)).filter(cls.version<=SESSION.version)
 
+    
 mapper(ClustoVersioning, CLUSTO_VERSIONING)
 
 mapper(Counter, COUNTER_TABLE,
@@ -414,13 +425,21 @@ mapper(Attribute, ATTR_TABLE,
 mapper(Entity, ENTITY_TABLE,
        properties={'_attrs' : relation(Attribute, lazy='dynamic',
                                        cascade="all, delete, delete-orphan",
-                                       primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
+                                       primaryjoin=and_(ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
+                                                        and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                                                 ATTR_TABLE.c.deleted_at_version==None),
+                                                             ATTR_TABLE.c.version<=SESSION.version)),
+                                                        
                                        backref='entity',
                                        passive_updates=False,
                                        uselist=True),
                    '_references' : relation(Attribute, lazy='dynamic',
                                             cascade="all, delete, delete-orphan",
-                                            primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
+                                            primaryjoin=and_(ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
+                                                        and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                                                 ATTR_TABLE.c.deleted_at_version==None),
+                                                             ATTR_TABLE.c.version<=SESSION.version)),
+
                                             passive_updates=False,
                                             uselist=True)
                 }
