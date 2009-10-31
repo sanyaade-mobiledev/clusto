@@ -149,10 +149,7 @@ class Attribute(object):
     """
 
     def __init__(self, entity, key, value=None,
-                 subkey=None, number=None,
-                 int_value=None, string_value=None,
-                 datetime_value=None, relation_id=None, datatype=None):
-
+                 subkey=None, number=None):
         self.entity = entity
         self.key = key
         
@@ -167,12 +164,6 @@ class Attribute(object):
             self.number = number.next()
         else:
             self.number = number
-
-        if int_value is not None: self.int_value = int_value
-        if string_value is not None: self.string_value = sting_value
-        if datetime_value is not None: self.datetime_value = datetime_value
-        if relation_id is not None: self.relation_id = relation_id
-        if datatype is not None: self.datatype = datatype
 
 
         SESSION.add(self)
