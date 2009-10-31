@@ -412,7 +412,7 @@ class Driver(object):
         else:
             merge_container_attrs = False
 
-        attrs = self.attr_filter(self.entity._attrs, *args, **kwargs) 
+        attrs = self.attr_filter(self.entity.attrs, *args, **kwargs) 
 
         if merge_container_attrs:
             kwargs['merge_container_attrs'] = merge_container_attrs
@@ -441,7 +441,7 @@ class Driver(object):
             
         clusto_types = kwargs.pop('clusto_types', None)
         
-        result = self.attr_filter(self.entity._references, *args, **kwargs)
+        result = self.attr_filter(self.entity.references, *args, **kwargs)
 
         if clusto_drivers:
             cdl = [clusto.get_driver_name(n) for n in clusto_drivers]
@@ -516,7 +516,6 @@ class Driver(object):
         try:
             clusto.begin_transaction()
             for i in self.attr_query(*args, **kwargs):
-                self.entity._attrs.remove(i)
                 i.delete()
             clusto.commit()
         except Exception, x:

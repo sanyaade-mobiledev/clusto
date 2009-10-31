@@ -220,7 +220,7 @@ def delete_entity(entity):
     """Delete an entity and all it's attributes and references"""
     try:
         begin_transaction()
-        SESSION.delete(entity)
+        entity.delete()
         commit()
     except Exception, x:
         rollback_transaction()

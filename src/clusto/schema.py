@@ -379,7 +379,21 @@ class Entity(object):
             
         return str(self.name)
             
+    @property
+    def attrs(self):
+        return Attribute.query().filter(and_(Attribute.entity==self,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                                      ATTR_TABLE.c.deleted_at_version==None),
+                                                  ATTR_TABLE.c.version<=SESSION.version))).all()
 
+    @property
+    def references(self):
+        return Attribute.query().filter(and_(Attribute.relation_id==self.entity_id,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                                      ATTR_TABLE.c.deleted_at_version==None),
+                                                  ATTR_TABLE.c.version<=SESSION.version))).all()
+        
+        
     def add_attr(self, *args, **kwargs):
 
         return Attribute(self, *args, **kwargs)
@@ -389,12 +403,12 @@ class Entity(object):
 
         clusto.begin_transaction()
         try:
-            self.deleted_at_version = latest_version() 
+            self.deleted_at_version = working_version() 
 
-            for i in self._references:
+            for i in self.references:
                 i.delete()
 
-            for i in self._attrs:
+            for i in self.attrs:
                 i.delete()
                 
             clusto.commit()
@@ -416,36 +430,18 @@ mapper(Counter, COUNTER_TABLE,
            
        )
 
-mapper(Attribute, ATTR_TABLE,
+mapper(Attribute, ATTR_TABLE,       
        properties = {'relation_value': relation(Entity, lazy=True, 
                                                 primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
                                                 uselist=False,
-                                                passive_updates=False)})
+                                                passive_updates=False),
+                     'entity': relation(Entity, lazy=True, uselist=False,
+                                        primaryjoin=ATTR_TABLE.c.entity_id==ENTITY_TABLE.c.entity_id)})
 
 
 ## might be better to make the relationships here dynamic_loaders in the long
 ## term.
 mapper(Entity, ENTITY_TABLE,
-       properties={'_attrs' : relation(Attribute, lazy='dynamic',
-                                       cascade="all, delete, delete-orphan",
-                                       primaryjoin=and_(ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
-                                                        and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
-                                                                 ATTR_TABLE.c.deleted_at_version==None),
-                                                             ATTR_TABLE.c.version<=SESSION.version)),
-                                                        
-                                       backref='entity',
-                                       passive_updates=False,
-                                       uselist=True),
-                   '_references' : relation(Attribute, lazy='dynamic',
-                                            cascade="all, delete, delete-orphan",
-                                            primaryjoin=and_(ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
-                                                        and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
-                                                                 ATTR_TABLE.c.deleted_at_version==None),
-                                                             ATTR_TABLE.c.version<=SESSION.version)),
 
-                                            passive_updates=False,
-                                            uselist=True)
-                }
        )
-
 

@@ -133,7 +133,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
         e4 = Entity.query().filter_by(name='e4').one()
 
-        attr = e4._attrs[0]
+        attr = e4.attrs[0]
 
         self.assertEqual(attr.relation_value, e1)
 
@@ -234,9 +234,9 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
         clusto.flush()
         e1 = Entity.query().filter_by(name='e1').one()
-        self.assertEqual(len(list(e1._attrs)), 2)
-        self.assertEqual(len(list(e1._attrs)), 2)
-        self.assertEqual(len(list(e1._attrs)), 2)
+        self.assertEqual(len(list(e1.attrs)), 2)
+        self.assertEqual(len(list(e1.attrs)), 2)
+        self.assertEqual(len(list(e1.attrs)), 2)
 
         
     
@@ -259,11 +259,11 @@ class TestEntityReferences(testbase.ClustoTestBase):
         e2 = Entity.query().filter_by(name='e2').one()
         e3 = Entity.query().filter_by(name='e3').one()
 
-        self.assertEqual(e1._references[0].entity,
-                         e2._references[0].entity)
+        self.assertEqual(e1.references[0].entity,
+                         e2.references[0].entity)
 
         self.assertEqual(e3,
-                         e2._references[0].entity)
+                         e2.references[0].entity)
 
     def testReferenceDelete(self):
 
@@ -275,16 +275,16 @@ class TestEntityReferences(testbase.ClustoTestBase):
         
         e3.delete()
 
-        self.assertEqual(len(list(e1._references)), 0)
+        self.assertEqual(len(list(e1.references)), 0)
 
         clusto.flush()
 
         e1a = Entity.query().filter_by(name='e1').one()
 
-        self.assertEqual(len(list(e1a._references)), 0)
+        self.assertEqual(len(list(e1a.references)), 0)
         self.assertEqual(id(e1a), id(e1))
 
         e2 = Entity.query().filter_by(name='e2').one()
 
-        self.assertEqual(len(list(e2._references)), 0)
+        self.assertEqual(len(list(e2.references)), 0)
 
