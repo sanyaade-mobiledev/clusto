@@ -37,8 +37,6 @@ def checkDBcompatibility(dbver):
 def init_clusto():
     """Initialize a clusto database. """
     METADATA.create_all(SESSION.bind)
-    if not SESSION.query(CLUSTO_VERSIONING).first():
-        SESSION.execute(CLUSTO_VERSIONING.insert().values())
     c = ClustoMeta()
     flush()
     commit()

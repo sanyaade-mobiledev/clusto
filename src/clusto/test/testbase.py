@@ -31,6 +31,7 @@ class ClustoTestBase(unittest.TestCase):
     
     def setUp(self):
 
+        clusto.SESSION.version = clusto.working_version()
         clusto.connect(DB,echo=ECHO)
         clusto.clear()
         clusto.SESSION.close()

@@ -12,7 +12,7 @@ class TestClustoVersioning(testbase.ClustoTestBase):
     def testGetFirstVersionNumber(self):
 
         curver = clusto.get_latest_version_number()
-        self.assertEqual(curver, 3)
+        self.assertEqual(curver, 2)
 
     def testVersionIncrementing(self):
 
@@ -51,6 +51,6 @@ class TestClustoVersioning(testbase.ClustoTestBase):
 
         etest = clusto.get_by_name('e1')
 
-        self.assertEqual(etest.entity.version, curver+2)
+        self.assertEqual(etest.entity.version, curver+3)
 
 

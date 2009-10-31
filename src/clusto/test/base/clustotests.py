@@ -16,7 +16,7 @@ class TestClustoPlain(testbase.ClustoTestBase):
         clusto.init_clusto()
         clusto.init_clusto()
 
-        self.assertEqual(SESSION.query(ClustoVersioning).count(), 3)
+        self.assertEqual(SESSION.query(ClustoVersioning).count(), 2)
                                        
 
 

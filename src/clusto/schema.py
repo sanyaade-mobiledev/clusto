@@ -23,7 +23,8 @@ import clusto
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
-           'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning']
+           'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
+           'working_version']
 
 
 METADATA = MetaData()
@@ -47,10 +48,12 @@ SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True,
 
 
 def latest_version():
-    return select([func.max(CLUSTO_VERSIONING.c.version)])
+    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version), 0)])
 
+def working_version():
+    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version)+1,1)])
 
-SESSION.version = latest_version()
+SESSION.version = working_version()
 
 ENTITY_TABLE = Table('entities', METADATA,
                      Column('entity_id', Integer, primary_key=True),
@@ -156,7 +159,7 @@ class Attribute(object):
         self.value = value
 
         self.subkey = subkey
-        self.version = latest_version()
+        self.version = working_version()
         if isinstance(number, bool) and number == True:
             counter = Counter.get(entity, key, default=-1)
             self.number = counter.next()
@@ -274,7 +277,7 @@ class Attribute(object):
     def delete(self):
         ### TODO this seems like a hack
         
-        self.deleted_at_version = latest_version()
+        self.deleted_at_version = working_version()
         
     @classmethod
     def queryarg(cls, key=None, value=(), subkey=(), number=()):
@@ -336,7 +339,7 @@ class Entity(object):
         self.driver = driver
         self.type = clustotype
 
-        self.version = latest_version()
+        self.version = working_version()
         SESSION.add(self)
         SESSION.flush()
         
