@@ -23,6 +23,7 @@ class SimpleNameManager(ResourceManager):
                    'leadingZeros':int(True)}
 
     _record_allocations = True
+    _attr_name = 'simplename'
     
     def allocator(self):
         clusto.flush()
