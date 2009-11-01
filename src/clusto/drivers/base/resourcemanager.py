@@ -72,13 +72,12 @@ class ResourceManager(Driver):
 
             if self._record_allocations:
                 if number == True:
-
                     c = Counter.get(ClustoMeta().entity, self._attr_name)
                     attr = thing.add_attr(self._attr_name,
                                           resource,
-                                          number=c
+                                          number=c.value
                                           )
-
+                    c.next()
                 else:
                     attr = thing.add_attr(self._attr_name, resource, number=number)
                     
