@@ -391,10 +391,10 @@ class Entity(object):
 
 
     def __repr__(self):
-        s = "%s(name=%s, driver=%s, clustotype=%s)"
+        s = "%s(name=%s, driver=%s, clustotype=%s, version=%s, deleted_at_version=%s)"
 
         return s % (self.__class__.__name__, 
-                    self.name, self.driver, self.type)
+                    self.name, self.driver, self.type, str(self.version), str(self.deleted_at_version))
 
     def __str__(self):
         "Return string representing this entity"
