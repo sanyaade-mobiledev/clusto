@@ -124,3 +124,43 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         e1 = Entity('e1')
 
         self.assertRaises(Exception, setattr, e1.driver, 'foo')
+
+    def testEntityRename(self):
+
+        curver = clusto.get_latest_version_number()
+
+        e1 = Entity('e1')
+
+        e1.add_attr('foo',1)
+        e1.add_attr('foo',2)
+
+        e1attrs = [a.to_tuple for a in e1.attrs]
+        
+        midver = clusto.get_latest_version_number()
+
+        clusto.rename('e1', 't1')
+
+        t1 = clusto.get_by_name('t1')
+
+        self.assertEqual(sorted(e1attrs),
+                         sorted([a.to_tuple for a in t1.entity.attrs]))
+
+        
+        t1.del_attrs('foo', 2)
+
+        self.assertRaises(LookupError, clusto.get_by_name, 'e1')
+
+        self.assertEqual(sorted(t1.attrs('foo',1)),
+                         sorted(t1.attrs()))
+
+        SESSION.version = midver
+
+        self.assertRaises(LookupError, clusto.get_by_name, 't1')
+
+        e = clusto.get_by_name('e1')
+
+        self.assertEqual(sorted(e1attrs),
+                         sorted([a.to_tuple for a in e.attrs()]))
+
+        
+                         
