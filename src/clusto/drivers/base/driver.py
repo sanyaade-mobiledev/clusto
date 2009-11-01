@@ -162,8 +162,7 @@ class Driver(object):
     
         
 
-    name = property(lambda x: x.entity.name,
-                    lambda x,y: setattr(x.entity, 'name', y))
+    name = property(lambda x: x.entity.name)
 
 
     def _check_attr_name(self, key):
