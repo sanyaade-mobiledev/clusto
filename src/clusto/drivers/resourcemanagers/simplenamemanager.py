@@ -26,7 +26,10 @@ class SimpleNameManager(ResourceManager):
     
     def allocator(self):
         clusto.flush()
-        num = str(self.next)
+
+        counter = clusto.Counter.get(self.entity, 'next', default=self.next)
+
+        num = str(counter.value)
 
         if self.leadingZeros:
             num = num.rjust(self.digits, '0')
@@ -38,7 +41,7 @@ class SimpleNameManager(ResourceManager):
         
         nextname = self.basename + num
 
-        self.next = ATTR_TABLE.c.int_value + 1
+        counter.next()
 
         return (nextname, True)
         
