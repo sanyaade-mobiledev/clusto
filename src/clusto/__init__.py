@@ -163,7 +163,32 @@ def rename(oldname, newname):
 
     old = get_by_name(oldname)
 
-    old.entity.name = newname
+    try:
+        begin_transaction()
+        
+        new = get_driver(old.entity)(newname)
+
+        for attr in old.attrs():
+            new.add_attr(key=attr.key,
+                         number=attr.number,
+                         subkey=attr.subkey,
+                         value=attr.value)
+
+        for ref in old.references():
+            ref.delete()
+            ref.entity.add_attr(key=ref.key,
+                                number=ref.number,
+                                subkey=ref.subkey,
+                                value=new)
+
+        for counter in SESSION.query(Counter).filter(Counter.entity==old.entity):
+            counter.entity = new.entity
+            
+        old.entity.delete()
+        commit()
+    except Exception, x:
+        rollback_transaction()
+        raise x
 
 def get_latest_version_number():
     "Return the latest version number"

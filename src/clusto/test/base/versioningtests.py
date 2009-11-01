@@ -119,3 +119,8 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         self.assertRaises(Exception, setattr, a.value, 2)
 
         
+    def testEntityImmutable(self):
+
+        e1 = Entity('e1')
+
+        self.assertRaises(Exception, setattr, e1.driver, 'foo')

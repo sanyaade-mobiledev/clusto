@@ -340,7 +340,7 @@ class Attribute(ProtectedObj):
         return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
                                              cls.deleted_at_version>SESSION.version))
 
-class Entity(object):
+class Entity(ProtectedObj):
     """
     The base object that can be stored and managed in clusto.
 
@@ -349,7 +349,8 @@ class Entity(object):
     An Entity's functionality is augmented by Drivers which act as proxies for
     interacting with an Entity and its Attributes.
     """
-    
+
+    @ProtectedObj.writer
     def __init__(self, name, driver='entity', clustotype='entity'):
         """Initialize an Entity.
 
@@ -422,7 +423,8 @@ class Entity(object):
     def add_attr(self, *args, **kwargs):
 
         return Attribute(self, *args, **kwargs)
-        
+
+    @ProtectedObj.writer
     def delete(self):
         "Delete self and all references to self."
 
