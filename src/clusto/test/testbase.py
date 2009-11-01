@@ -40,6 +40,8 @@ class ClustoTestBase(unittest.TestCase):
 
 
     def tearDown(self):
+        if clusto.SESSION.is_active:
+            raise Exception("SESSION IS STILL ACTIVE in %s" % str(self.__class__))
 
         clusto.clear()
         clusto.disconnect()
