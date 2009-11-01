@@ -532,12 +532,11 @@ class Driver(object):
         if len(attrs) > 1:
             raise DriverException("cannot set an attribute when args match more than one value")
 
-        elif len(attrs) == 0:
-            attr = self.add_attr(key, value, number=number, subkey=subkey)
-
         else:
-            attr = attrs[0]
-            attr.value = value
+            if len(attrs) == 1:
+                self.del_attrs(key=key, number=number, subkey=subkey)
+
+            attr = self.add_attr(key, value, number=number, subkey=subkey)
 
         return attr        
 

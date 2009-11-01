@@ -20,6 +20,8 @@ import re
 import sys
 import datetime
 import clusto
+from functools import wraps
+
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
@@ -131,8 +133,34 @@ class Counter(object):
             ctr = cls(entity, keyname, default)
 
         return ctr
-        
-class Attribute(object):
+
+class ProtectedObj(object):
+
+    ## this is a hack to make these objects immutable-ish
+    writable = False
+    
+    @staticmethod
+    def writer(func):
+        @wraps(func)
+        def newfunc(self, *args, **kwargs):
+            self.writable = True
+            res = func(self, *args, **kwargs)
+            self.writable = False
+            return res
+        return newfunc
+            
+    def __setattr__(self, name, val):
+        if (name != 'writable'
+            and not self.writable
+            and not name.startswith('_sa_')):
+            
+            raise Exception("Not Writable")
+        else:
+            super(ProtectedObj, self).__setattr__(name, val)
+
+
+    
+class Attribute(ProtectedObj):
     """Attribute class holds key/value pair
 
     An Attribute is a DB backed object that holds a key, number, subkey,
@@ -148,8 +176,10 @@ class Attribute(object):
     the values set by passing in 'value'.
     """
 
+    @ProtectedObj.writer
     def __init__(self, entity, key, value=None,
                  subkey=None, number=None):
+
         self.entity = entity
         self.key = key
         
@@ -265,6 +295,7 @@ class Attribute(object):
 
     value = property(_get_value, _set_value)
 
+    @ProtectedObj.writer
     def delete(self):
         ### TODO this seems like a hack
         

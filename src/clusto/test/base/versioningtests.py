@@ -107,3 +107,15 @@ class TestClustoVersioning(testbase.ClustoTestBase):
 
         self.assertEqual(sorted([a.key for a in e.attrs]),
                          sorted(['foo', 'foo2']))
+
+
+    def testAttributesImmutable(self):
+
+        e1 = Entity('e1')
+        e1.add_attr('foo', 1)
+
+        a = e1.attrs[0]
+
+        self.assertRaises(Exception, setattr, a.value, 2)
+
+        
