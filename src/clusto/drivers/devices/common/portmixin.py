@@ -108,6 +108,7 @@ class PortMixin:
                 
                 self.del_port_attr(porttype, portnum, 'connection')
                 self.del_port_attr(porttype, portnum, 'otherportnum')
+                clusto.commit()
             except Exception, x:
                 clusto.rollback_transaction()
                 raise x
