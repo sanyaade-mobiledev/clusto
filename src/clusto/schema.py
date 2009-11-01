@@ -258,7 +258,10 @@ class Attribute(ProtectedObj):
     @classmethod
     def get_type(self, value):
 
-        if isinstance(value, int):
+        if isinstance(value, (int,long)):
+            if value > sys.maxint:
+                raise ValueError("Can only store number between %s and %s"
+                                 % (-sys.maxint-1, sys.maxint))
             datatype = 'int'
         elif isinstance(value, datetime.datetime):
             datatype = 'datetime'
