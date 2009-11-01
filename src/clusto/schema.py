@@ -255,6 +255,10 @@ class Attribute(ProtectedObj):
     def keytuple(self):
         return (self.key, self.number, self.subkey)
 
+    @property
+    def to_tuple(self):
+        return (self.key, self.number, self.subkey, self.value)
+
     @classmethod
     def get_type(self, value):
 
