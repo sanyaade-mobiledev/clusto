@@ -140,6 +140,8 @@ class TestClustoVersioning(testbase.ClustoTestBase):
 
         clusto.rename('e1', 't1')
 
+        postrenamever = clusto.get_latest_version_number()
+        
         t1 = clusto.get_by_name('t1')
 
         self.assertEqual(sorted(e1attrs),
@@ -163,4 +165,15 @@ class TestClustoVersioning(testbase.ClustoTestBase):
                          sorted([a.to_tuple for a in e.attrs()]))
 
         
-                         
+        for a in e.attrs():
+            self.assertEqual(e.entity.deleted_at_version,
+                             a.deleted_at_version)
+
+        SESSION.version = postrenamever
+
+        self.assertEqual(e.entity.deleted_at_version,
+                         t1.entity.version)
+
+        for a in t1.attrs():
+            self.assertEqual(e.entity.deleted_at_version,
+                             a.version)
