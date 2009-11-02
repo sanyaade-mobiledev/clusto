@@ -137,9 +137,7 @@ def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     
 def get_by_name(name):
     try:
-        entity = Entity.query().filter(and_(or_(Entity.deleted_at_version>=SESSION.clusto_version,
-                                                       Entity.deleted_at_version==None),
-                                                   Entity.version<=SESSION.clusto_version)).filter_by(name=name).one()
+        entity = Entity.query().filter_by(name=name).one()
 
         retval = Driver(entity)
             
