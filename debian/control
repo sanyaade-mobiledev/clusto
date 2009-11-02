@@ -1,0 +1,11 @@
+Source: clusto
+Section: net
+Priority: extra
+Maintainer: Jeremy Grosser <jgrosser@digg.com>
+Build-Depends: cdbs, debhelper (>= 5), python-sqlalchemy, python-mysqldb, python-setuptools, python-support (>= 0.3), python (>= 2.4), python-dev (>= 2.4), python2.4, python2.4-dev, python2.5, python2.5-dev
+Standards-Version: 3.7.2
+
+Package: clusto
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python (>= 2.4), ipython, python-sqlalchemy
+Description: Clusto is a tool/library for organizing and managing infrastructure

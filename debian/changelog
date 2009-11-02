@@ -1,0 +1,151 @@
+clusto (0.4.0-1) unstable; urgency=low
+
+  * New upstream version 
+
+ -- Jeremy Grosser <synack@digg.com>  Mon, 02 Nov 2009 12:09:05 -0800
+
+clusto (0.3.2) unstable; urgency=low
+
+  * Use the right python version 
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 07 Jul 2009 22:59:40 +0000
+
+clusto (0.3.1) unstable; urgency=low
+
+  * New upstream release 
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 07 Jul 2009 22:55:16 +0000
+
+clusto (0.2.7-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Wed, 18 Mar 2009 02:25:39 -0700
+
+clusto (0.2.6-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Tue, 17 Mar 2009 21:54:31 -0700
+
+clusto (0.2.5-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Tue, 17 Mar 2009 14:04:40 -0700
+
+clusto (0.2.4-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 13 Mar 2009 19:54:51 -0700
+
+clusto (0.2.3-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 06 Mar 2009 18:58:22 -0800
+
+clusto (0.1.22-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Mon, 02 Mar 2009 15:02:49 -0800
+
+clusto (0.1.21-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Sun, 01 Mar 2009 20:22:52 -0800
+
+clusto (0.1.20-1) unstable; urgency=low
+
+  * New Upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Wed, 25 Feb 2009 20:03:41 -0800
+
+clusto (0.1.18-2) unstable; urgency=low
+
+  * Add sqlalchemy and ipython dependencies
+
+ -- Jeremy Grosser <synack@digg.com>  Wed, 18 Feb 2009 15:47:00 -0800
+
+clusto (0.1.18-1) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Sun, 15 Feb 2009 15:32:46 -0800
+
+clusto (0.1.17-1) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 13 Feb 2009 11:19:16 -0800
+
+clusto (0.1.16-3) unstable; urgency=low
+
+  * actually fix missing files
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 13 Feb 2009 11:10:49 -0800
+
+clusto (0.1.16-2) unstable; urgency=low
+
+  * fix missing files 
+  * fix debian package versioning
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 13 Feb 2009 11:05:53 -0800
+
+clusto (0.1.16) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Fri, 13 Feb 2009 10:55:34 -0800
+
+clusto (0.1.13) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Tue, 10 Feb 2009 18:31:56 -0800
+
+clusto (0.1.12) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Tue, 10 Feb 2009 12:21:46 -0800
+
+clusto (0.1.11) unstable; urgency=low
+
+  * new upsream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Mon,  9 Feb 2009 18:07:53 -0800
+
+clusto (0.1.10-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Thu,  5 Feb 2009 18:45:42 -0800
+
+clusto (0.1.8-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Wed,  4 Feb 2009 07:42:20 -0800
+
+clusto (0.1.7-1) unstable; urgency=low
+
+  * fix package so it's not a debian native package
+
+ -- Ron Gorodetzky <ron@digg.com>  Wed,  4 Feb 2009 07:42:00 -0800
+
+clusto (0.1.7) unstable; urgency=low
+
+  * New upstream release
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 27 Jan 2009 16:47:00 -0800
+
+clusto (0.1.3) unstable; urgency=low
+
+  * Initial release (Closes: #216)
+
+ -- Jeremy Grosser <jgrosser@digg.com>  Wed, 14 Jan 2009 16:48:49 -0800
+
