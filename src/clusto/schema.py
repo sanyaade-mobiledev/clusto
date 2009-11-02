@@ -34,7 +34,7 @@ METADATA = MetaData()
 
 CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
                           Column('version', Integer, primary_key=True),
-                          Column('timestamp', TIMESTAMP, default=func.current_timestamp()),
+                          Column('timestamp', TIMESTAMP, default=func.current_timestamp(), index=True),
                           Column('user', String(64), default=None),
                           Column('description', Text, default=None),
                           mysql_engine='InnoDB'
