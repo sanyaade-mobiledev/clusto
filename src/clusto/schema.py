@@ -56,7 +56,7 @@ def latest_version():
 def working_version():
     return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version)+1,1)])
 
-SESSION.version = working_version()
+SESSION.clusto_version = working_version()
 
 ENTITY_TABLE = Table('entities', METADATA,
                      Column('entity_id', Integer, primary_key=True),
@@ -344,7 +344,7 @@ class Attribute(ProtectedObj):
     @classmethod
     def query(cls):
         return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
-                                             cls.deleted_at_version>SESSION.version))
+                                             cls.deleted_at_version>SESSION.clusto_version))
 
 class Entity(ProtectedObj):
     """
@@ -414,16 +414,16 @@ class Entity(ProtectedObj):
     @property
     def attrs(self):
         return Attribute.query().filter(and_(Attribute.entity==self,
-                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
                                                       ATTR_TABLE.c.deleted_at_version==None),
-                                                  ATTR_TABLE.c.version<=SESSION.version))).all()
+                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
 
     @property
     def references(self):
         return Attribute.query().filter(and_(Attribute.relation_id==self.entity_id,
-                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.version,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
                                                       ATTR_TABLE.c.deleted_at_version==None),
-                                                  ATTR_TABLE.c.version<=SESSION.version))).all()
+                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
         
         
     def add_attr(self, *args, **kwargs):
@@ -452,7 +452,7 @@ class Entity(ProtectedObj):
     @classmethod
     def query(cls):
         return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
-                                             cls.deleted_at_version>SESSION.version)).filter(cls.version<=SESSION.version)
+                                             cls.deleted_at_version>SESSION.clusto_version)).filter(cls.version<=SESSION.clusto_version)
 
     
         

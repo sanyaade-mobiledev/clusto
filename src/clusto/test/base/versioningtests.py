@@ -65,23 +65,23 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
                          3)
 
-        SESSION.version = curver
+        SESSION.clusto_version = curver
 
         self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
                          0)
 
-        SESSION.version = clusto.working_version()
+        SESSION.clusto_version = clusto.working_version()
 
         self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
                          3)
 
-        SESSION.version = curver + 1
+        SESSION.clusto_version = curver + 1
 
         self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
                          1)
 
 
-        SESSION.version = curver + 2
+        SESSION.clusto_version = curver + 2
 
         self.assertEqual(sorted([e1,e2]),
                          Entity.query().filter(Entity.name.like('e%')).all())
@@ -97,13 +97,13 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         e1.add_attr('foo2', 2)
         e1.add_attr('foo3', 3)
 
-        SESSION.version = curver + 3
+        SESSION.clusto_version = curver + 3
 
         self.assertEqual(len(list(e1.attrs)), 1)
         
         e = Entity.query().filter_by(name='e1').one()
 
-        SESSION.version = curver + 4
+        SESSION.clusto_version = curver + 4
 
         self.assertEqual(sorted([a.key for a in e.attrs]),
                          sorted(['foo', 'foo2']))
@@ -155,7 +155,7 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         self.assertEqual(sorted(t1.attrs('foo',1)),
                          sorted(t1.attrs()))
 
-        SESSION.version = midver
+        SESSION.clusto_version = midver
 
         self.assertRaises(LookupError, clusto.get_by_name, 't1')
 
@@ -169,7 +169,7 @@ class TestClustoVersioning(testbase.ClustoTestBase):
             self.assertEqual(e.entity.deleted_at_version,
                              a.deleted_at_version)
 
-        SESSION.version = postrenamever
+        SESSION.clusto_version = postrenamever
 
         self.assertEqual(e.entity.deleted_at_version,
                          t1.entity.version)
