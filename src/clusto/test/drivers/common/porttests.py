@@ -50,12 +50,12 @@ class PortTests(testbase.ClustoTestBase):
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
         self.assertTrue(t1.port_exists('a', 3))
-        self.assertTrue(t1.port_exists('a', 0))
-        self.assertFalse(t1.port_exists('a', 5))
-        self.assertFalse(t1.port_exists('z', 3))
+        self.assertTrue(t1.port_exists('a', 1))
+        self.assertFalse(t1.port_exists('a', 6))
+        self.assertFalse(t1.port_exists('z', 4))
 
-        self.assertTrue(t2.port_exists('z', 0))
-        self.assertFalse(t2.port_exists('z', 1))
+        self.assertTrue(t2.port_exists('z', 1))
+        self.assertFalse(t2.port_exists('z', 2))
 
     def testPortsConnectable(self):
         
@@ -85,7 +85,7 @@ class PortTests(testbase.ClustoTestBase):
         self.assertEqual(t2, t1.get_connected('a', 1))
         self.assertEqual(t1, t2.get_connected('a', 3))
 
-        self.assertEqual(None, t1.get_connected('b', 0))
+        self.assertEqual(None, t1.get_connected('b', 1))
 
 
         # try to work with ports that don't exist
@@ -121,17 +121,17 @@ class PortTests(testbase.ClustoTestBase):
 
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        t1.set_port_attr('a', 0, 'macaddr', 'foo')
-        self.assertEqual('foo', t1.get_port_attrs('a', 0, 'macaddr'))
+        t1.set_port_attr('a', 1, 'macaddr', 'foo')
+        self.assertEqual('foo', t1.get_port_attrs('a', 1, 'macaddr'))
 
         self.assertRaises(ConnectionException, 
-                          t2.set_port_attr, 'j', 2, 'foo', 'bar')
+                          t2.set_port_attr, 'j', 3, 'foo', 'bar')
 
-        self.assertEqual(None, t2.get_port_attrs('z', 0, 'mac'))
-        t2.set_port_attr('z', 0, 'mac', 'bar')
-        self.assertEqual('bar', t2.get_port_attrs('z', 0, 'mac'))
-        t2.del_port_attr('z', 0, 'mac')
-        self.assertEqual(None, t2.get_port_attrs('z', 0, 'mac'))
+        self.assertEqual(None, t2.get_port_attrs('z', 1, 'mac'))
+        t2.set_port_attr('z', 1, 'mac', 'bar')
+        self.assertEqual('bar', t2.get_port_attrs('z', 1, 'mac'))
+        t2.del_port_attr('z', 1, 'mac')
+        self.assertEqual(None, t2.get_port_attrs('z', 1, 'mac'))
         
 
 
@@ -139,34 +139,34 @@ class PortTests(testbase.ClustoTestBase):
         
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
 
-        self.assertEqual(sorted([('a', 0, None, None,),
-                                 ('a', 1, None, None,),
+        self.assertEqual(sorted([('a', 1, None, None,),
                                  ('a', 2, None, None,),
                                  ('a', 3, None, None,),
                                  ('a', 4, None, None,),
-                                 ('b', 0, None, None,),]),
+                                 ('a', 5, None, None,),
+                                 ('b', 1, None, None,),]),
                          sorted(t1.port_info_tuples))
 
         
         t1.connect_ports('a', 2, t2, 1)
 
-        self.assertEqual(sorted([('a', 0, None, None,),
+        self.assertEqual(sorted([('a', 2, None, None,),
                                  ('a', 1, t1, 2,),
-                                 ('a', 2, None, None,),
                                  ('a', 3, None, None,),
-                                 ('z', 0, None, None,),]),
+                                 ('a', 4, None, None,),
+                                 ('z', 1, None, None,),]),
                          sorted(t2.port_info_tuples))
 
         self.assertEqual(t1, t2.port_info['a'][1]['connection'])
         self.assertEqual(2, t2.port_info['a'][1]['otherportnum'])
 
         self.assertEqual(None, t2.port_info['a'][3]['connection'])
-        self.assertEqual(None, t2.port_info['z'][0]['otherportnum'])
+        self.assertEqual(None, t2.port_info['z'][1]['otherportnum'])
 
-        self.assertEqual(sorted([('a', 0),
-                                 ('a', 2),
+        self.assertEqual(sorted([('a', 2),
                                  ('a', 3),
-                                 ('z', 0),]),
+                                 ('a', 4),
+                                 ('z', 1),]),
                          sorted(t2.free_ports))
 
         self.assertEqual(sorted(['a', 'b']),

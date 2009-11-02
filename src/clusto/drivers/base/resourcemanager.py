@@ -1,7 +1,7 @@
 
 import clusto
-from clusto.schema import select, and_, ATTR_TABLE, Attribute, func
-from clusto.drivers.base import Driver
+from clusto.schema import select, and_, ATTR_TABLE, Attribute, func, Counter
+from clusto.drivers.base import Driver, ClustoMeta
 from clusto.exceptions import ResourceTypeException, ResourceNotAvailableException, ResourceException
 
 
@@ -72,28 +72,22 @@ class ResourceManager(Driver):
 
             if self._record_allocations:
                 if number == True:
-                    attr = thing.add_attr(Attribute(self._attr_name,
-                                                   resource,
-                                                   number=select([func.count('*')],
-                                                                 and_(ATTR_TABLE.c.key==self._attr_name,
-                                                                      ATTR_TABLE.c.number!=None,
-                                                                      ATTR_TABLE.c.subkey==None,
-                                                                      )).as_scalar(), 
-                                                   ))
+                    c = Counter.get(ClustoMeta().entity, self._attr_name)
+                    attr = thing.add_attr(self._attr_name,
+                                          resource,
+                                          number=c.value
+                                          )
+                    c.next()
                 else:
                     attr = thing.add_attr(self._attr_name, resource, number=number)
                     
                 clusto.flush()
-                n=select(['number'], ATTR_TABLE.c.attr_id==attr.attr_id).as_scalar()
 
-                a=Attribute(self._attr_name,
+                a=thing.add_attr(self._attr_name,
                             self.entity,
-                            number=n,
+                            number=attr.number,
                             subkey='manager',
                             )
-                
-
-                a=thing.add_attr(a)
                                           
                 self.additional_attrs(thing, resource, number)
                 

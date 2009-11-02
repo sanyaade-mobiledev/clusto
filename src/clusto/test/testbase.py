@@ -31,16 +31,21 @@ class ClustoTestBase(unittest.TestCase):
     
     def setUp(self):
 
+        clusto.SESSION.clusto_version = clusto.working_version()
         clusto.connect(DB,echo=ECHO)
+        clusto.clear()
+        clusto.SESSION.close()
         clusto.init_clusto()
         self.data()
 
 
     def tearDown(self):
+        if clusto.SESSION.is_active:
+            raise Exception("SESSION IS STILL ACTIVE in %s" % str(self.__class__))
 
         clusto.clear()
         clusto.disconnect()
-        clusto.METADATA.drop_all()
+        clusto.METADATA.drop_all(clusto.SESSION.bind)
 
 
 

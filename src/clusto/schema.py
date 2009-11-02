@@ -2,7 +2,7 @@
 Clusto schema
 
 """
-VERSION = 2
+VERSION = 3
 from sqlalchemy import *
 
 from sqlalchemy.exceptions import InvalidRequestError
@@ -20,25 +20,67 @@ import re
 import sys
 import datetime
 import clusto
+from functools import wraps
+
 
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
-           'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION', ]
+           'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
+           'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
+           'working_version']
 
 
 METADATA = MetaData()
 
-SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True))
 
+CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
+                          Column('version', Integer, primary_key=True),
+                          Column('timestamp', TIMESTAMP, default=func.current_timestamp(), index=True),
+                          Column('user', String(64), default=None),
+                          Column('description', Text, default=None),
+                          mysql_engine='InnoDB'
+                          
+                          )
+
+
+class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
+
+    def before_commit(self, session):
+        session.execute(CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
+                                                          description=SESSION.clusto_description))
+        SESSION.clusto_description = None
+        return EXT_CONTINUE
+        
+
+SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True,
+                                      extension=ClustoSession()))
+
+
+def latest_version():
+    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version), 0)])
+
+def working_version():
+    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version)+1,1)])
+
+SESSION.clusto_version = working_version()
+SESSION.clusto_user = None
+SESSION.clusto_description = None
 
 ENTITY_TABLE = Table('entities', METADATA,
-                    Column('entity_id', Integer, primary_key=True),
-                    Column('name', String(128, convert_unicode=True,
-                           assert_unicode=None), unique=True,
-                           nullable=False, ),
-                    Column('type', String(32), nullable=False),
-                    Column('driver', String(32), nullable=False),
-                    mysql_engine='InnoDB'
-                    )
+                     Column('entity_id', Integer, primary_key=True),
+                     Column('name', String(128, convert_unicode=True,
+                                           assert_unicode=None),
+                            nullable=False, ),
+                     Column('type', String(32), nullable=False),
+                     Column('driver', String(32), nullable=False),
+                     Column('version', Integer, nullable=False),
+                     Column('deleted_at_version', Integer, default=None),
+                     mysql_engine='InnoDB'
+                     )
+
+Index('idx_entity_name_version',
+      ENTITY_TABLE.c.name,
+      ENTITY_TABLE.c.version,
+      ENTITY_TABLE.c.deleted_at_version)
 
 ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
@@ -59,9 +101,87 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('relation_id', Integer,
                           ForeignKey('entities.entity_id'), default=None),
 
-                   )
+                   Column('version', Integer, nullable=False),
+                   Column('deleted_at_version', Integer, default=None),
+                   mysql_engine='InnoDB'
 
-class Attribute(object):
+                   )
+Index('idx_attrs_entity_version',
+      ATTR_TABLE.c.entity_id,
+      ATTR_TABLE.c.version,
+      ATTR_TABLE.c.deleted_at_version)
+
+COUNTER_TABLE = Table('counters', METADATA,
+                      Column('counter_id', Integer, primary_key=True),
+                      Column('entity_id', Integer, ForeignKey('entities.entity_id'), nullable=False),
+                      Column('attr_key', String(256, convert_unicode=True, assert_unicode=None)),
+                      Column('value', Integer, default=0),
+                      mysql_engine='InnoDB'
+                      )
+
+Index('idx_counter_entity_attr',
+      COUNTER_TABLE.c.entity_id,
+      COUNTER_TABLE.c.attr_key)
+
+class ClustoVersioning(object):
+    pass
+
+class Counter(object):
+
+    def __init__(self, entity, keyname, start=0):
+        self.entity = entity
+        self.attr_key = keyname
+
+        self.value = start
+
+        SESSION.add(self)
+        SESSION.flush()
+
+    def next(self):
+
+        self.value = Counter.value + 1
+        SESSION.flush()
+        return self.value
+
+    @classmethod
+    def get(cls, entity, keyname, default=0):
+
+        try:
+            ctr = SESSION.query(cls).filter(and_(cls.entity==entity,
+                                                 cls.attr_key==keyname)).one()
+
+        except sqlalchemy.orm.exc.NoResultFound:
+            ctr = cls(entity, keyname, default)
+
+        return ctr
+
+class ProtectedObj(object):
+
+    ## this is a hack to make these objects immutable-ish
+    writable = False
+    
+    @staticmethod
+    def writer(func):
+        @wraps(func)
+        def newfunc(self, *args, **kwargs):
+            self.writable = True
+            res = func(self, *args, **kwargs)
+            self.writable = False
+            return res
+        return newfunc
+            
+    def __setattr__(self, name, val):
+        if (name != 'writable'
+            and not self.writable
+            and not name.startswith('_sa_')):
+            
+            raise Exception("Not Writable")
+        else:
+            super(ProtectedObj, self).__setattr__(name, val)
+
+
+    
+class Attribute(ProtectedObj):
     """Attribute class holds key/value pair
 
     An Attribute is a DB backed object that holds a key, number, subkey,
@@ -77,34 +197,30 @@ class Attribute(object):
     the values set by passing in 'value'.
     """
 
-    def __init__(self, key, value=None,
-                 subkey=None, number=None,
-                 int_value=None, string_value=None,
-                 datetime_value=None, relation_id=None, datatype=None):
+    @ProtectedObj.writer
+    def __init__(self, entity, key, value=None,
+                 subkey=None, number=None):
 
-
+        self.entity = entity
         self.key = key
         
         self.value = value
 
         self.subkey = subkey
-
+        self.version = working_version()
         if isinstance(number, bool) and number == True:
-            self.number = select([func.coalesce(select([func.max(ATTR_TABLE.c.number)+1], 
-                                                       and_(ATTR_TABLE.c.key==key,
-                                                            ATTR_TABLE.c.number!=None,
-                                                            )).as_scalar(), 0)])
-
+            counter = Counter.get(entity, key, default=-1)
+            self.number = counter.next()
+        elif isinstance(number, Counter):
+            self.number = number.next()
         else:
             self.number = number
 
-        if int_value is not None: self.int_value = int_value
-        if string_value is not None: self.string_value = sting_value
-        if datetime_value is not None: self.datetime_value = datetime_value
-        if relation_id is not None: self.relation_id = relation_id
-        if datatype is not None: self.datatype = datatype
 
         SESSION.add(self)
+        SESSION.flush()
+
+
         
     def __cmp__(self, other):
 
@@ -123,7 +239,7 @@ class Attribute(object):
 
     def __repr__(self):
 
-        params = ('key','value','subkey','number','datatype',)
+        params = ('key','value','subkey','number','datatype','version', 'deleted_at_version')
                   #'int_value','string_value','datetime_value','relation_id')
                   
 
@@ -160,10 +276,17 @@ class Attribute(object):
     def keytuple(self):
         return (self.key, self.number, self.subkey)
 
+    @property
+    def to_tuple(self):
+        return (self.key, self.number, self.subkey, self.value)
+
     @classmethod
     def get_type(self, value):
 
-        if isinstance(value, int):
+        if isinstance(value, (int,long)):
+            if value > sys.maxint:
+                raise ValueError("Can only store number between %s and %s"
+                                 % (-sys.maxint-1, sys.maxint))
             datatype = 'int'
         elif isinstance(value, datetime.datetime):
             datatype = 'datetime'
@@ -182,27 +305,30 @@ class Attribute(object):
         if self.getValueType() == 'relation_value':
             return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
         else:
-            return getattr(self, self.getValueType())
+            val = getattr(self, self.getValueType())
+            if self.datatype == 'int':
+                return int(val)
+            else:
+                return val
 
     def _set_value(self, value):
         
         if not isinstance(value, sqlalchemy.sql.ColumnElement):
             self.datatype = self.get_type(value)
-
+            if self.datatype == 'int':
+                value = int(value)
         setattr(self, self.getValueType(value), value)
 
 
 
     value = property(_get_value, _set_value)
 
+    @ProtectedObj.writer
     def delete(self):
         ### TODO this seems like a hack
         
-        try:
-            SESSION.delete(self)
-        except InvalidRequestError:
-            pass #SESSION.expunge(self)
-
+        self.deleted_at_version = working_version()
+        
     @classmethod
     def queryarg(cls, key=None, value=(), subkey=(), number=()):
 
@@ -234,7 +360,12 @@ class Attribute(object):
 
         return and_(*args)
 
-class Entity(object):
+    @classmethod
+    def query(cls):
+        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
+                                             cls.deleted_at_version>SESSION.clusto_version))
+
+class Entity(ProtectedObj):
     """
     The base object that can be stored and managed in clusto.
 
@@ -243,7 +374,8 @@ class Entity(object):
     An Entity's functionality is augmented by Drivers which act as proxies for
     interacting with an Entity and its Attributes.
     """
-    
+
+    @ProtectedObj.writer
     def __init__(self, name, driver='entity', clustotype='entity'):
         """Initialize an Entity.
 
@@ -258,7 +390,9 @@ class Entity(object):
         self.driver = driver
         self.type = clustotype
 
+        self.version = working_version()
         SESSION.add(self)
+        SESSION.flush()
         
     def __eq__(self, otherentity):
         """Am I the same as the Other Entity.
@@ -277,7 +411,7 @@ class Entity(object):
 
     def __cmp__(self, other):
 
-        if not hasattr(otherentity, 'name'):
+        if not hasattr(other, 'name'):
             raise TypeError("Can only compare equality with an Entity-like "
                             "object.  Got a %s instead." 
                             % (type(other).__name__))
@@ -286,55 +420,80 @@ class Entity(object):
 
 
     def __repr__(self):
-        s = "%s(name=%s, driver=%s, clustotype=%s)"
+        s = "%s(name=%s, driver=%s, clustotype=%s, version=%s, deleted_at_version=%s)"
 
         return s % (self.__class__.__name__, 
-                    self.name, self.driver, self.type)
+                    self.name, self.driver, self.type, str(self.version), str(self.deleted_at_version))
 
     def __str__(self):
         "Return string representing this entity"
             
         return str(self.name)
             
+    @property
+    def attrs(self):
+        return Attribute.query().filter(and_(Attribute.entity==self,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
+                                                      ATTR_TABLE.c.deleted_at_version==None),
+                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
 
+    @property
+    def references(self):
+        return Attribute.query().filter(and_(Attribute.relation_id==self.entity_id,
+                                             and_(or_(ATTR_TABLE.c.deleted_at_version>SESSION.clusto_version,
+                                                      ATTR_TABLE.c.deleted_at_version==None),
+                                                  ATTR_TABLE.c.version<=SESSION.clusto_version))).all()
+        
+        
+    def add_attr(self, *args, **kwargs):
+
+        return Attribute(self, *args, **kwargs)
+
+    @ProtectedObj.writer
     def delete(self):
         "Delete self and all references to self."
 
+        clusto.begin_transaction()
         try:
-            SESSION.delete(self)
-        except InvalidRequestError:
-            SESSION.expunge(self)
-        #SESSION.delete(self)
+            self.deleted_at_version = working_version() 
 
-        q = SESSION.query(Attribute).filter_by(relation_id=self.entity_id)
+            for i in self.references:
+                i.delete()
 
-        for i in q:
-            i.delete()
+            for i in self.attrs:
+                i.delete()
+                
+            clusto.commit()
+        except Exception, x:
+            clusto.rollback_transaction()
+            raise x
+
+    @classmethod
+    def query(cls):
+        return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
+                                             cls.deleted_at_version>SESSION.clusto_version)).filter(cls.version<=SESSION.clusto_version)
+
     
+        
+mapper(ClustoVersioning, CLUSTO_VERSIONING)
 
+mapper(Counter, COUNTER_TABLE,
+       properties = {'entity': relation(Entity, lazy=True, uselist=False)},
+           
+       )
 
-mapper(Attribute, ATTR_TABLE,
+mapper(Attribute, ATTR_TABLE,       
        properties = {'relation_value': relation(Entity, lazy=True, 
                                                 primaryjoin=ATTR_TABLE.c.relation_id==ENTITY_TABLE.c.entity_id,
                                                 uselist=False,
-                                                passive_updates=False)})
+                                                passive_updates=False),
+                     'entity': relation(Entity, lazy=True, uselist=False,
+                                        primaryjoin=ATTR_TABLE.c.entity_id==ENTITY_TABLE.c.entity_id)})
 
 
 ## might be better to make the relationships here dynamic_loaders in the long
 ## term.
 mapper(Entity, ENTITY_TABLE,
-       properties={'_attrs' : relation(Attribute, lazy='dynamic',
-                                       cascade="all, delete, delete-orphan",
-                                       primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.entity_id,
-                                       backref='entity',
-                                       passive_updates=False,
-                                       uselist=True),
-                   '_references' : relation(Attribute, lazy='dynamic',
-                                            cascade="all, delete, delete-orphan",
-                                            primaryjoin=ENTITY_TABLE.c.entity_id==ATTR_TABLE.c.relation_id,
-                                            passive_updates=False,
-                                            uselist=True)
-                }
-       )
 
+       )
 

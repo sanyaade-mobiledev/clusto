@@ -27,7 +27,7 @@ def connect(dsn, echo=False):
 
     @param dsn: the clusto database URI
     """
-    METADATA.bind = create_engine(dsn, echo=echo)
+    SESSION.configure(bind=create_engine(dsn, echo=echo))
 
 def checkDBcompatibility(dbver):
 
@@ -36,8 +36,10 @@ def checkDBcompatibility(dbver):
 
 def init_clusto():
     """Initialize a clusto database. """
-    METADATA.create_all(METADATA.bind)
+    METADATA.create_all(SESSION.bind)
     c = ClustoMeta()
+    flush()
+    commit()
 
 
 
@@ -63,9 +65,12 @@ def get_driver_name(name):
             raise NameError("driver name %s doesn't exist." % name)
     elif isinstance(name, type):
         return name._driver_name
-    else:
-        return name.driver
 
+    elif isinstance(name, Entity):
+        return name.driver
+    else:
+        raise LookupError("Couldn't find driver name.")
+    
 def get_type_name(name):
 
     if isinstance(name, str):
@@ -76,16 +81,17 @@ def get_type_name(name):
 
     elif isinstance(name, type):
         return name._clusto_type
-    else:
+    elif isinstance(name, Entity):
         return name.type
+    else:
+        raise LookupError("Couldn't find type name.")
         
 
-def get_driver(entity, ignore_driver_column=False):
+def get_driver(entity):
     """Return the driver to use for a given entity """
 
-    if not ignore_driver_column:
-        if entity.driver in DRIVERLIST:
-            return DRIVERLIST[entity.driver]
+    if entity.driver in DRIVERLIST:
+        return DRIVERLIST[entity.driver]
 
     return Driver
 
@@ -106,7 +112,7 @@ def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
                  valid keys: key, number, subkey, value
     """
     
-    query = SESSION.query(Entity)
+    query = Entity.query()
 
     if names:
         query = query.filter(Entity.name.in_(names))
@@ -131,7 +137,7 @@ def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     
 def get_by_name(name):
     try:
-        entity = SESSION.query(Entity).filter_by(name=name).one()
+        entity = Entity.query().filter_by(name=name).one()
 
         retval = Driver(entity)
             
@@ -159,7 +165,40 @@ def rename(oldname, newname):
 
     old = get_by_name(oldname)
 
-    old.entity.name = newname
+    try:
+        begin_transaction()
+        
+        new = get_driver(old.entity)(newname)
+
+        for attr in old.attrs():
+            new.add_attr(key=attr.key,
+                         number=attr.number,
+                         subkey=attr.subkey,
+                         value=attr.value)
+
+        for ref in old.references():
+            ref.delete()
+            ref.entity.add_attr(key=ref.key,
+                                number=ref.number,
+                                subkey=ref.subkey,
+                                value=new)
+
+        for counter in SESSION.query(Counter).filter(Counter.entity==old.entity):
+            counter.entity = new.entity
+            
+        old.entity.delete()
+        commit()
+    except Exception, x:
+        rollback_transaction()
+        raise x
+
+def get_latest_version_number():
+    "Return the latest version number"
+
+    s = SESSION()
+
+    val = s.execute(latest_version()).fetchone()[0]
+    return val
 
 
 tl = threading.local()
@@ -208,7 +247,7 @@ def delete_entity(entity):
     """Delete an entity and all it's attributes and references"""
     try:
         begin_transaction()
-        SESSION.delete(entity)
+        entity.delete()
         commit()
     except Exception, x:
         rollback_transaction()

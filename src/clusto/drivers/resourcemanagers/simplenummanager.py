@@ -18,17 +18,21 @@ class SimpleNumManager(ResourceManager):
                    }
 
     _record_allocations = True
+    _attr_name = "simplenum"
     
     def allocator(self):
 
         clusto.flush()
-        num = self.next
+
+        counter = clusto.Counter.get(self.entity, 'next', default=self.next)
+
+        num = counter.value
         
         if self.maxnum and num > self.maxnum:
             raise SimpleNumManagerException("Out of numbers. "
                                             "Max of %d reached." 
                                             % (self.maxnum))
         
-        self.next = ATTR_TABLE.c.int_value + 1
-
+        counter.next()
         return (num, True)
+

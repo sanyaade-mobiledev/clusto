@@ -7,6 +7,19 @@ from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter
 from sqlalchemy.exceptions import InvalidRequestError
 
+class TestClustoPlain(testbase.ClustoTestBase):
+
+    def testInitClustoIdempotent(self):
+        
+        clusto.init_clusto()
+        clusto.init_clusto()
+        clusto.init_clusto()
+        clusto.init_clusto()
+
+        self.assertEqual(SESSION.query(ClustoVersioning).count(), 2)
+                                       
+
+
 class TestClusto(testbase.ClustoTestBase):
     def data(self):
 
@@ -21,11 +34,11 @@ class TestClusto(testbase.ClustoTestBase):
 
         cm = clusto.get_by_name('clustometa')
 
-        self.assertEqual(cm.version, VERSION)
+        self.assertEqual(cm.schemaversion, VERSION)
         
     def testGetByName(self):
 
-        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name='e1').one()
 
         q = clusto.get_by_name('e1')
 
@@ -37,7 +50,7 @@ class TestClusto(testbase.ClustoTestBase):
 
         clusto.rename('e1', 'f1')
 
-        q = SESSION.query(Entity)
+        q = Entity.query()
 
         self.assertEqual(q.filter_by(name='e1').count(), 0)
 
@@ -193,7 +206,7 @@ class TestClusto(testbase.ClustoTestBase):
 
     def testDeleteEntity(self):
 
-        e1 = SESSION.query(Entity).filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name='e1').one()
 
         d = Driver(e1)
 
@@ -211,3 +224,32 @@ class TestClusto(testbase.ClustoTestBase):
                          
 
 
+    def testDriverSearches(self):
+
+        d = Driver('d1')
+        
+        self.assertRaises(NameError, clusto.get_driver_name, 'FAKEDRIVER')
+
+        self.assertEqual(clusto.get_driver_name(Driver),
+                         'entity')
+
+        self.assertRaises(LookupError, clusto.get_driver_name, 123)
+
+        self.assertEqual(clusto.get_driver_name('entity'),
+                         'entity')
+
+        self.assertEqual(clusto.get_driver_name(d.entity),
+                         'entity')
+
+    def testTypeSearches(self):
+
+        d = Driver('d1')
+        
+        self.assertEqual(clusto.get_type_name('generic'),
+                         'generic')
+
+        self.assertEqual(clusto.get_type_name(d.entity),
+                         'generic')
+
+        self.assertRaises(LookupError, clusto.get_type_name, 123)
+        

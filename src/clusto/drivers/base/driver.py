@@ -105,9 +105,10 @@ class Driver(object):
                                     % (name_driver_entity))
 
 
-            self.entity = Entity(name_driver_entity)
-            self.entity.driver = self._driver_name
-            self.entity.type = self._clusto_type
+            self.entity = Entity(name_driver_entity,
+                                 driver=self._driver_name,
+                                 clustotype=self._clusto_type)
+
 
         else:
             raise TypeError("Could not create driver from given arguments.")
@@ -138,7 +139,12 @@ class Driver(object):
 
     def __cmp__(self, other):
 
-        return cmp(self.name, other.name)
+        if hasattr(other, 'name'):
+            return cmp(self.name, other.name)
+        elif other is None:
+            return 1
+        else:
+            raise TypeError("Cannot compare %s with %s", type(self), type(other))
 
     def __hash__(self):
         return hash(self.entity.name)
@@ -156,8 +162,7 @@ class Driver(object):
     
         
 
-    name = property(lambda x: x.entity.name,
-                    lambda x,y: setattr(x.entity, 'name', y))
+    name = property(lambda x: x.entity.name)
 
 
     def _check_attr_name(self, key):
@@ -227,7 +232,7 @@ class Driver(object):
         if querybase:
             query = querybase 
         else:
-            query = SESSION.query(Attribute)
+            query = Attribute.query()
 
         ### This is bunk, gotta fix it
         if isinstance(cls, Driver):
@@ -406,7 +411,7 @@ class Driver(object):
         else:
             merge_container_attrs = False
 
-        attrs = self.attr_filter(self.entity._attrs, *args, **kwargs) 
+        attrs = self.attr_filter(self.entity.attrs, *args, **kwargs) 
 
         if merge_container_attrs:
             kwargs['merge_container_attrs'] = merge_container_attrs
@@ -435,7 +440,7 @@ class Driver(object):
             
         clusto_types = kwargs.pop('clusto_types', None)
         
-        result = self.attr_filter(self.entity._references, *args, **kwargs)
+        result = self.attr_filter(self.entity.references, *args, **kwargs)
 
         if clusto_drivers:
             cdl = [clusto.get_driver_name(n) for n in clusto_drivers]
@@ -485,8 +490,7 @@ class Driver(object):
         """
 
         if isinstance(key, Attribute):
-            self.entity._attrs.append(key)
-            return key
+            raise Exception("Unsupported Operation.  You can no longer add an attribute directly")
         
         self._check_attr_name(key)
         if subkey:
@@ -501,10 +505,8 @@ class Driver(object):
             subkey = None
 
 
-        attr = Attribute(key, value, subkey=subkey, number=number)
-        self.entity._attrs.append(attr)
+        return self.entity.add_attr(key, value, subkey=subkey, number=number)
 
-        return attr
 
     def del_attrs(self, *args, **kwargs):
         "delete attribute with the given key and value optionally value also"
@@ -513,7 +515,6 @@ class Driver(object):
         try:
             clusto.begin_transaction()
             for i in self.attr_query(*args, **kwargs):
-                self.entity._attrs.remove(i)
                 i.delete()
             clusto.commit()
         except Exception, x:
@@ -530,12 +531,11 @@ class Driver(object):
         if len(attrs) > 1:
             raise DriverException("cannot set an attribute when args match more than one value")
 
-        elif len(attrs) == 0:
-            attr = self.add_attr(key, value, number=number, subkey=subkey)
-
         else:
-            attr = attrs[0]
-            attr.value = value
+            if len(attrs) == 1:
+                self.del_attrs(key=key, number=number, subkey=subkey)
+
+            attr = self.add_attr(key, value, number=number, subkey=subkey)
 
         return attr        
 

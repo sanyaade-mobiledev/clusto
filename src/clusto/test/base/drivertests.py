@@ -293,22 +293,6 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(d1.attr_query(key='foo', number=4, count=True), 1)
         
         
-    def testAddAttributeDirectly(self):
-
-        d1 = Driver('d1')
-        d2 = Driver('d2')
-
-
-        
-        d1.add_attr(Attribute(key='foo',                             
-                             value='bar'))
-
-        d2.add_attr(Attribute(key='foo1',
-                             value=d1.entity))
-
-        self.assertEqual(len(d1.attrs(key='foo')), 1)
-        self.assertEqual(len(d2.attrs(key='foo1')), 1)
-        
 
 class TestDriverContainerFunctions(testbase.ClustoTestBase):
     
@@ -398,7 +382,7 @@ class TestDriver(testbase.ClustoTestBase):
 
         self.assertEquals(len(s), 2)
 
-class TestDriver(Driver):
+class ATestDriver(Driver):
 
     _clusto_type = "tester"
     _driver_name = "testdriver"
@@ -411,7 +395,7 @@ class TestDriverProperties(testbase.ClustoTestBase):
     
     def testPropDefaultGetter(self):
 
-        d = TestDriver('d')
+        d = ATestDriver('d')
 
         self.assertEqual(None, d.propA)
         self.assertEqual('foo', d.propB)
@@ -419,7 +403,7 @@ class TestDriverProperties(testbase.ClustoTestBase):
 
     def testPropSetter(self):
 
-        d = TestDriver('d')
+        d = ATestDriver('d')
 
         self.assertEqual(None, d.propA)
 
@@ -433,8 +417,8 @@ class TestDriverProperties(testbase.ClustoTestBase):
         self.assertEqual(10, d.propA)
 
     def testPropSetterMultipleObjects(self):
-        d = TestDriver('d')
-        d2 = TestDriver('d2')
+        d = ATestDriver('d')
+        d2 = ATestDriver('d2')
 
         d.propB = 'bar'
         d2.propB = 'cat'

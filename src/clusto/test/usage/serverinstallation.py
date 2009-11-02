@@ -51,18 +51,18 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         sw = clusto.get_by_name('sw1')
         p1 = clusto.get_by_name('p1')
 
-        sw.connect_ports('nic-eth', 0, s, 0)
+        sw.connect_ports('nic-eth', 1, s, 1)
         
         
         self.assertRaises(ConnectionException,
-                          s.connect_ports, 'nic-eth', 0, sw, 1)
+                          s.connect_ports, 'nic-eth', 1, sw, 2)
 
         p1.connect_ports(porttype='pwr-nema-5',
-                        srcportnum=0,
+                        srcportnum=1,
                         dstdev=s,
-                        dstportnum=0)
+                        dstportnum=1)
                         
-        self.assertEqual(s.get_connected('pwr-nema-5', 0),
+        self.assertEqual(s.get_connected('pwr-nema-5', 1),
                          p1)
 
 
@@ -88,14 +88,14 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         self.assertRaises(TypeError, r.insert, newserver, 1)
 
         r.insert(newserver,2)
-        p1.connect_ports('pwr-nema-5', 0, newserver, 0)
-        sw.connect_ports('nic-eth', 0, newserver, 0)
-        sw.connect_ports('nic-eth', 2, p1, 0)
+        p1.connect_ports('pwr-nema-5', 1, newserver, 1)
+        sw.connect_ports('nic-eth', 1, newserver, 1)
+        sw.connect_ports('nic-eth', 3, p1, 1)
 
         self.assertEqual(BasicRack.get_rack_and_u(newserver)['rack'], r)
 
         ipman = IPManager('subnet-10.0.0.1', netmask='255.255.255.0', basip='10.0.0.1')
-        newserver.bind_ip_to_osport('10.0.0.10', 'eth0', porttype='nic-eth', portnum=0)
+        newserver.bind_ip_to_osport('10.0.0.10', 'eth0', porttype='nic-eth', portnum=1)
 
         ipvals = newserver.attrs(value='10.0.0.10')
         self.assertEqual(len(ipvals), 1)
