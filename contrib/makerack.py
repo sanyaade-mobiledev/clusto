@@ -36,7 +36,7 @@ def bind_dns_ip_to_osport(obj, osport, porttype=None, portnum=None, domain='digg
 if __name__ == '__main__':
     op = OptionParser(usage='usage: %prog [options] <rack name>')
     op.add_option('-s', '--switch',
-        action='store', type='string', dest='switchtype',
+        action='store', type='string', dest='switchtype', default='cisco4948',
         help='Switch type in rack. (%s)' % ', '.join(SWITCH_TYPES.keys()))
     op, args = op.parse_args()
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         print 'Rack name is required'
         sys.exit(0)
 
-    match = re.match('^([a-z0-9]+)-([0-9]+)$', sys.argv[1])
+    match = re.match('^([a-z0-9]+)-([0-9]+)$', args[0])
     if not match:
         print 'Invalid rack name (eg. sjc1-000)'
         sys.exit(0)
