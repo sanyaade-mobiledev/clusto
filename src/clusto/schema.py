@@ -35,6 +35,7 @@ METADATA = MetaData()
 CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
                           Column('version', Integer, primary_key=True),
                           Column('timestamp', TIMESTAMP, default=func.current_timestamp()),
+                          mysql_engine='InnoDB'
                           )
 
 
@@ -99,7 +100,8 @@ COUNTER_TABLE = Table('counters', METADATA,
                       Column('counter_id', Integer, primary_key=True),
                       Column('entity_id', Integer, ForeignKey('entities.entity_id'), nullable=False),
                       Column('attr_key', String(256, convert_unicode=True, assert_unicode=None)),
-                      Column('value', Integer, default=0)
+                      Column('value', Integer, default=0),
+                      mysql_engine='InnoDB'
                       )
 
 class ClustoVersioning(object):
