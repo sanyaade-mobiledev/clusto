@@ -65,9 +65,12 @@ def get_driver_name(name):
             raise NameError("driver name %s doesn't exist." % name)
     elif isinstance(name, type):
         return name._driver_name
-    else:
-        return name.driver
 
+    elif isinstance(name, Entity):
+        return name.driver
+    else:
+        raise LookupError("Couldn't find driver name.")
+    
 def get_type_name(name):
 
     if isinstance(name, str):
@@ -78,16 +81,17 @@ def get_type_name(name):
 
     elif isinstance(name, type):
         return name._clusto_type
-    else:
+    elif isinstance(name, Entity):
         return name.type
+    else:
+        raise LookupError("Couldn't find type name.")
         
 
-def get_driver(entity, ignore_driver_column=False):
+def get_driver(entity):
     """Return the driver to use for a given entity """
 
-    if not ignore_driver_column:
-        if entity.driver in DRIVERLIST:
-            return DRIVERLIST[entity.driver]
+    if entity.driver in DRIVERLIST:
+        return DRIVERLIST[entity.driver]
 
     return Driver
 

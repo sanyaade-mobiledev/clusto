@@ -224,3 +224,32 @@ class TestClusto(testbase.ClustoTestBase):
                          
 
 
+    def testDriverSearches(self):
+
+        d = Driver('d1')
+        
+        self.assertRaises(NameError, clusto.get_driver_name, 'FAKEDRIVER')
+
+        self.assertEqual(clusto.get_driver_name(Driver),
+                         'entity')
+
+        self.assertRaises(LookupError, clusto.get_driver_name, 123)
+
+        self.assertEqual(clusto.get_driver_name('entity'),
+                         'entity')
+
+        self.assertEqual(clusto.get_driver_name(d.entity),
+                         'entity')
+
+    def testTypeSearches(self):
+
+        d = Driver('d1')
+        
+        self.assertEqual(clusto.get_type_name('generic'),
+                         'generic')
+
+        self.assertEqual(clusto.get_type_name(d.entity),
+                         'generic')
+
+        self.assertRaises(LookupError, clusto.get_type_name, 123)
+        
