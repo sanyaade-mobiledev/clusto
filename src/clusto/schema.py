@@ -35,14 +35,19 @@ METADATA = MetaData()
 CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
                           Column('version', Integer, primary_key=True),
                           Column('timestamp', TIMESTAMP, default=func.current_timestamp()),
+                          Column('user', String(64), default=None),
+                          Column('description', Text, default=None),
                           mysql_engine='InnoDB'
+                          
                           )
 
 
 class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
 
     def before_commit(self, session):
-        session.execute(CLUSTO_VERSIONING.insert().values())
+        session.execute(CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
+                                                          description=SESSION.clusto_description))
+        SESSION.clusto_description = None
         return EXT_CONTINUE
         
 
@@ -57,6 +62,8 @@ def working_version():
     return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version)+1,1)])
 
 SESSION.clusto_version = working_version()
+SESSION.clusto_user = None
+SESSION.clusto_description = None
 
 ENTITY_TABLE = Table('entities', METADATA,
                      Column('entity_id', Integer, primary_key=True),
