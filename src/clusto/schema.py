@@ -74,9 +74,13 @@ ENTITY_TABLE = Table('entities', METADATA,
                      Column('driver', String(32), nullable=False),
                      Column('version', Integer, nullable=False),
                      Column('deleted_at_version', Integer, default=None),
-                     
                      mysql_engine='InnoDB'
                      )
+
+Index('idx_entity_name_version',
+      ENTITY_TABLE.c.name,
+      ENTITY_TABLE.c.version,
+      ENTITY_TABLE.c.deleted_at_version)
 
 ATTR_TABLE = Table('entity_attrs', METADATA,
                    Column('attr_id', Integer, primary_key=True),
@@ -102,6 +106,10 @@ ATTR_TABLE = Table('entity_attrs', METADATA,
                    mysql_engine='InnoDB'
 
                    )
+Index('idx_attrs_entity_version',
+      ATTR_TABLE.c.entity_id,
+      ATTR_TABLE.c.version,
+      ATTR_TABLE.c.deleted_at_version)
 
 COUNTER_TABLE = Table('counters', METADATA,
                       Column('counter_id', Integer, primary_key=True),
@@ -110,6 +118,10 @@ COUNTER_TABLE = Table('counters', METADATA,
                       Column('value', Integer, default=0),
                       mysql_engine='InnoDB'
                       )
+
+Index('idx_counter_entity_attr',
+      COUNTER_TABLE.c.entity_id,
+      COUNTER_TABLE.c.attr_key)
 
 class ClustoVersioning(object):
     pass
