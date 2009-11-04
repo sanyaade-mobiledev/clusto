@@ -5,7 +5,7 @@ Server Technology Power Strips
 
 
 from basicpowerstrip import BasicPowerStrip
-from clusto.drivers.devices.common import IPMixin
+from clusto.drivers.devices.common import IPMixin, SNMPMixin
 from clusto.drivers import IPManager
 from clusto.exceptions import DriverException
 
@@ -13,7 +13,7 @@ import netsnmp
 import re
 
 
-class PowerTowerXM(BasicPowerStrip, IPMixin):
+class PowerTowerXM(BasicPowerStrip, IPMixin, SNMPMixin):
     """
     Provides support for Power Tower XL/XM
 
@@ -92,19 +92,14 @@ class PowerTowerXM(BasicPowerStrip, IPMixin):
 
         return netsnmp.Session(Version=2, DestHost=ip, Community=community)
 
-    def _get_port_oid_index(self, outlet, session=None):
-        if not session:
-            session = self._create_snmp_session()
-        vars = netsnmp.VarList(netsnmp.Varbind('.1.3.6.1.4.1.1718.3.2.3.1.2'))
-        for i, portname in enumerate(session.walk(vars)):
-            if portname.lower() == outlet.lower().lstrip('.'):
-                return '.'.join(vars[i].tag.rsplit('.', 3)[1:])
+    def _get_port_oid(self, outlet):
+        for oid, value in self._snmp_walk('1.3.6.1.4.1.1718.3.2.3.1.2'):
+            if value.val.lower() == outlet.lower.lstrip('.'):
+                return oid
 
-    def get_outlet_state(self, outlet, session=None):
-        if not session:
-            session = self._create_snmp_session()
-        index = self._get_port_oid_index(outlet, session=session)
-        oid = '.1.3.6.1.4.1.1718.3.2.3.1.10.%s' % index
+    def get_outlet_state(self, outlet):
+        index = self._get_port_oid(outlet).split('1.3.6.1.4.1.1718.3.2.3.1.2', 1)
+        oid = '1.3.6.1.4.1.1718.3.2.3.1.10.%s' % index
         state = session.get(netsnmp.VarList(netsnmp.Varbind(oid)))
         state = state[0]
         if state == None:
