@@ -104,6 +104,13 @@ if __name__ == '__main__':
     if console.port_free('nic-eth', 1):
         console.connect_ports('nic-eth', 1, switch, 43)
 
+    # Assign IPs to basic devices
+    bind_dns_ip_to_osport(switch, 'Vlan242')
+    bind_dns_ip_to_osport(console, 'nic0', porttype='nic-eth', portnum=1)
+    bind_dns_ip_to_osport(power, 'nic0', porttype='nic-eth', portnum=1)
+
+    sys.exit(0)
+
     # Create 20 servers, skipping every 6th
     for ru in range(1, 24):
         if (ru % 6) == 0: continue
@@ -124,8 +131,3 @@ if __name__ == '__main__':
             server.connect_ports('nic-eth', 1, switch, portnum)
         if server.port_free('nic-eth', 2):
             server.connect_ports('nic-eth', 2, switch, portnum + 20)
-
-    # Assign IPs to basic devices
-    bind_dns_ip_to_osport(switch, 'Vlan242')
-    bind_dns_ip_to_osport(console, 'nic0', porttype='nic-eth', portnum=1)
-    bind_dns_ip_to_osport(power, 'nic0', porttype='nic-eth', portnum=1)
