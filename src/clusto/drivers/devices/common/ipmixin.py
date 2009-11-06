@@ -64,7 +64,8 @@ class IPMixin:
                 ipman.allocate(self, ip)
 
                 clusto.flush()
-
+            else:
+                ipman = IPManager.get_ip_manager(ip)
 
             ipattrs = ipman.get_resource_attrs(self, ip)
 

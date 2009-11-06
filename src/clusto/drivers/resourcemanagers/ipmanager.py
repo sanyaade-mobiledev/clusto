@@ -37,10 +37,7 @@ class IPManager(ResourceManager):
         """check that the given ip falls within the range managed by this manager"""
 
         try:
-            if not isinstance(number, bool) and isinstance(int(number), int):
-                ## add here to map unsigned ints from IPs to signed ints of python
-                ip = IPy.IP(int(number+self.__int_ip_const))
-            elif isinstance(resource, int):
+            if isinstance(resource, int):
                 ip = IPy.IP(resource+self.__int_ip_const)
             else:
                 ip = IPy.IP(resource)
@@ -50,10 +47,10 @@ class IPManager(ResourceManager):
 
         if self.baseip and (ip not in self.ipy):
             raise ResourceTypeException("The ip %s is out of range for this IP manager.  Should be in %s/%s"
-                                        % (str(resource), self.baseip, self.netmask))
+                                        % (str(ip), self.baseip, self.netmask))
 
 
-        return (int(ip.int()-self.__int_ip_const), True)
+        return (int(ip.int()-self.__int_ip_const), number)
 
 
     def additional_attrs(self, thing, resource, number):

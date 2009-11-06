@@ -95,11 +95,47 @@ class ServerInstallationTest(testbase.ClustoTestBase):
         self.assertEqual(BasicRack.get_rack_and_u(newserver)['rack'], r)
 
         ipman = IPManager('subnet-10.0.0.1', netmask='255.255.255.0', baseip='10.0.0.1')
-        newserver.bind_ip_to_osport('10.0.0.10', 'eth0', porttype='nic-eth', portnum=1)
 
-        ipvals = newserver.attrs(value='10.0.0.10')
+        newserver.bind_ip_to_osport('10.0.0.2', 'eth0', porttype='nic-eth', portnum=1)
+
+        ipvals = newserver.attrs(value='10.0.0.2')
         self.assertEqual(len(ipvals), 1)
 
-        self.assertEqual(ipvals[0].value, '10.0.0.10')
+        self.assertEqual(ipvals[0].value, '10.0.0.2')
 
-        self.assertEqual(clusto.get_by_attr('ip', '10.0.0.10'), [newserver])
+        self.assertEqual(clusto.get_by_attr('ip', '10.0.0.2'), [newserver])
+
+
+        aserver = servernames.allocate(BasicServer)
+
+        ipattr = ipman.allocate(aserver)
+        
+        aserver.bind_ip_to_osport(ipattr.value, 'eth0', porttype='nic-eth', portnum=1)
+
+        ip = aserver.attr_values(ipattr.key, number=ipattr.number, subkey=ipattr.subkey)
+
+        self.assertEqual(aserver.get_port_attr('nic-eth', 1, 'osportname'),
+                         'eth0')
+
+        self.assertEqual(len(aserver.attrs(subkey='osportname', value='eth0')),
+                         2)
+
+        self.assertEqual(aserver.attrs(IPManager._attr_name,
+                                       subkey='ipstring',
+                                       number=aserver.attrs(IPManager._attr_name,
+                                                            subkey='osportname',
+                                                            value='eth0')[0].number,
+                                       )[0].value,
+                         '10.0.0.1')
+
+        ipattr2 = ipman.allocate(aserver)
+
+        self.assertEqual(sorted(aserver.get_ips()),
+                         sorted(['10.0.0.1', '10.0.0.3']))
+        
+        
+        
+        
+        
+
+        

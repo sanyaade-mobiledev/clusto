@@ -88,8 +88,9 @@ class ResourceManager(Driver):
                             number=attr.number,
                             subkey='manager',
                             )
-                                          
-                self.additional_attrs(thing, resource, number)
+
+                clusto.flush()
+                self.additional_attrs(thing, resource, attr.number)
                 
             else:
                 attr = None
