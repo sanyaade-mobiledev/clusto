@@ -99,7 +99,7 @@ class PortMixin:
 
             dev = self.get_connected(porttype, portnum)
             
-            otherportnum = self.get_port_attrs(porttype, portnum, 'otherportnum')
+            otherportnum = self.get_port_attr(porttype, portnum, 'otherportnum')
             
             clusto.begin_transaction()
             try:
@@ -124,7 +124,7 @@ class PortMixin:
             raise ConnectionException(msg % (porttype, portnum, self.name))
             
 
-        return self.get_port_attrs(porttype, portnum, 'connection')
+        return self.get_port_attr(porttype, portnum, 'connection')
             
 
     def ports_connectable(self, porttype, srcportnum, dstdev, dstportnum):
@@ -197,7 +197,7 @@ class PortMixin:
                           value=value)
             
                      
-    def get_port_attrs(self, porttype, portnum, key):
+    def get_port_attr(self, porttype, portnum, key):
         """get an attribute on the given port"""
 
         portnum = self._ensure_portnum(porttype, portnum)
@@ -229,8 +229,8 @@ class PortMixin:
         for ptype in self.port_types:
             portinfo[ptype]={}
             for n in range(1, self._portmeta[ptype]['numports'] + 1):
-                portinfo[ptype][n] = {'connection': self.get_port_attrs(ptype, n, 'connection'),
-                                      'otherportnum': self.get_port_attrs(ptype, n, 'otherportnum')}
+                portinfo[ptype][n] = {'connection': self.get_port_attr(ptype, n, 'connection'),
+                                      'otherportnum': self.get_port_attr(ptype, n, 'otherportnum')}
 
         return portinfo
 
