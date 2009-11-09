@@ -170,13 +170,13 @@ def rename(oldname, newname):
         
         new = get_driver(old.entity)(newname)
 
-        for attr in old.attrs():
+        for attr in old.attrs(ignore_hidden=False):
             new.add_attr(key=attr.key,
                          number=attr.number,
                          subkey=attr.subkey,
                          value=attr.value)
 
-        for ref in old.references():
+        for ref in old.references(ignore_hidden=False):
             ref.delete()
             ref.entity.add_attr(key=ref.key,
                                 number=ref.number,

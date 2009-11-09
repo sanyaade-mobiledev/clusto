@@ -211,7 +211,7 @@ class Driver(object):
         """
         
         if isinstance(obj, Entity):
-            d = Driver(Entity)
+            d = Driver(obj)
         elif isinstance(obj, Driver):
             d = obj
         else:
