@@ -104,7 +104,17 @@ fieldset.search legend {
 
 li {
 	display: block;
+	float: left;
+	width: 100%;
 	clear: both;
+}
+
+li.color0 {
+	background-color: #EEF;
+}
+
+li.color1 {
+	background-color: #FFF;
 }
 
 a, a:link a:visited a:active a:hover {
