@@ -9,7 +9,6 @@ from clusto.drivers.devices.common import IPMixin, SNMPMixin
 from clusto.drivers import IPManager
 from clusto.exceptions import DriverException
 
-import netsnmp
 import re
 
 
