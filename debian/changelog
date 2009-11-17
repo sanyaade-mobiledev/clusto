@@ -1,3 +1,9 @@
+clusto (0.4.4-1) unstable; urgency=low
+
+  * fix missing exception
+
+ -- Ron Gorodetzky <ron@digg.com>  Mon, 16 Nov 2009 17:13:56 -0800
+
 clusto (0.4.3-1) unstable; urgency=low
 
   * transaction bugfix
