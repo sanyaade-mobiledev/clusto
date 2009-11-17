@@ -51,6 +51,8 @@ if __name__ == '__main__':
 
     init_script()
 
+    clusto.begin_transaction()
+
     # Make sure we can allocate server names
     try:
         servernames = clusto.get_by_name('servernames')
@@ -65,6 +67,10 @@ if __name__ == '__main__':
         vpnsubnet = clusto.get_by_name('vpnsubnet')
     except LookupError:
         vpnsubnet = IPManager('vpnsubnet', baseip='10.2.16.0', netmask='255.255.248.0')
+    try:
+        dmzsubnet = clusto.get_by_name('subnet-dmz1')
+    except LookupError:
+        dmzsubnet = IPManager('subnet-dmz1', baseip='64.191.203.32', netmask='255.255.255.224')
     
     rackname = args[0]
     datacenter, racknum = match.groups()
@@ -108,6 +114,8 @@ if __name__ == '__main__':
     bind_dns_ip_to_osport(switch, 'Vlan242')
     bind_dns_ip_to_osport(console, 'nic0', porttype='nic-eth', portnum=1)
     bind_dns_ip_to_osport(power, 'nic0', porttype='nic-eth', portnum=1)
+
+    clusto.commit()
 
     sys.exit(0)
 
