@@ -1,7 +1,7 @@
 
 
 from schema import *
-
+from clusto.exceptions import *
 
 from drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
 from sqlalchemy.exceptions import InvalidRequestError
@@ -39,7 +39,6 @@ def init_clusto():
     METADATA.create_all(SESSION.bind)
     c = ClustoMeta()
     flush()
-    commit()
 
 
 
@@ -170,13 +169,13 @@ def rename(oldname, newname):
         
         new = get_driver(old.entity)(newname)
 
-        for attr in old.attrs():
+        for attr in old.attrs(ignore_hidden=False):
             new.add_attr(key=attr.key,
                          number=attr.number,
                          subkey=attr.subkey,
                          value=attr.value)
 
-        for ref in old.references():
+        for ref in old.references(ignore_hidden=False):
             ref.delete()
             ref.entity.add_attr(key=ref.key,
                                 number=ref.number,
@@ -201,9 +200,42 @@ def get_latest_version_number():
     return val
 
 
-tl = threading.local()
-tl.TRANSACTIONCOUNTER = 0
+def _check_transaction_counter():
+    tl = SESSION()
 
+    if not hasattr(tl, 'TRANSACTIONCOUNTER'):
+        raise TransactionException("No transaction counter.  Outside of a transaction.")
+    
+    if tl.TRANSACTIONCOUNTER < 0:
+        raise TransactionException("Negative transaction counter!  SHOULD NEVER HAPPEN!")
+
+def _init_transaction_counter():
+
+    tl = SESSION()
+    if not hasattr(tl, 'TRANSACTIONCOUNTER'):
+        tl.TRANSACTIONCOUNTER = 0
+    else:
+        raise TransactionException("Transaction counter already initialized.")
+    
+def _inc_transaction_counter():
+    _check_transaction_counter()
+
+    tl = SESSION()
+    
+    tl.TRANSACTIONCOUNTER += 1
+    
+def _dec_transaction_counter():
+
+    _check_transaction_counter()
+    
+    tl = SESSION()
+    
+    tl.TRANSACTIONCOUNTER -= 1
+
+    if tl.TRANSACTIONCOUNTER == 0:
+        del tl.TRANSACTIONCOUNTER
+
+    
 def begin_transaction():
     """Start a transaction
 
@@ -212,31 +244,34 @@ def begin_transaction():
     If allow_nested is False then an exception will be raised if we're already
     in a transaction.
     """
-    global tl
+    
     if SESSION.is_active:
-        tl.TRANSACTIONCOUNTER += 1
+        _inc_transaction_counter()
         return None
     else:
-        tl.TRANSACTIONCOUNTER += 1
+        _init_transaction_counter()
+        _inc_transaction_counter()
         return SESSION.begin()
 
 def rollback_transaction():
     """Rollback a transaction"""
-    global tl
 
+    tl = SESSION()
+    _check_transaction_counter()
     if SESSION.is_active:
         SESSION.rollback()
-        tl.TRANSACTIONCOUNTER -= 1
+        _dec_transaction_counter()
     
     
 def commit():
     """Commit changes to the datastore"""
-    global tl
 
+    _check_transaction_counter()
+    tl = SESSION()
     if SESSION.is_active:
         if tl.TRANSACTIONCOUNTER == 1:
             SESSION.commit()
-        tl.TRANSACTIONCOUNTER -= 1
+        _dec_transaction_counter()
         flush()
             
 

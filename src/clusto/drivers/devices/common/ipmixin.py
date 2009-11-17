@@ -35,6 +35,12 @@ class IPMixin:
 
         return self in ipman.owners(ip)
 
+    def get_ips(self):
+        """Get a list of IPs for this Entity in ipstring format"""
+
+        return self.attr_values(IPManager._attr_name, subkey='ipstring')
+        
+
     def bind_ip_to_osport(self, ip, osportname, ipman=None, porttype=None, portnum=None):
         """bind an IP to an os port and optionally also asign the os port name
         to a physical port
@@ -58,7 +64,8 @@ class IPMixin:
                 ipman.allocate(self, ip)
 
                 clusto.flush()
-
+            else:
+                ipman = IPManager.get_ip_manager(ip)
 
             ipattrs = ipman.get_resource_attrs(self, ip)
 

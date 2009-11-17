@@ -31,3 +31,6 @@ class ResourceTypeException(ResourceException):
 class PoolException(ClustoException):
     pass
 
+class TransactionException(ClustoException):
+    pass
+

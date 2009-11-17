@@ -177,3 +177,28 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         for a in t1.attrs():
             self.assertEqual(e.entity.deleted_at_version,
                              a.version)
+
+    def testPoolRename(self):
+
+        
+        curver = clusto.get_latest_version_number()
+
+        e1 = Entity('e1')
+        e2 = Entity('e2')
+
+        p1 = clusto.drivers.Pool('p1')
+
+        p1.insert(e1)
+        p1.insert(e2)
+
+        self.assertEqual(sorted([e1,e2]),
+                         sorted((d.entity for d in p1.contents())))
+
+        clusto.rename('p1', 'p1renamed')
+
+        p1renamed = clusto.get_by_name('p1renamed')
+
+        self.assertEqual(sorted([e1,e2]),
+                         sorted((d.entity for d in p1renamed.contents())))
+
+        
