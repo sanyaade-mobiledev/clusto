@@ -12,10 +12,10 @@ import drivers
 
 import threading
 import logging
+import time
 
 driverlist = DRIVERLIST
 typelist = TYPELIST
-
 
 def connect(dsn, echo=False):
     """Connect to a given Clusto datastore.
@@ -270,7 +270,20 @@ def commit():
     tl = SESSION()
     if SESSION.is_active:
         if tl.TRANSACTIONCOUNTER == 1:
-            SESSION.commit()
+            exc = None
+            for i in range(3): ## retry 3 times
+                try:
+                    SESSION.commit()
+                    break
+                except OperationalError, x:
+                    exc = x
+                    if x.orig[0] == 1213:
+                        time.sleep(0.001*i)
+                        continue
+                    else:
+                        raise x
+            else:
+                raise exc
         _dec_transaction_counter()
         flush()
             

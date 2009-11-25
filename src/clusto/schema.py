@@ -2,9 +2,10 @@
 Clusto schema
 
 """
+
 VERSION = 3
 from sqlalchemy import *
-
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.exceptions import InvalidRequestError
 
 #from sqlalchemy.ext.sessioncontext import SessionContext
@@ -26,7 +27,7 @@ from functools import wraps
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
            'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
-           'working_version']
+           'working_version', "OperationalError"]
 
 
 METADATA = MetaData()
