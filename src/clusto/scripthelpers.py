@@ -109,7 +109,8 @@ def get_clusto_config(filename=None):
     return config
 
 
-def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
+def init_script(name=os.path.basename(sys.argv[0]), configfile=None,
+                initializedb=False):
     """Initialize the clusto environment for clusto scripts.
 
     Connects to the clusto database, returns a python SafeConfigParser and a
@@ -119,7 +120,9 @@ def init_script(name=os.path.basename(sys.argv[0]), configfile=None):
     """
     config = get_clusto_config(filename=configfile)
     clusto.connect(config.get('clusto', 'dsn'))
-    clusto.init_clusto()
+
+    if initializedb:
+        clusto.init_clusto()
     
     logger = setup_logging(config=config, name=name)
 
