@@ -216,8 +216,8 @@ def _init_transaction_counter():
     tl = SESSION()
     if not hasattr(tl, 'TRANSACTIONCOUNTER'):
         tl.TRANSACTIONCOUNTER = 0
-    else:
-        raise TransactionException("Transaction counter already initialized.")
+    elif tl.TRANSACTIONCOUNTER != 0:        
+        raise TransactionException("Transaction counter already initialized. At %d." % tl.TRANSACTIONCOUNTER)
     
 def _inc_transaction_counter():
     _check_transaction_counter()
@@ -234,9 +234,6 @@ def _dec_transaction_counter():
     
     tl.TRANSACTIONCOUNTER -= 1
 
-    if tl.TRANSACTIONCOUNTER == 0:
-        del tl.TRANSACTIONCOUNTER
-
     
 def begin_transaction():
     """Start a transaction
@@ -246,8 +243,8 @@ def begin_transaction():
     If allow_nested is False then an exception will be raised if we're already
     in a transaction.
     """
-    
-    if SESSION.is_active:
+
+    if SESSION().is_active:
         _inc_transaction_counter()
         return None
     else:
@@ -263,8 +260,9 @@ def rollback_transaction():
     if SESSION.is_active:
         SESSION.rollback()
         _dec_transaction_counter()
-    
-    
+    else:
+        _dec_transaction_counter()
+
 def commit():
     """Commit changes to the datastore"""
 
