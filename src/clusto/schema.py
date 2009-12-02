@@ -2,9 +2,10 @@
 Clusto schema
 
 """
+
 VERSION = 3
 from sqlalchemy import *
-
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.exceptions import InvalidRequestError
 
 #from sqlalchemy.ext.sessioncontext import SessionContext
@@ -26,7 +27,7 @@ from functools import wraps
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
            'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
-           'working_version']
+           'working_version', "OperationalError"]
 
 
 METADATA = MetaData()
@@ -44,9 +45,15 @@ CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
 
 class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
 
-    def before_commit(self, session):
-        session.execute(CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
-                                                          description=SESSION.clusto_description))
+    def after_begin(self, session, transaction, connection):
+        sql = CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
+                                                description=SESSION.clusto_description)
+
+        session.execute(sql)
+        #session.flush()
+        #v = ClustoVersioning(user=SESSION.clusto_user,
+        #                     description=SESSION.clusto_description)
+        #session.add(v)
         SESSION.clusto_description = None
         return EXT_CONTINUE
         
@@ -59,7 +66,7 @@ def latest_version():
     return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version), 0)])
 
 def working_version():
-    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version)+1,1)])
+    return select([func.coalesce(func.max(CLUSTO_VERSIONING.c.version),1)])
 
 SESSION.clusto_version = working_version()
 SESSION.clusto_user = None

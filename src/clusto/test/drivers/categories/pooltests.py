@@ -176,35 +176,3 @@ class PoolTests(testbase.ClustoTestBase):
 
         self.assertRaises(PoolException, p1.insert, d1)
         
-class WeightedPoolTests(testbase.ClustoTestBase):
-
-    def testSetWeight(self):
-
-        s = BasicServer('s')
-        p = WeightedPool('p')
-
-        p.insert(s)
-        p.set_weight(s, 45)
-
-        self.assertEqual(45, p.get_weight(s))
-
-    def testSetWeightNotInPool(self):
-
-        s = BasicServer('s')
-        p = WeightedPool('p')
-
-        self.assertRaises(LookupError, p.set_weight, s, 45)
-
-    def testDefaultWeight(self):
-        
-
-        s = BasicServer('s')
-        p = WeightedPool('p')
-
-        p.insert(s)
-
-        self.assertEqual(None, p.get_weight(s))
-
-        p.defaultweight = 33
-
-        self.assertEqual(33, p.get_weight(s))
