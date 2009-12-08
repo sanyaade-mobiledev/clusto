@@ -65,6 +65,7 @@ def discover_hardware(server):
         if key in ('model name', 'cpu MHz', 'cache size', 'vendor_id'):
             key = key.lower().replace(' ', '-').replace('_', '-')
             cpu[key] = value.strip(' ')
+    cpucount = len(processors)
 
     serial = client.exec_command('/usr/sbin/dmidecode --string=system-serial-number')[1].read()
 
@@ -74,7 +75,10 @@ def discover_hardware(server):
         'disk': disks,
         'memory': memory,
         'processor': processors,
-        'system': [{'serial': serial}],
+        'system': [{
+            'serial': serial,
+            'cpucount': cpucount,
+        }],
     })
 
 def main():

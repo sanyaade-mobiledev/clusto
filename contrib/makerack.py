@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     # Make sure all the IPManager instances exist
     ensure_vlan(243, '10.2.128.0', '255.255.252.0')
-    ensure_vlan(242, '10.2.3.0', '255.255.252.0')
+    ensure_vlan(242, '10.2.0.0', '255.255.252.0')
     try:
         vpnsubnet = clusto.get_by_name('vpnsubnet')
     except LookupError:
