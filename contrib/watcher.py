@@ -34,7 +34,7 @@ def update_clusto(trap):
     if not switch.attrs(key='snmp', subkey='discovery', value=1):
         return
 
-    server = switch.port_info['nic-eth'][trap['port']]['connection']
+    server = switch.get_connected('nic-eth', trap['port'])
     if not server:
         servernames = clusto.get_by_name('servernames')
         print ts, 'Allocating new server on', trap['switch'], trap['port']
