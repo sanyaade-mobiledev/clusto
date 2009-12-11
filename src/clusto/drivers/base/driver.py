@@ -10,7 +10,7 @@ import clusto
 from clusto.schema import *
 from clusto.exceptions import *
 
-from clustodriver import *
+from clusto.drivers.base.clustodriver import *
 
 
 class Driver(object):

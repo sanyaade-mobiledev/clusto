@@ -1,6 +1,6 @@
 
 
-from schema import *
+from clusto.schema import *
 from clusto.exceptions import *
 
 from drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
@@ -8,7 +8,7 @@ from sqlalchemy.exceptions import InvalidRequestError
 from sqlalchemy import create_engine
 
 
-import drivers
+from clusto import drivers
 
 import threading
 import logging
