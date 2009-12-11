@@ -10,7 +10,7 @@ import clusto
 from clusto.schema import *
 from clusto.exceptions import *
 
-from clustodriver import *
+from clusto.drivers.base.clustodriver import *
 
 
 class Driver(object):
@@ -533,6 +533,8 @@ class Driver(object):
 
         else:
             if len(attrs) == 1:
+                if attrs[0].value == value:
+                    return attrs[0]
                 self.del_attrs(key=key, number=number, subkey=subkey)
 
             attr = self.add_attr(key, value, number=number, subkey=subkey)
