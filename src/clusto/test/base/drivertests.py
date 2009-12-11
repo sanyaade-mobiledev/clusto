@@ -292,7 +292,19 @@ class TestDriverAttributes(testbase.ClustoTestBase):
         self.assertEqual(d1.attr_query(key='foo', number=0, count=True), 0)
         self.assertEqual(d1.attr_query(key='foo', number=4, count=True), 1)
         
+    def testSetAttrAlreadySet(self):
+
+        d1 = Driver('d1')
+
+        version = clusto.get_latest_version_number()
         
+        d1.set_attr(key='foo', value='bar1')
+
+        self.assertEqual(version+1, clusto.get_latest_version_number())
+
+        d1.set_attr(key='foo', value='bar1')
+
+        self.assertEqual(version+1, clusto.get_latest_version_number())
 
 class TestDriverContainerFunctions(testbase.ClustoTestBase):
     

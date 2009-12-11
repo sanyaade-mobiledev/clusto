@@ -533,6 +533,8 @@ class Driver(object):
 
         else:
             if len(attrs) == 1:
+                if attrs[0].value == value:
+                    return attrs[0]
                 self.del_attrs(key=key, number=number, subkey=subkey)
 
             attr = self.add_attr(key, value, number=number, subkey=subkey)
