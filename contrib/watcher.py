@@ -31,7 +31,8 @@ def update_clusto(trap):
     if trap['port'] > 20:
         return
 
-    if not switch.attrs(key='snmp', subkey='discovery', value=1):
+    if not switch.attrs(key='snmp', subkey='discovery', value=1, merge_container_attrs=True):
+        print 'Discovery disabled for', switch.name
         return
 
     server = switch.get_connected('nic-eth', trap['port'])
@@ -160,7 +161,7 @@ def dhcp_process():
         server = server[0]
         if request.get('vendor_class_id', None) == 'udhcp 0.9.9-pre':
             # This is an IPMI request
-            print 'Associating IPMI address', address, 'with nic-eth:1 on', server.name
+            #print 'Associating IPMI address', address, 'with nic-eth:1 on', server.name
             server.set_port_attr('nic-eth', 1, 'ipmi-mac', address)
         else:
             print 'Associating physical address with nic-eth:1 on', server.name

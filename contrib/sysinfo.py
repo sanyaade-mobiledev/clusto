@@ -9,12 +9,7 @@ from pprint import pprint
 class SilentPolicy(MissingHostKeyPolicy):
     def missing_host_key(self, client, hostname, key): pass
 
-def discover_hardware(server):
-    ip = server.get_ips()
-    if not ip:
-        return None
-    ip = ip[0]
-
+def discover_hardware(ip):
     client = SSHClient()
 
     try:
@@ -67,38 +62,98 @@ def discover_hardware(server):
             cpu[key] = value.strip(' ')
     cpucount = len(processors)
 
-    serial = client.exec_command('/usr/sbin/dmidecode --string=system-serial-number')[1].read()
+    serial = client.exec_command('/usr/sbin/dmidecode --string=system-serial-number')[1].read().rstrip('\r\n')
+    hostname = client.exec_command('/bin/hostname -s')[1].read().rstrip('\r\n')
+
+    stdout = client.exec_command('/sbin/ifconfig -a')[1].read()
+    iface = {}
+    for line in stdout.split('\n'):
+        line = line.rstrip('\r\n')
+        if not line: continue
+        line = line.split('  ')
+        if line[0]:
+            name = line[0]
+            iface[name] = []
+            del line[0]
+        line = [x for x in line if x]
+        iface[name] += line
+
+    for name in iface:
+        attribs = {}
+        value = None
+        for attr in iface[name]:
+            value = None
+            if attr.startswith('Link encap') or \
+                attr.startswith('inet addr') or \
+                attr.startswith('Bcast') or \
+                attr.startswith('Mask') or \
+                attr.startswith('MTU') or \
+                attr.startswith('Metric'):
+                key, value = attr.split(':', 1)
+            if attr.startswith('HWaddr'):
+                key, value = attr.split(' ', 1)
+            if attr.startswith('inet6 addr'):
+                key, value = attr.split(': ', 1)
+            if not value: continue
+            attribs[key.lower()] = value
+        iface[name] = attribs
 
     client.close()
 
-    return (server, {
+    return {
         'disk': disks,
         'memory': memory,
         'processor': processors,
+        'network': iface,
         'system': [{
             'serial': serial,
             'cpucount': cpucount,
+            'hostname': hostname,
         }],
-    })
+    }
+
+def update_server(server, info):
+    clusto.begin_transaction()
+    for itemtype in info:
+        if itemtype == 'network': continue
+        for i, item in enumerate(info[itemtype]):
+            for subkey, value in item.items():
+                server.set_attr(key=itemtype, subkey=subkey, value=value, number=i)
+    clusto.commit()
+
+    clusto.begin_transaction()
+    for ifnum in range(0, 2):
+        ifname = 'eth%i' % ifnum
+        if server.attrs(subkey='mac', value=info['network'].get(ifname, {}).get('hwaddr', '')):
+            continue
+        server.set_port_attr('nic-eth', ifnum + 1, 'mac', info['network'][ifname]['hwaddr'])
+
+        try:
+            if 'inet addr' in info['network'][ifname]:
+                server.bind_ip_to_osport(info['network'][ifname]['inet addr'], ifname)
+        except:
+            pass
+    clusto.commit()
 
 def main():
-    for server in clusto.get_entities(clusto_drivers=[PenguinServer]):
-        print server.name
+    for server in clusto.get_entities(clusto_types=['server']):
+        if server.attrs(key='memory'): continue
 
-        #if server.attrs(key='memory'): continue
+        ip = server.get_ips()
+        if not ip:
+            print 'Unable to find IP for', server.name
+            continue
+        ip = ip[0]
 
-        server = discover_hardware(server)
-        if not server: continue
-        server, info = server
+        info = discover_hardware(ip)
+        if not info:
+            print 'Unable to discover', server.name
+            continue
+        print 'Discovered', server.name
 
-        clusto.begin_transaction()
+        update_server(server, info)
+        print 'Updated', server.name
 
-        for itemtype in info:
-            for i, item in enumerate(info[itemtype]):
-                for subkey, value in item.items():
-                    server.set_attr(key=itemtype, subkey=subkey, value=value, number=i)
-
-        clusto.commit()
 
 if __name__ == '__main__':
     init_script()
