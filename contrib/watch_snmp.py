@@ -1,17 +1,13 @@
 from socket import socket, AF_INET, SOCK_DGRAM
 from traceback import format_exc
-from multiprocessing import Process
-from threading import Thread
-from Queue import Queue
 from time import strftime, time, localtime, sleep
 from struct import unpack
 
-from scapy import SNMP, BOOTP, sniff
+from scapy import SNMP
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
 import clusto
-import sys
 
 from discovery import SWITCHPORT_TO_RU, RU_TO_PWRPORT
 
@@ -91,26 +87,7 @@ def trap_listen():
                 }
                 yield result
 
-dhcpqueue = Queue()
-
-def dhcp_parse(packet):
-    options = packet[BOOTP].payload.options
-
-    mac = None
-    vendor = None
-    options = [(k, v) for k, v in [x for x in options if type(x) == tuple]]
-    options = dict(options)
-    if 'client_id' in options:
-        mac = unpack('>6s', options['client_id'][1:])[0]
-        options['client_id'] = ':'.join([('%x' % ord(x)).ljust(2, '0') for x in mac]).lower()
-    dhcpqueue.put((packet.src, options))
-
-def dhcp_listen():
-    sniff(filter='udp port 67', prn=lambda x: dhcp_parse(x), store=0)
-
-def run_snmp():
-    init_script()
-
+def main():
     for trap in trap_listen():
         try:
             clusto.begin_transaction()
@@ -121,73 +98,6 @@ def run_snmp():
             print format_exc()
             clusto.rollback_transaction()
 
-def run_dhcp():
-    init_script()
-
-    t = Thread(target=dhcp_listen)
-    t.setDaemon(True)
-    t.start()
-
-    while True:
-        try:
-            dhcp_process()
-        except:
-            print format_exc()
-            print 'dhcp_process threw an exception, lost an update'
-
-def dhcp_process():
-    address, request = dhcpqueue.get()
-
-    if 'client_id' in request and (request['client_id'].lower() != address.lower()):
-        pass
-        #print 'Warning: DHCP client ID does not match source MAC', request['client_id'], '!=', address
-    address = request.get('client_id', address).lower()
-
-    server = clusto.get_entities(attrs=[{
-            'key': 'bootstrap',
-            'subkey': 'mac',
-            'value': address
-        }, {
-            'key': 'port-nic-eth',
-            'subkey': 'mac',
-            'number': 1,
-            'value': address
-        }])
-    if not server:
-        #print 'DHCP from unknown MAC:', address
-        return
-
-    try:
-        server = server[0]
-        if request.get('vendor_class_id', None) == 'udhcp 0.9.9-pre':
-            # This is an IPMI request
-            #print 'Associating IPMI address', address, 'with nic-eth:1 on', server.name
-            server.set_port_attr('nic-eth', 1, 'ipmi-mac', address)
-        else:
-            print 'Associating physical address with nic-eth:1 on', server.name
-            server.set_port_attr('nic-eth', 1, 'mac', address)
-    except:
-        print 'Something went wrong'
-        print format_exc()
-
-def main():
-    t1 = Process(target=run_dhcp)
-    t1.start()
-
-    try:
-        run_snmp()
-    except KeyboardInterrupt:
-        t1.terminate()
-        t1.join()
-
 if __name__ == '__main__':
-    #main()
-    if sys.argv[1] == 'dhcp':
-        run_dhcp()
-        sys.exit(0)
-
-    if sys.argv[1] == 'snmp':
-        run_snmp()
-        sys.exit(0)
-
-    print 'Usage: %s (dhcp|snmp)' % sys.argv[0]
+    init_script()
+    main()
