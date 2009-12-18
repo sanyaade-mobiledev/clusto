@@ -68,13 +68,10 @@ def main():
     init_script()
     for address, request in dhcp_listen():
         try:
-            clusto.begin_transaction()
             update_clusto(address, request)
-            clusto.commit()
         except:
             print 'Exception in watch_dhcp'
             print format_exc()
-            clusto.rollback_transaction()
 
 if __name__ == '__main__':
     main()

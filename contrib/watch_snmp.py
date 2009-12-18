@@ -43,6 +43,7 @@ def update_clusto(trap):
 
     ifnum = int(trap['port'] > 21) + 1
 
+    clusto.begin_transaction()
     if not trap['mac'] in server.attr_values(key='bootstrap', subkey='mac', value=trap['mac']):
         print 'Adding bootstrap mac to', server.name
         server.add_attr(key='bootstrap', subkey='mac', value=trap['mac'])
@@ -64,6 +65,7 @@ def update_clusto(trap):
         rack = rack[0]
         if not server in rack:
             rack.insert(server, ru)
+    clusto.commit()
 
     print ts, switch.name, server.name, trap['mac']
 
@@ -90,13 +92,10 @@ def trap_listen():
 def main():
     for trap in trap_listen():
         try:
-            clusto.begin_transaction()
             update_clusto(trap)
-            clusto.commit()
         except:
             print 'Exception in run_snmp process'
             print format_exc()
-            clusto.rollback_transaction()
 
 if __name__ == '__main__':
     init_script()
