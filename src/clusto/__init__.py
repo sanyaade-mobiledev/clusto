@@ -177,12 +177,13 @@ def rename(oldname, newname):
                          subkey=attr.subkey,
                          value=attr.value)
 
+
         for ref in old.references(ignore_hidden=False):
+            drivers.base.Driver(ref.entity).add_attr(key=ref.key,
+                                                     number=ref.number,
+                                                     subkey=ref.subkey,
+                                                     value=new)
             ref.delete()
-            ref.entity.add_attr(key=ref.key,
-                                number=ref.number,
-                                subkey=ref.subkey,
-                                value=new)
 
         for counter in SESSION.query(Counter).filter(Counter.entity==old.entity):
             counter.entity = new.entity
