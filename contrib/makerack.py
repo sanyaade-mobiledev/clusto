@@ -92,7 +92,7 @@ if __name__ == '__main__':
     if power.port_free('nic-eth', 1):
         power.connect_ports('nic-eth', 1, switch, 44)
     if power.port_free('console-serial', 1):
-        power.connect_ports('console-serial', 1, console, 43)
+        power.connect_ports('console-serial', 1, console, 44)
 
     # Wire up the switch
     if not switch in rack:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     if switch.port_free('pwr-nema-5', 1):
         switch.connect_ports('pwr-nema-5', 1, power, 'aa8')
     if switch.port_free('console-serial', 1):
-        switch.connect_ports('console-serial', 1, console, 47)
+        switch.connect_ports('console-serial', 1, console, 48)
 
     # Wire up the console server
     if not console in rack:
