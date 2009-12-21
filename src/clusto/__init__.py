@@ -131,11 +131,42 @@ def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
 
         query = query.filter(or_(*[Attribute.queryarg(**args) 
                                    for args in attrs]))
-        
 
     return [Driver(entity) for entity in query.all()]
 
-    
+def get_from_pools(pools, clusto_types=(), clusto_drivers=()):
+    """Get entitis that are in all the given pools
+
+    parameters:
+      pools - the list of pools you want the intersection for
+      clusto_types - a list of clusto types you'd like to filter on
+      clusto_drivers - a list of clusto drivers you'd like to filter on
+    """
+
+    pool_names = []
+    pool_types = []
+
+    for p in pools:
+        if isinstance(p, basestring):
+            pool_names.append(p)
+        elif isinstance(p, drivers.Pool):
+            pool_types.append(p)
+        else:
+            raise TypeError("%s is neither a string or a Pool." % str(p))
+
+    pls = pool_types
+    if pool_names:
+        pls.extend(get_entities(names=pool_names))
+
+    resultsets = []
+    for p in pls:
+        contents = set(p.contents(clusto_types=clusto_types,
+                                  clusto_drivers=clusto_drivers,
+                                  search_children=True))
+        resultsets.append(contents)
+
+    return reduce(set.intersection, resultsets)
+                   
 def get_by_name(name):
     try:
         entity = Entity.query().filter_by(name=name).one()
