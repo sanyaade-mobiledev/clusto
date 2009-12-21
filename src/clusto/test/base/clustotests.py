@@ -4,7 +4,7 @@ from clusto.test import testbase
 import clusto
 from clusto.schema import *
 from clusto.drivers.base import *
-from clusto.drivers import BasicDatacenter
+from clusto.drivers import BasicDatacenter, Pool, BasicServer
 from sqlalchemy.exceptions import InvalidRequestError
 
 class TestClustoPlain(testbase.ClustoTestBase):
@@ -166,6 +166,44 @@ class TestClusto(testbase.ClustoTestBase):
         self.assertEqual(sorted([n.name
                                  for n in clusto.get_entities(clusto_types=tl)]),
                          sorted(['l1','dc1']))
+
+        p1 = Pool('p1')
+        p2 = Pool('p2')
+        p3 = Pool('p3')
+        p4 = Pool('p4')
+
+        s1 = BasicServer('s1')
+        s2 = BasicServer('s2')
+        s3 = BasicServer('s3')
+
+        p1.insert(s1)
+        p1.insert(s2)
+
+        p2.insert(s2)
+        p2.insert(s3)
+        p2.insert(d1)
+
+        p3.insert(s3)
+        p3.insert(d1)
+        p3.insert(s1)
+
+        p4.insert(p3)
+        
+
+        self.assertEqual(sorted([s2,s3]),
+                         sorted(clusto.get_from_pools(pools=[p2],
+                                                      clusto_types=[BasicServer])))
+
+        self.assertEqual(sorted([s2]),
+                         sorted(clusto.get_from_pools(pools=[p2, 'p1'],
+                                                      clusto_types=[BasicServer])))
+        self.assertEqual(sorted([s3]),
+                         sorted(clusto.get_from_pools(pools=['p2', 'p3'],
+                                                      clusto_types=[BasicServer])))
+
+        self.assertEqual(sorted([s1]),
+                         sorted(clusto.get_from_pools(pools=['p4', 'p1'],
+                                                      clusto_types=[BasicServer])))
 
     def testGetEntitesWithAttrs(self):
 

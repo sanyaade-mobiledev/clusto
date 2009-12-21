@@ -545,7 +545,7 @@ class Driver(object):
     def has_attr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
-        for i in self.attr_query(*args, **kwargs):
+        if self.attr_query(*args, **kwargs):
             return True
 
         return False
@@ -613,8 +613,19 @@ class Driver(object):
         [B, C]
         
         """
-        
-        return [attr.value for attr in self.content_attrs(*args, **kwargs)]
+
+        if 'search_children' in kwargs:
+            search_children = kwargs.pop('search_children')
+        else:
+            search_children = False
+
+        contents = [attr.value for attr in self.content_attrs(*args, **kwargs)]
+        if search_children:
+            for child in (attr.value for attr in self.content_attrs()):
+                kwargs['search_children'] = search_children
+                contents.extend(child.contents(*args, **kwargs))
+
+        return contents
 
     def parents(self, **kwargs):        
         """Return a list of Things that contain _this_ Thing. """
