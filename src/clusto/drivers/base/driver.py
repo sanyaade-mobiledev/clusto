@@ -545,7 +545,7 @@ class Driver(object):
     def has_attr(self, *args, **kwargs):
         """return True if this list has an attribute with the given key"""
 
-        for i in self.attr_query(*args, **kwargs):
+        if self.attr_query(*args, **kwargs):
             return True
 
         return False
