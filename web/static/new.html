@@ -35,14 +35,21 @@
 		$.getJSON(apiurl + '/search?callback=?', {'q': query}, function(data) {
 			data.sort();
 			$('#search_results').html('')
+			exact = null;
 			$.each(data, function(i, item) {
 				name = item.split('/')[2];
 				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#top">' + name + '</a></li>');
 				$('a.searchresult[name=' + item + ']').click(item_detail);
+				if(name == query) {
+					exact = item;
+				}
 			});
 			$('#search_results').show();
 			if(data.length == 1) {
 				$('a.searchresult[name=' + data[0] + ']').trigger('click');
+			}
+			if(exact != null) {
+				$('a.searchresult[name=' + exact + ']').trigger('click');
 			}
 		});
 	}
