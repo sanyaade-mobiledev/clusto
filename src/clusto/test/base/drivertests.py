@@ -9,6 +9,7 @@ import datetime
 import clusto
 from clusto import Attribute
 from clusto.drivers.base import *
+from clusto.drivers import Pool
 from clusto.exceptions import *
 
 class TestDriverAttributes(testbase.ClustoTestBase):
@@ -349,6 +350,21 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
         self.assertEqual(d1.contents(), [d2])
                          
 
+    def testChildrenContents(self):
+
+        p1 = Pool('p1')
+        p2 = Pool('p2')
+
+        d1 = Driver('d1')
+        d2 = Driver('d2')
+
+        p1.insert(d1)
+        p2.insert(d2)
+        p2.insert(p1)
+
+        self.assertEqual(sorted([p1,d1,d2]),
+                         sorted(p2.contents(search_children=True)))
+        
     def testMultipleInserts(self):
 
         d1 = Driver('d1')

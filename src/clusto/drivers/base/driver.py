@@ -613,8 +613,19 @@ class Driver(object):
         [B, C]
         
         """
-        
-        return [attr.value for attr in self.content_attrs(*args, **kwargs)]
+
+        if 'search_children' in kwargs:
+            search_children = kwargs.pop('search_children')
+        else:
+            search_children = False
+
+        contents = [attr.value for attr in self.content_attrs(*args, **kwargs)]
+        if search_children:
+            for child in (attr.value for attr in self.content_attrs()):
+                kwargs['search_children'] = search_children
+                contents.extend(child.contents(*args, **kwargs))
+
+        return contents
 
     def parents(self, **kwargs):        
         """Return a list of Things that contain _this_ Thing. """
