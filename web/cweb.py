@@ -93,6 +93,18 @@ class EntityAPI(object):
         clusto.commit()
         return self.show(request)
 
+    def attrs(self, request):
+        '''
+        Query attributes from this object.
+        '''
+        result = {
+            'attrs': []
+        }
+        kwargs = dict(request.params.items())
+        for attr in self.obj.attrs(**kwargs):
+            result['attrs'].append(unclusto(attr))
+        return Response(status=200, body=dumps(request, result))
+
     def insert(self, request):
         '''
         Insert an object into this object
