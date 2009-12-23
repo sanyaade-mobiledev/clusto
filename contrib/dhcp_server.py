@@ -110,8 +110,8 @@ class DHCPServer(object):
                 method(request)
 
     def send(self, address, data):
-        while response:
-            bytes = self.sock.sendto(str(response), 0, (address, 68))
+        while data:
+            bytes = self.sock.sendto(str(data), 0, (address, 68))
             data = data[bytes:]
 
 class ClustoDHCPServer(DHCPServer):
@@ -135,6 +135,7 @@ class ClustoDHCPServer(DHCPServer):
         server = clusto.get_entities(attrs=[{
             'key': 'port-nic-eth',
             'subkey': 'mac',
+            'number': 1,
             'value': request.hwaddr,
         }])
 

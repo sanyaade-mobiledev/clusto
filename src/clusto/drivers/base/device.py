@@ -69,3 +69,17 @@ class Device(Driver):
                 port['connection'].reboot(porttype, port['otherportnum'])
                 ports_rebooted += 1
         return ports_rebooted
+
+    def console(self, ssh_user='root'):
+        console = self.port_info['console-serial'][1]
+        if not console['connection']:
+            sys.stderr.write('No console connected to %s console-serial:1\n' % self.name)
+            sys.stderr.flush()
+            return
+
+        if not hasattr(console['connection'], 'console'):
+            sys.stderr.write('No console method on %s\n' % console.name)
+            sys.stderr.flush()
+            return
+
+        console['connection'].connect('console-serial', console['otherportnum'], ssh_user)
