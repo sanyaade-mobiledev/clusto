@@ -2,15 +2,15 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_REUSEADDR, SO_BRO
 from traceback import format_exc
 from struct import unpack
 
-from scapy import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions, dhcpmagic
+from scapy import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
 import clusto
 
-SERVER_IP = '10.2.128.48'
+from ncore.daemon import become_daemon
 
-DHCPRevTypes = dict([(x[1], x[0]) for x in DHCPTypes.items()])
+SERVER_IP = '10.2.128.48'
 
 DHCPOptions.update({
     66: 'tftp_server',
@@ -47,14 +47,14 @@ class DHCPRequest(object):
 
 class DHCPResponse(object):
     def __init__(self, type, offerip=None, options={}, request=None):
-        self.type = DHCPRevTypes[type]
+        self.type = type
         self.offerip = offerip
         self.serverip = gethostbyname(gethostname())
         self.options = options
         self.request = request
 
     def set_type(self, type):
-        self.type = DHCPRevTypes[type]
+        self.type = type
 
     def build(self):
         options = [
@@ -109,16 +109,20 @@ class DHCPServer(object):
                 method = getattr(self, methodname)
                 method(request)
 
+    def send(self, address, data):
+        while response:
+            bytes = self.sock.sendto(str(response), 0, (address, 68))
+            data = data[bytes:]
+
 class ClustoDHCPServer(DHCPServer):
     def __init__(self):
         DHCPServer.__init__(self)
         self.offers = {}
-        self.leases = {}
 
     def handle_request(self, request):
         chaddr = request.packet.chaddr
         if not chaddr in self.offers:
-            print 'Got a request before sending an offer!'
+            print 'Got a request before sending an offer from', request.hwaddr
             return
         response = self.offers[chaddr]
         response.type = 'ack'
@@ -126,6 +130,8 @@ class ClustoDHCPServer(DHCPServer):
         self.send('255.255.255.255', response.build())
 
     def handle_discover(self, request):
+        self.update_ipmi(request)
+
         server = clusto.get_entities(attrs=[{
             'key': 'port-nic-eth',
             'subkey': 'mac',
@@ -172,12 +178,35 @@ class ClustoDHCPServer(DHCPServer):
         self.offers[request.packet.chaddr] = response
         self.send('255.255.255.255', response.build())
 
-    def send(self, address, response):
-        while response:
-            bytes = self.sock.sendto(str(response), 0, (address, 68))
-            response = response[bytes:]
+    def update_ipmi(self, request):
+        server = clusto.get_entities(attrs=[{
+            'key': 'bootstrap',
+            'subkey': 'mac',
+            'value': request.hwaddr,
+        }, {
+            'key': 'port-nic-eth',
+            'subkey': 'mac',
+            'number': 1,
+            'value': request.hwaddr,
+        }])
+
+        if not server:
+            return
+
+        try:
+            server = server[0]
+            if request.options.get('vendor_class_id', None) == 'udhcp 0.9.9-pre':
+                # This is an IPMI request
+                #print 'Associating IPMI address', request.hwaddr, 'with nic-eth:1 on', server.name
+                server.set_port_attr('nic-eth', 1, 'ipmi-mac', request.hwaddr)
+            else:
+                #print 'Associating physical address with nic-eth:1 on', server.name
+                server.set_port_attr('nic-eth', 1, 'mac', request.hwaddr)
+        except:
+            print 'Error updating server MAC:', format_exc()
 
 if __name__ == '__main__':
+    #become_daemon()
     init_script()
     server = ClustoDHCPServer()
     server.run()
