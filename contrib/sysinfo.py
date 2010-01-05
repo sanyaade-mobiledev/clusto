@@ -2,6 +2,7 @@ from clusto.scripthelpers import init_script
 from clusto.drivers import PenguinServer
 from paramiko import SSHClient, MissingHostKeyPolicy
 import clusto
+import sys
 import re
 
 from pprint import pprint
@@ -136,8 +137,12 @@ def update_server(server, info):
     clusto.commit()
 
 def main():
-    for server in clusto.get_entities(clusto_types=['server']):
-        if server.attrs(key='memory'): continue
+    if len(sys.argv) < 2:
+        servers = clusto.get_entities(clusto_types=['server'])
+    else:
+        servers = [clusto.get_by_name(sys.argv[1])]
+    for server in servers:
+        if server.attrs(key='system', subkey='serial'): continue
 
         ip = server.get_ips()
         if not ip:
