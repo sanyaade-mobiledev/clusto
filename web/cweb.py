@@ -64,7 +64,7 @@ def dumps(request, obj):
 def loads(request, obj):
     format = request.params.get('format', 'json')
     dumpfunc, loadfunc, kwargs = formats[format]
-    return loadfunc(obj, **kwargs)
+    return loadfunc(obj)
 
 class EntityAPI(object):
     def __init__(self, obj):
@@ -196,13 +196,34 @@ class ResourceAPI(EntityAPI):
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
         clusto.commit()
-        return Response(status=201, body=unclusto(device))
+        return Response(status=201, body=dumps(request, unclusto(device)))
+
+class QueryAPI(object):
+    @classmethod
+    def get_entities(self, request):
+        kwargs = {}
+        for k, v in request.POST.items():
+            v = loads(request, v)
+            kwargs[k] = v
+        result = [unclusto(x) for x in clusto.get_entities(**kwargs)]
+        return Response(status=200, body=dumps(request, result))
+
+    @classmethod
+    def get_by_name(self, request):
+        if not 'name' in request.params:
+            return Response(status=400, body='400 Bad Request\nYou must specify a "name" parameter\n')
+        name = request.params['name']
+        obj = clusto.get_by_name(name)
+        api = EntityAPI(obj)
+        return api.show(request)
 
 class ClustoApp(object):
     def __init__(self):
         self.urls = [
             ('^/search$',
                 self.search),
+            ('^/query/(?P<querytype>[a-z_]+)',
+                self.query_delegate),
             ('^/(?P<objtype>\w+)/(?P<name>[-\w0-9]+)/(?P<action>\w+)',
                 self.action_delegate),
             ('^/(?P<objtype>\w+)/(?P<name>[-\w0-9]+)',
@@ -244,6 +265,15 @@ class ClustoApp(object):
             return self.delete_action(request, match)
 
         return Response(status=501, body='501 Not Implemented\n')
+
+    def query_delegate(self, request, match):
+        querytype = match.groupdict()['querytype']
+
+        if hasattr(QueryAPI, querytype):
+            method = getattr(QueryAPI, querytype)
+            return method(request)
+        else:
+            return Response(status=400, body='400 Bad Request\nThere is no such query\n')
 
     def post_action(self, request, match):
         name = request.path_info.strip('/')
@@ -329,7 +359,7 @@ class ClustoApp(object):
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server, WSGIRequestHandler
-    become_daemon(out_log='/tmp/cweb.log', err_log='/tmp/cweb.log')
+    #become_daemon(out_log='/tmp/cweb.log', err_log='/tmp/cweb.log')
 
     app = ClustoApp()
     
