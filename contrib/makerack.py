@@ -63,6 +63,7 @@ if __name__ == '__main__':
     # Make sure all the IPManager instances exist
     ensure_vlan(243, '10.2.128.0', '255.255.252.0')
     ensure_vlan(242, '10.2.0.0', '255.255.252.0')
+    ensure_vlan(442, '10.0.0.0', '255.255.252.0')
     try:
         vpnsubnet = clusto.get_by_name('vpnsubnet')
     except LookupError:
@@ -111,7 +112,7 @@ if __name__ == '__main__':
         console.connect_ports('nic-eth', 1, switch, 43)
 
     # Assign IPs to basic devices
-    bind_dns_ip_to_osport(switch, 'Vlan242')
+    bind_dns_ip_to_osport(switch, 'Vlan442')
     bind_dns_ip_to_osport(console, 'nic0', porttype='nic-eth', portnum=1)
     bind_dns_ip_to_osport(power, 'nic0', porttype='nic-eth', portnum=1)
 
