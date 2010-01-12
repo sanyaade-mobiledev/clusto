@@ -117,5 +117,5 @@ class BasicServerTest(testbase.ClustoTestBase):
         
         s1.bind_ip_to_osport('10.0.0.100', 'eth0')#, porttype='nic-eth', portnum=1)
 
-        self.assertEqual(IPManager.get_device('10.0.0.100'), [s1])
+        self.assertEqual(IPManager.get_devices('10.0.0.100'), [s1])
         
