@@ -425,6 +425,27 @@ class Driver(object):
 
         return [k.value for k in self.attrs(*args, **kwargs)]
 
+    def attr_value(self, *args, **kwargs):
+        """Return a single value for the given arguments or the default if none exist
+
+        extra parameters:
+          default - the default value to return if none exist
+        """
+        
+        if 'default' in kwargs:
+            default = kwargs.pop('default')
+        else:
+            default = None
+            
+        vals = self.attr_values(*args, **kwargs)
+
+        if vals:
+            if len(vals) != 1:
+                raise DriverException("args match more than one value")         
+            return vals[0]
+        else:            
+            return default
+        
     def references(self, *args, **kwargs):
         """Return the references to this Thing. The references are attributes. 
 
