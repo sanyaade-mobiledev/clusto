@@ -11,7 +11,22 @@ class ResourceManager(Driver):
     manage a resource such as IP allocation, MAC Address lists, etc.
 
     This base class just allocates unique integers.
-    
+
+    Resources are attributes on Entities that are managed by a ResourceManger.
+    The implementation has the following properties:
+
+    1. The Entity being assigned the resource gets an attribute who's key is
+    defined by the resource manager, a number assigned by the resource manager
+    (sometimes related to the resource being allocated), and a value which is
+    a representation of the resource.
+
+    2. The Entity gets an additional attribute who's key, and number match the
+    allocated resource, but with subkey='manager', and value that is a
+    reference to the resource manager assigning the resource.
+
+    Any additional attributes with same attribute key and number are
+    considered part of the resource and can be managed by the resource
+    manager.
     """
     
 
