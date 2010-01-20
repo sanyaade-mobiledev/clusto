@@ -59,3 +59,29 @@ class ResourceManagerTests(testbase.ClustoTestBase):
                          sorted([]))
 
 
+    def testResourceAttrs(self):
+
+        
+        rm = ResourceManager('test')
+        d = Driver('d')
+
+        rm.allocate(d, 'foo')
+        rm.allocate(d, 'bar')
+
+        rm.add_resource_attr(d, 'foo', 'attr1', 10)
+
+        self.assertEqual(rm.get_resource_attr_values(d, 'foo', 'attr1'), [10])
+
+        rm.add_resource_attr(d, 'foo', 'attr1', 20)
+
+        self.assertEqual(sorted(rm.get_resource_attr_values(d, 'foo', 'attr1')),
+                         sorted([10, 20]))
+
+        rm.del_resource_attr(d, 'foo', 'attr1')
+        self.assertEqual(rm.get_resource_attr_values(d, 'foo', 'attr1'), [])
+
+        rm.set_resource_attr(d,'bar', 'attr2', 1)        
+        self.assertEqual(rm.get_resource_attr_values(d, 'bar', 'attr2'), [1])
+
+        rm.set_resource_attr(d,'bar', 'attr2', 2)
+        self.assertEqual(rm.get_resource_attr_values(d, 'bar', 'attr2'), [2])

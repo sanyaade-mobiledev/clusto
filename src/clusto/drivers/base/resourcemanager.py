@@ -46,7 +46,7 @@ class ResourceManager(Driver):
                              % self.name)
 
 
-    def ensure_type(self, resource, number=True):
+    def ensure_type(self, resource, number=True, thing=None):
         """checks the type of a given resourece
 
         if the resource is valid return it and optionally convert it to
@@ -54,6 +54,54 @@ class ResourceManager(Driver):
         attribute naming 
         """
         return (resource, number)
+
+    def get_resource_number(self, thing, resource):
+        """Get the number for a resource on a given entity."""
+        
+        resource, number = self.ensure_type(resource, thing=thing)
+        
+        attrs = thing.attrs(self._attr_name, value=resource)
+
+        if attrs:
+            return attrs[0].number
+        else:
+            raise ResourceException("%s isn't assigned resource %s"
+                                    % (thing.name, str(resource)))
+
+    def get_resource_attr_values(self, thing, resource, key, number=True):
+        """Get the value for the attrs on the resource assigned to a given entity matching the given key."""
+        
+        return [x.value for x in self.get_resource_attrs(thing, resource,
+                                                         key, number)]
+    
+    def get_resource_attrs(self, thing, resource, key, number=True):
+        """Get the Attributes for the attrs on the resource assigned to a given enttiy matching the given key."""
+        
+        resource, number = self.ensure_type(resource, number, thing=thing)
+        
+        return thing.attrs(self._attr_name, number=number, subkey=key)
+    
+    def add_resource_attr(self, thing, resource, key, value, number=True):
+        """Add an Attribute for the resource assigned to a given entity setting the given key and value"""
+        
+        resource, number = self.ensure_type(resource, number, thing=thing)
+
+        attr = thing.add_attr(self._attr_name, number=number, subkey=key, value=value)
+        return attr
+
+    def set_resource_attr(self, thing, resource, key, value, number=True):
+        """Set an Attribute for the resource assigned to a given entity with the given key and value"""
+        
+        resource, number = self.ensure_type(resource, number, thing=thing)
+        attr = thing.set_attr(self._attr_name, number=number, subkey=key, value=value)
+
+        return attr
+
+    def del_resource_attr(self, thing, resource, key, value=(), number=True):
+        """Delete an Attribute for the resource assigned to a given entity matching the given key and value"""
+        
+        resource, number = self.ensure_type(resource, number, thing=thing)
+        thing.del_attrs(self._attr_name, number=number, subkey=key, value=value)
 
     def additional_attrs(self, thing, resource, number):
         pass
@@ -183,21 +231,3 @@ class ResourceManager(Driver):
 
         return len(self.references(self._attr_name, self, subkey='manager'))
 
-    def get_resource_number(self, thing, resource):
-        """Retrun the resource number for the given resource on the given Entity"""
-
-        resource, number = self.ensure_type(resource)
-        res = thing.attrs(self._attr_name, number=number, value=resource)
-
-        if res:
-            return res[0].number
-        else:
-            return None
-
-        
-    def get_resource_attrs(self, thing, resource):
-        """Return the Attribute objects for a given resource on a given Entity"""
-        
-        resource, number = self.ensure_type(resource)
-
-        return thing.attrs(self._attr_name, number=number, value=resource)
