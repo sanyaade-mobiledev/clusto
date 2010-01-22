@@ -19,11 +19,19 @@ class BasicServer(IPMixin, PortMixin, Device):
 
     
 class BasicVirtualServer(BasicServer):
-
     _driver_name = "basicvirtualserver"
 
-    
-    
-        
+    def create(self, pool, **kwargs):
+        raise NotImplemented
 
+    def start(self):
+        raise NotImplemented
 
+    def reboot(self):
+        raise NotImplemented
+
+    def shutdown(self):
+        raise NotImplemented
+
+    def destroy(self):
+        raise NotImplemented
