@@ -1,3 +1,4 @@
+#!/home/synack/src/clusto/env/bin/python
 from socket import socket, AF_INET, SOCK_DGRAM
 from traceback import format_exc
 from time import strftime, time, localtime, sleep

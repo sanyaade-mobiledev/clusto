@@ -1,6 +1,7 @@
 from clusto.scripthelpers import init_script
 from clusto.drivers import PenguinServer
 from paramiko import SSHClient, MissingHostKeyPolicy
+from traceback import format_exc
 import clusto
 import sys
 import re
@@ -19,6 +20,7 @@ def discover_hardware(ip):
         client.connect(ip, username='root')
         stdout = client.exec_command('cat /proc/partitions')[1].read()
     except:
+        print format_exc()
         return None
 
     disks = []
