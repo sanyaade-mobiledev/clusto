@@ -50,16 +50,45 @@ class Device(Driver):
         
         self.del_attrs("fqdn", number=True, value=fqdn)
 
-    def power_reboot(self, captcha=True):
+    def _power_captcha(self):
         while captcha:
             sys.stdout.write('Are you sure you want to reboot %s (yes/no)? ' % self.name)
             line = sys.stdin.readline().rstrip('\r\n')
             if line == 'yes':
-                captcha = False
-                continue
+                return True
             if line == 'no':
-                return
+                return False
             sys.stdout.write('"yes" or "no", please\n')
+
+    def power_on(self, captcha=True):
+        if captcha and not self._power_captcha():
+            return
+
+        ports_set = 0
+        for porttype, ports in self.port_info.items():
+            if not porttype.startswith('pwr-'): continue
+            for portnum, port in ports.items():
+                if not port['connection']: continue
+                port['connection'].set_power_on(porttype, port['otherportnum'])
+                ports_set += 1
+        return ports_set
+
+    def power_off(self, captcha=True):
+        if captcha and not self._power_captcha():
+            return
+
+        ports_set = 0
+        for porttype, ports in self.port_info.items():
+            if not porttype.startswith('pwr-'): continue
+            for portnum, port in ports.items():
+                if not port['connection']: continue
+                port['connection'].set_power_off(porttype, port['otherportnum'])
+                ports_set += 1
+        return ports_set
+
+    def power_reboot(self, captcha=True):
+        if captcha and not self._power_captcha():
+            return
 
         ports_rebooted = 0
         for porttype, ports in self.port_info.items():
