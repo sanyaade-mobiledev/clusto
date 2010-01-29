@@ -100,7 +100,7 @@ class PowerTowerXM(BasicPowerStrip, IPMixin, SNMPMixin):
         if porttype != 'pwr-nema-5':
             raise DriverException('Cannot turn off ports of type: %s' % str(porttype))
         portnum = portnum.lstrip('.').lower()
-        state = self.set_outlet_state(portnum, 0)
+        state = self.set_outlet_state(portnum, 2)
 
     def set_power_on(self, porttype, portnum):
         if porttype != 'pwr-nema-5':

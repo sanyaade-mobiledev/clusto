@@ -139,11 +139,12 @@ def update_server(server, info):
     clusto.commit()
 
 def main():
-    if len(sys.argv) < 2:
-        servers = clusto.get_entities(clusto_types=['server'])
-    else:
-        servers = [clusto.get_by_name(sys.argv[1])]
-    for server in servers:
+    #if len(sys.argv) < 2:
+    #    servers = clusto.get_entities(clusto_types=['server'])
+    #else:
+    #    servers = [clusto.get_by_name(sys.argv[1])]
+    #for server in servers:
+    for server in clusto.get_by_name('unallocated').contents():
         if server.attrs(key='system', subkey='serial'): continue
 
         ip = server.get_ips()
