@@ -42,7 +42,7 @@ class AttrQuery(object):
                 ]])
 
 def main():
-    parser = OptionParser(usage='%prog (add|set|delete) [options] <object>')
+    parser = OptionParser(usage='%prog (add|set|delete|show) [options] <object>')
     parser.add_option('-k', '--key', dest='key', default=None)
     parser.add_option('-s', '--subkey', dest='subkey', default=None)
     parser.add_option('-v', '--value', dest='value', default=None)
