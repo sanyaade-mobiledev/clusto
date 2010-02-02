@@ -96,6 +96,18 @@ class PowerTowerXM(BasicPowerStrip, IPMixin, SNMPMixin):
         if r.PDU.varbindlist[0].value.val != state:
             raise DriverException('Unable to set SNMP state')
 
+    def set_power_off(self, porttype, portnum):
+        if porttype != 'pwr-nema-5':
+            raise DriverException('Cannot turn off ports of type: %s' % str(porttype))
+        portnum = portnum.lstrip('.').lower()
+        state = self.set_outlet_state(portnum, 2)
+
+    def set_power_on(self, porttype, portnum):
+        if porttype != 'pwr-nema-5':
+            raise DriverException('Cannot turn off ports of type: %s' % str(porttype))
+        portnum = portnum.lstrip('.').lower()
+        state = self.set_outlet_state(portnum, 1)
+
     def reboot(self, porttype, portnum):
         if porttype != 'pwr-nema-5':
             raise DriverException('Cannot reboot ports of type: %s' % str(porttype))

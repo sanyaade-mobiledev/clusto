@@ -1,3 +1,4 @@
+#!/home/synack/src/clusto/env/bin/python
 import simplejson as json
 import xmlrpclib
 import cPickle

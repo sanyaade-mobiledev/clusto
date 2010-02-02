@@ -1,6 +1,7 @@
 from clusto.scripthelpers import init_script
 from clusto.drivers import PenguinServer
 from paramiko import SSHClient, MissingHostKeyPolicy
+from traceback import format_exc
 import clusto
 import sys
 import re
@@ -19,6 +20,7 @@ def discover_hardware(ip):
         client.connect(ip, username='root')
         stdout = client.exec_command('cat /proc/partitions')[1].read()
     except:
+        print format_exc()
         return None
 
     disks = []
@@ -137,11 +139,12 @@ def update_server(server, info):
     clusto.commit()
 
 def main():
-    if len(sys.argv) < 2:
-        servers = clusto.get_entities(clusto_types=['server'])
-    else:
-        servers = [clusto.get_by_name(sys.argv[1])]
-    for server in servers:
+    #if len(sys.argv) < 2:
+    #    servers = clusto.get_entities(clusto_types=['server'])
+    #else:
+    #    servers = [clusto.get_by_name(sys.argv[1])]
+    #for server in servers:
+    for server in clusto.get_by_name('unallocated').contents():
         if server.attrs(key='system', subkey='serial'): continue
 
         ip = server.get_ips()
