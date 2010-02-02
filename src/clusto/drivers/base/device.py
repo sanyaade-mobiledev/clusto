@@ -51,7 +51,7 @@ class Device(Driver):
         self.del_attrs("fqdn", number=True, value=fqdn)
 
     def _power_captcha(self):
-        while captcha:
+        while True:
             sys.stdout.write('Are you sure you want to reboot %s (yes/no)? ' % self.name)
             line = sys.stdin.readline().rstrip('\r\n')
             if line == 'yes':
