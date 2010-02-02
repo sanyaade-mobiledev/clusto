@@ -22,7 +22,13 @@ class AttrQuery(object):
         result.sort(key=lambda x: (x.key, x.number, x.subkey, x.value))
 
         if output_csv:
-            print '\n'.join(['%s,%s,%s,%s' % (x.key, x.number, x.subkey, x.value) for x in result])
+            for x in result:
+                attr = [x.key, x.number, x.subkey, x.value]
+                for i, val in enumerate(attr):
+                    if val == None:
+                        attr[i] = ''
+                    attr[i] = str(attr[i])
+                print ','.join(attr)
         else:
             maxkey = 3 + max([len(str(x.key)) for x in result] + [0])
             maxsubkey = 6 + max([len(str(x.subkey)) for x in result] + [0])
@@ -63,6 +69,7 @@ def main():
         sys.stderr.write('%s does not exist\n' % object)
         return -1
 
+
     actions = {
         'add':  object.add_attr,
         'set':  object.set_attr,
@@ -75,6 +82,9 @@ def main():
     if not func:
         sys.stderr.write('Unknown action: %s\n' % action)
         return -1
+
+    if options.number:
+        options.number = int(options.number)
 
     opts = dict([(k, v) for k, v in options.__dict__.items() if v != None])
     func(**opts)
