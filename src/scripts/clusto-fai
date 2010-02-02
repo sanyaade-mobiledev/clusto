@@ -1,41 +1,66 @@
 #!/usr/bin/env python
+import clusto
+from clusto.scripthelpers import init_script
 
 import sys
-from optparse import OptionParser
 
-import clusto.scripthelpers
-
-config, logger = clusto.scripthelpers.initScript()
-
-from clusto import *
-
-def main(argv):
-    (opts, args) = parseargs(argv)
+def main():
+    if len(sys.argv) < 2:
+        print 'Usage: %s <server name>' % sys.argv[0]
+        return -1
 
     try:
-        clusto_node = clusto.getByName(args[0])
+        server = clusto.get_by_name(sys.argv[1])
     except LookupError:
-        return 1
+        sys.stderr.write('%s does not exist.' % sys.argv[1])
+        return -1
 
-    fai_classes = clusto_node.attrValues(key='fai',
-                                         subkey='class',
-                                         mergeContainerAttrs=True,
-                                         )
-    for i in fai_classes:
-        print i,
+    ip = server.get_ips()
+    if not ip:
+        print '%s does not have an IP. Cannot FAI' % server.name
+        return -1
+    else:
+        ip = ip[0]
 
-    print
-    return 0
+    mac = server.attr_values(key='port-nic-eth', subkey='mac', number=1)
+    if not mac:
+        print '%s does not have a MAC. Cannot FAI' % server.name
+        return -1
+    else:
+        mac = mac[0]
 
-def parseargs(argv):
-    usage = "usage: %prog node-name"
-    parser = OptionParser(usage=usage)
+    print 'IP:'.ljust(16, ' '), ip
+    print 'MAC:'.ljust(16, ' '), mac
 
-    (opts, args) = parser.parse_args(argv)
+    pool = clusto.get_by_name('fai')
+    if not server in pool:
+        pool.insert(server)
 
-    if len(args) != 1:
-        parser.error("Incorrect number of arguments!")
-    return (opts, args)
+    classes = server.attr_values(key='fai', subkey='class', merge_container_attrs=True)
+    print 'FAI classes:'.ljust(16, ' '), ' '.join(classes)
+    print 'Pools:'.ljust(16, ' '), ' '.join([x.name for x in server.parents(clusto_types=['pool'])])
+
+    if not [x for x in classes if x.lower().find('disk') != -1]:
+        from termcolor import colorred
+        print '\nWARNING: This server does not have a DISK config. FAI will likely fail.\n'
+
+    sys.stdout.write('Are you absolutely sure you want to FAI %s (yes/no)? ' % server.name)
+    sys.stdout.flush()
+
+    try:
+        line = sys.stdin.readline().rstrip('\r\n')
+    except KeyboardInterrupt:
+        line = False
+
+    if line != 'yes':
+        print 'Aborting'
+        pool.remove(server)
+        return
+    
+    server.power_reboot(captcha=False)
+
+    print '%s is rebooting now.'
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    init_script()
+    main()
