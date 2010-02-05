@@ -1,66 +1,21 @@
 #!/home/synack/src/clusto/env/bin/python
-from clusto.scripthelpers import getClustoConfig
-from clusto.drivers import IPManager
+from clusto.scripthelpers import init_script
 import clusto
 
-from subprocess import Popen
+from os import environ
 import sys
 
 def main():
     if len(sys.argv) < 2:
-        print 'Usage: clusto console <name or IP>'
-        sys.exit(0)
+        sys.stderr.write('Usage: %s <server name>\n' % sys.argv[0])
+        return -1
 
-    ip = None
-    try:
-        server = clusto.getByName(sys.argv[1])
-    except LookupError:
-        server = IPManager.getDevice(sys.argv[1])
-        ip = [sys.argv[1]]
-        if len(server) == 0:
-            print '%s is not bound to any device in clusto' % sys.argv[1]
-            return
-        else:
-            server = server[0]
-
-    if not ip:
-        ip = IPManager.getIPs(server)
-        if len(ip) == 0:
-            print 'Unable to determine IP address for', server.name
-            return
-    ip = ip[0]
-
-    if server.driver == 'basicserver':
-        print 'Escape sequence is ~.'
-        port = server.portInfo['console-serial'][0]
-        tsport = port['otherportnum']
-        print 'Connecting to %s port %s' % (port['connection'].name, port['otherportnum'])
-        tsname = port['connection'].connect('console-serial', tsport, 'digg')
-        return
-
-    if server.driver == 'basicvirtualserver':
-        proc = Popen(SSH_CMD + ['-l', 'root', ip, 'xm list'], stdout=PIPE, stderr=STDOUT)
-        stdout = proc.stdout.read()
-        domu = None
-        for line in stdout.split('\n')[1:]:
-            line = line.strip('\r\n ')
-            line = [x for x in line.split(' ') if x]
-            if line[0].find(server.name) != -1:
-                domu = line[0]
-                break
-        if not domu:
-            print 'Unable to find a running VM containing the name', server.name
-            return
-
-        print 'Escape sequence is ^]'
-        proc = Popen(SSH_CMD + ['-l', 'root', ip, 'xm console', domu])
-        proc.communicate()
-        return
-
-    print '%s is not a server!' % sys.argv[1]
+    server = clusto.get_by_name(sys.argv[1])
+    if not hasattr(server, 'console'):
+        sys.stderr.write('%s doesn\'t have a console method\n' % server.name)
+        return -1
+    server.console(ssh_user=environ.get('CLUSTO_CONSOLE_USER', 'digg'))
 
 if __name__ == '__main__':
-    config = getClustoConfig()
-    clusto.connect(config.get('clusto', 'dsn'))
-    #clusto.initclusto()
-    main()
+    init_script()
+    sys.exit(main())

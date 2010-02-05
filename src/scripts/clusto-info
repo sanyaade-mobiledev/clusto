@@ -1,84 +1,74 @@
 #!/usr/bin/env python
-"""
-Get info about clusto and the clusto database.
-
-"""
-
+from clusto.scripthelpers import init_script
+from clusto.drivers import IPManager
+import clusto
 
 import sys
+import re
 
-from optparse import OptionParser
+def device_info(obj):
+    print 'Name:'.ljust(20, ' '), obj.name
+    print 'Type:'.ljust(20, ' '), obj.type
 
-import clusto.scripthelpers
+    ip = IPManager.get_ips(obj)
+    if ip:
+        print 'IP:'.ljust(20, ' '), ', '.join(ip)
+    parents = obj.parents()
+    if parents:
+        print 'Parents:'.ljust(20, ' '), ', '.join([x.name for x in parents])
+    contents = obj.contents()
+    if contents:
+        print 'Contents:'.ljust(20, ' '), ', '.join([x.name for x in contents])
+    serial = obj.attr_values(key='system', subkey='serial')
+    if serial:
+        print 'Serial:'.ljust(20, ' '), ', '.join([x.rstrip('\r\n') for x in serial if x])
+    desc = obj.attr_values(key='description')
+    if desc:
+        print 'Description:'.ljust(20, ' '), '\n                    '.join(desc)
 
-cmds = {'driverlist':None,
-	'typelist':None}
+    ifaces = [('nic-eth(%i)' % x.number).ljust(20, ' ') + ' %s = %s' % (x.subkey, x.value) for x in obj.attrs(key='port-nic-eth') if x.subkey.find('mac') != -1]
+    if ifaces:
+        print '\n', '\n'.join(ifaces)
 
-class Info:
+def main():
+    if len(sys.argv) < 2:
+        print 'Usage: %s <name, ip, or mac>' % sys.argv[0]
+        return
+
+    query = sys.argv[1]
     
-    @staticmethod
-    def driverlist():
-	"Driver List"
+    if re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', query):
+        quad = [int(x) for x in query.split('.', 3) if int(x) >= 0 and int(x) < 256]
+        if len(quad) == 4:
+            obj = IPManager.get_device(query)
+            if obj:
+                device_info(obj[0])
+                return
 
-	for key in sorted(clusto.driverlist.keys()):
-	    print ' ', key
-	
-    @staticmethod
-    def typelist():
-	"Type List"
-	for key in sorted(clusto.typelist.keys()):
-	    print ' ', key
+    if re.match('[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}', query, re.IGNORECASE):
+        obj = clusto.get_entities(attrs=[
+            {
+                'subkey': 'mac',
+                'value': query.lower(),
+            }])
+        if obj:
+            [device_info(x) for x in obj]
+            return
 
-	
+    try:
+        obj = clusto.get_by_name(query)
+        device_info(obj)
+        return
+    except LookupError:
+        pass
 
-def printhelp():
-    
-    infos = [x for x in dir(Info) if not x.startswith('__')]
-
-    print "Available info commands:"
-    
-    print '  ', 'all', '\t - ', 'print all info'
-    for cmd in infos:
-	func = getattr(Info, cmd)
-	print '  ', cmd, '\t - ', func.__doc__
-
-    
-def main(argv):
-
-    options, args = parseargs(argv)
-
-    config, logger = clusto.scripthelpers.initScript()
-
-    args = args[1:]
-    print 
-    if not args:
-	printhelp()
-	return 0
-
-    if 'all' in args:
-	args = [x for x in dir(Info) if not x.startswith('__')]
-	
-	
-    for cmd in args:
-	if not hasattr(Info, cmd):
-	    printhelp()
-	    return 0
-
-    for cmd in args:
-	if hasattr(Info, cmd):
-	    func = getattr(Info, cmd)
-	    print func.__doc__, ':'
-	    func()
-	    print
-	    
-    return 0
-
-def parseargs(argv):
-    
-    parser = OptionParser(usage="%prog")
-
-    return parser.parse_args(argv)
-
+    sys.stderr.write('Object not found\n')
+    return -1
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv))
+    init_script()
+    ret = main()
+    if not ret:
+        sys.exit(0)
+    else:
+        sys.exit(ret)
