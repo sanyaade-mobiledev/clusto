@@ -291,3 +291,16 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertRaises(LookupError, clusto.get_type_name, 123)
         
+
+    def testAttributeOldVersionsInGetEntities(self):
+ 
+        sl = [BasicServer('s' + str(x)) for x in range(10)]
+        for n, s in enumerate(sl):
+            s.add_attr(key='old', value="val")
+            s.del_attrs(key='old')
+            s.add_attr(key='new', value='foo')
+            
+        l=clusto.get_entities(attrs=[{'key':'old', 'value':'val'}])
+
+        self.assertEqual(l, [])
+            

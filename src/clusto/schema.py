@@ -345,7 +345,9 @@ class Attribute(ProtectedObj):
     @classmethod
     def queryarg(cls, key=None, value=(), subkey=(), number=()):
 
-        args = []
+        args = [or_(cls.deleted_at_version==None,
+                    cls.deleted_at_version>SESSION.clusto_version),
+                cls.version<=SESSION.clusto_version]
         
         if key:
             args.append(Attribute.key==key)
@@ -376,7 +378,7 @@ class Attribute(ProtectedObj):
     @classmethod
     def query(cls):
         return SESSION.query(cls).filter(or_(cls.deleted_at_version==None,
-                                             cls.deleted_at_version>SESSION.clusto_version))
+                                             cls.deleted_at_version>SESSION.clusto_version)).filter(cls.version<=SESSION.clusto_version)
 
 class Entity(ProtectedObj):
     """
