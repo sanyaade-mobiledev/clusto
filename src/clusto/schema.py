@@ -268,7 +268,7 @@ class Attribute(ProtectedObj):
     def is_relation(self):
         return self.datatype == 'relation'
     
-    def getValueType(self, value=None):
+    def get_value_type(self, value=None):
         if value == None:
             if self.datatype == None:
                 valtype = "string"
@@ -309,10 +309,10 @@ class Attribute(ProtectedObj):
         
     def _get_value(self):
 
-        if self.getValueType() == 'relation_value':
-            return clusto.drivers.base.Driver(getattr(self, self.getValueType()))
+        if self.get_value_type() == 'relation_value':
+            return clusto.drivers.base.Driver(getattr(self, self.get_value_type()))
         else:
-            val = getattr(self, self.getValueType())
+            val = getattr(self, self.get_value_type())
             if self.datatype == 'int':
                 return int(val)
             else:
@@ -324,7 +324,7 @@ class Attribute(ProtectedObj):
             self.datatype = self.get_type(value)
             if self.datatype == 'int':
                 value = int(value)
-        setattr(self, self.getValueType(value), value)
+        setattr(self, self.get_value_type(value), value)
 
 
 
