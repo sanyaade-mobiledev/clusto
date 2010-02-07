@@ -33,7 +33,7 @@ class IPManager(ResourceManager):
 
         return self.__ipy
 
-    def ensure_type(self, resource, number=True):
+    def ensure_type(self, resource, number=True, thing=None):
         """check that the given ip falls within the range managed by this manager"""
 
         try:

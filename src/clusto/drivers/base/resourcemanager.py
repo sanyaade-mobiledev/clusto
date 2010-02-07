@@ -74,7 +74,7 @@ class ResourceManager(Driver):
         return [x.value for x in self.get_resource_attrs(thing, resource,
                                                          key, number)]
     
-    def get_resource_attrs(self, thing, resource, key, number=True):
+    def get_resource_attrs(self, thing, resource, key=(), number=True):
         """Get the Attributes for the attrs on the resource assigned to a given enttiy matching the given key."""
         
         resource, number = self.ensure_type(resource, number, thing=thing)
