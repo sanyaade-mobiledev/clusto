@@ -182,13 +182,13 @@ class ProtectedObj(object):
         return newfunc
             
     def __setattr__(self, name, val):
-        if (name != 'writable'
-            and not self.writable
-            and not name.startswith('_sa_')):
-            
-            raise Exception("Not Writable")
+        if (name.startswith('_sa_')
+            or self.writable
+            or name == 'writable'):
+            super(ProtectedObj, self).__setattr__(name, val)            
         else:
-            super(ProtectedObj, self).__setattr__(name, val)
+            raise Exception("Not Writable")
+
 
 
     
