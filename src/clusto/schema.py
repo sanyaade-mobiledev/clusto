@@ -299,6 +299,8 @@ class Attribute(ProtectedObj):
                 raise ValueError("Can only store number between %s and %s"
                                  % (-sys.maxint-1, sys.maxint))
             datatype = 'int'
+        elif isinstance(value, basestring):
+            datatype = 'string'
         elif isinstance(value, datetime.datetime):
             datatype = 'datetime'
         elif isinstance(value, Entity):
