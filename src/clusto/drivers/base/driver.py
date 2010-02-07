@@ -221,8 +221,8 @@ class Driver(object):
         
     @classmethod
     def do_attr_query(cls, key=(), value=(), number=(),
+                    glob=False, count=False, querybase=None, return_query=False,
                     subkey=(), ignore_hidden=True, sort_by_keys=True, 
-                    glob=True, count=False, querybase=None, return_query=False,
                     entity=None):
         """Does queries against all Attributes using the DB."""
 
