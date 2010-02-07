@@ -183,11 +183,9 @@ class Driver(object):
 
     def __getattr__(self, name):
         if name in self._properties:                
-            if not self.has_attr(name):
-                return self._properties[name]
             attr = self.attr_query(name, subkey='property')
             if not attr:
-                return None
+                return self._properties[name]
             else:
                 return attr[0].value
         else:
