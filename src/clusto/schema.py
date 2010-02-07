@@ -118,6 +118,10 @@ Index('idx_attrs_entity_version',
       ATTR_TABLE.c.version,
       ATTR_TABLE.c.deleted_at_version)
 
+Index('idx_attrs_key', ATTR_TABLE.c.key)
+Index('idx_attrs_subkey', ATTR_TABLE.c.subkey)
+Index('idx_attrs_str_value', ATTR_TABLE.c.string_value)
+
 COUNTER_TABLE = Table('counters', METADATA,
                       Column('counter_id', Integer, primary_key=True),
                       Column('entity_id', Integer, ForeignKey('entities.entity_id'), nullable=False),
