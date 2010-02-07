@@ -524,5 +524,5 @@ class TestDriverQueries(testbase.ClustoTestBase):
 
         d1 = clusto.get_by_name('d1')
         d2 = clusto.get_by_name('d2')
-        self.assertEqual(set(Driver.get_by_attr(key='a*')),
+        self.assertEqual(set(Driver.get_by_attr(key='a*', glob=True)),
                          set([d1,d2]))
