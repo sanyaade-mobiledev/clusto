@@ -4,10 +4,9 @@ SNMPMixin for objects that can be accessed with SNMP
 
 import clusto
 from clusto.drivers import IPManager
-try:
-    from scapy import SNMP, SNMPnext, SNMPvarbind, SNMPget, SNMPset
-except ImportError, x:
-    from scapy.all import SNMP, SNMPnext, SNMPvarbind, SNMPget, SNMPset
+
+import scapy
+
 from socket import socket, AF_INET, SOCK_DGRAM
 
 class SNMPMixin:
@@ -31,21 +30,21 @@ class SNMPMixin:
     def _snmp_get(self, oid):
         community, sock = self._snmp_connect()
 
-        pdu = SNMPget(varbindlist=[SNMPvarbind(oid=str(oid))])
-        p = SNMP(community=community, PDU=pdu)
+        pdu = scapy.SNMPget(varbindlist=[scapy.SNMPvarbind(oid=str(oid))])
+        p = scapy.SNMP(community=community, PDU=pdu)
         sock.sendall(p.build())
 
-        r = SNMP(sock.recv(4096))
+        r = scapy.SNMP(sock.recv(4096))
         return r.PDU.varbindlist[0].value.val
 
     def _snmp_set(self, oid, value):
         community, sock = self._snmp_connect()
 
-        pdu = SNMPset(varbindlist=[SNMPvarbind(oid=str(oid), value=value)])
-        p = SNMP(community=community, PDU=pdu)
+        pdu = scapy.SNMPset(varbindlist=[scapy.SNMPvarbind(oid=str(oid), value=value)])
+        p = scapy.SNMP(community=community, PDU=pdu)
         sock.sendall(p.build())
 
-        r = SNMP(sock.recv(4096))
+        r = scapy.SNMP(sock.recv(4096))
         return r
 
     def _snmp_walk(self, oid_prefix):
@@ -53,10 +52,10 @@ class SNMPMixin:
 
         nextoid = oid_prefix
         while True:
-            p = SNMP(community=community, PDU=SNMPnext(varbindlist=[SNMPvarbind(oid=nextoid)]))
+            p = scapy.SNMP(community=community, PDU=scapy.SNMPnext(varbindlist=[scapy.SNMPvarbind(oid=nextoid)]))
             sock.sendall(p.build())
 
-            r = SNMP(sock.recv(4096))
+            r = scapy.SNMP(sock.recv(4096))
             oid = r.PDU.varbindlist[0].oid.val
             if oid.startswith(oid_prefix):
                 yield (oid, r.PDU.varbindlist[0].value.val)
