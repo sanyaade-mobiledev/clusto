@@ -7,7 +7,7 @@ from optparse import OptionParser
 import sys
 
 def main():
-    parser = OptionParser(usage='Usage: %prog (create|delete|insert|remove) <pool> [objects...]')
+    parser = OptionParser(usage='Usage: %prog (create|delete|insert|remove|show) <pool> [objects...]')
     options, args = parser.parse_args()
 
     if len(args) == 2 and args[0] == 'show':
