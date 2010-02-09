@@ -10,6 +10,15 @@ def main():
     parser = OptionParser(usage='Usage: %prog (create|delete|insert|remove) <pool> [objects...]')
     options, args = parser.parse_args()
 
+    if len(args) == 2 and args[0] == 'show':
+        try:
+            obj = clusto.get_by_name(args[1])
+        except LookupError:
+            sys.stderr.write('Object %s does not exist!\n' % args[1])
+            return -1
+        print '\n'.join([x.name for x in obj.contents()]).strip('\n')
+        return 0
+
     if len(args) < 2:
         parser.print_help()
         return -1
