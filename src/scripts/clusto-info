@@ -40,7 +40,7 @@ def main():
     if re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', query):
         quad = [int(x) for x in query.split('.', 3) if int(x) >= 0 and int(x) < 256]
         if len(quad) == 4:
-            obj = IPManager.get_device(query)
+            obj = IPManager.get_devices(query)
             if obj:
                 device_info(obj[0])
                 return
