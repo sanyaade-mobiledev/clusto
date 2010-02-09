@@ -1,3 +1,9 @@
+clusto (0.5.0-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Ron Gorodetzky <ron@digg.com>  Mon, 08 Feb 2010 16:42:40 -0800
+
 clusto (0.4.6-1) unstable; urgency=low
 
   * concurrency fixes
