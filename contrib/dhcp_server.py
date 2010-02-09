@@ -1,4 +1,4 @@
-#!/home/synack/src/clusto/env/bin/python
+#!/usr/bin/env python
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST, gethostbyname, gethostname
 from traceback import format_exc
 from struct import unpack
@@ -8,8 +8,6 @@ from scapy import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
 import clusto
-
-from ncore.daemon import become_daemon
 
 SERVER_IP = '10.2.128.48'
 
@@ -208,7 +206,6 @@ class ClustoDHCPServer(DHCPServer):
             print 'Error updating server MAC:', format_exc()
 
 if __name__ == '__main__':
-    #become_daemon()
     init_script()
     server = ClustoDHCPServer()
     server.run()
