@@ -1,3 +1,9 @@
+clusto (0.5.2-1) unstable; urgency=low
+
+  * Fix a minor bug in clusto-info
+
+ -- Jeremy Grosser <synack@digg.com>  Mon, 08 Feb 2010 17:32:47 -0800
+
 clusto (0.5.1-1) unstable; urgency=low
 
   * Update control file and clusto-pool
