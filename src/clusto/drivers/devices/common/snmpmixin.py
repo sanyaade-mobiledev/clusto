@@ -5,8 +5,8 @@ SNMPMixin for objects that can be accessed with SNMP
 import clusto
 from clusto.drivers import IPManager
 
-from scapy.layers.snmp import SNMP, SNMPget, SNMPset, SNMPnext, SNMPvarbind
-
+#import scapy
+from scapy.all import SNMP, SNMPget, SNMPset, SNMPnext, SNMPvarbind
 from socket import socket, AF_INET, SOCK_DGRAM
 
 class SNMPMixin:

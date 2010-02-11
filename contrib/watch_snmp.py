@@ -4,7 +4,7 @@ from traceback import format_exc
 from time import strftime, time, localtime, sleep
 from struct import unpack
 
-from scapy.layers.snmp import SNMP
+from scapy.all import SNMP
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
