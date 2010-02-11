@@ -58,7 +58,7 @@ def main():
     
     server.power_reboot(captcha=False)
 
-    print '%s is rebooting now.'
+    print '%s is rebooting now.' % server.name
 
 if __name__ == '__main__':
     init_script()
