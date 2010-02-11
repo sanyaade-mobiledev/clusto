@@ -3,7 +3,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_REUSEADDR, SO_BRO
 from traceback import format_exc
 from struct import unpack
 
-from scapy import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
+from scapy.layers.dhcp import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
