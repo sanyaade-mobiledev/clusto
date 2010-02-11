@@ -41,7 +41,6 @@ def main():
     print 'Pools:'.ljust(16, ' '), ' '.join([x.name for x in server.parents(clusto_types=['pool'])])
 
     if not [x for x in classes if x.lower().find('disk') != -1]:
-        from termcolor import colorred
         print '\nWARNING: This server does not have a DISK config. FAI will likely fail.\n'
 
     sys.stdout.write('Are you absolutely sure you want to FAI %s (yes/no)? ' % server.name)
