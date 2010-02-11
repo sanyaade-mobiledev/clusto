@@ -1,3 +1,9 @@
+clusto (0.5.5-2) unstable; urgency=low
+
+  * Fix scapy imports 
+
+ -- Jeremy Grosser <synack@digg.com>  Thu, 11 Feb 2010 14:09:23 -0800
+
 clusto (0.5.5-1) unstable; urgency=low
 
   * Depend on scapy 2.0.1 and update all relevant imports to suit
