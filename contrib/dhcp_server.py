@@ -3,6 +3,9 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_REUSEADDR, SO_BRO
 from traceback import format_exc
 from struct import unpack
 
+import logging
+runtime = logging.getLogger('scapy.runtime')
+runtime.setLevel(logging.ERROR)
 from scapy.all import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 
 from clusto.scripthelpers import init_script

@@ -5,7 +5,9 @@ SNMPMixin for objects that can be accessed with SNMP
 import clusto
 from clusto.drivers import IPManager
 
-#import scapy
+import logging
+runtime = logging.getLogger('scapy.runtime')
+runtime.setLevel(logging.ERROR)
 from scapy.all import SNMP, SNMPget, SNMPset, SNMPnext, SNMPvarbind
 from socket import socket, AF_INET, SOCK_DGRAM
 

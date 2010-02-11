@@ -4,6 +4,9 @@ from traceback import format_exc
 from time import strftime, time, localtime, sleep
 from struct import unpack
 
+import logging
+runtime = logging.getLogger('scapy.runtime')
+runtime.setLevel(logging.ERROR)
 from scapy.all import SNMP
 
 from clusto.scripthelpers import init_script
