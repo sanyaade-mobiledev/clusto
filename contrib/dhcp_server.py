@@ -12,8 +12,6 @@ from clusto.scripthelpers import init_script
 from clusto.drivers import IPManager, PenguinServer
 import clusto
 
-SERVER_IP = '10.2.128.48'
-
 DHCPOptions.update({
     66: 'tftp_server',
     67: 'tftp_filename',

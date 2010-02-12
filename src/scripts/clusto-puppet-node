@@ -32,8 +32,8 @@ def main():
         if not 'parameters' in result:
             result['parameters'] = {}
 
-        if isinstance(attr.value, int):
-            val = attr.value
+        if isinstance(attr.value, int) or attr.value.isdigit():
+            val = int(attr.value)
         else:
             val = str(attr.value)
 
