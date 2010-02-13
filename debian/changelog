@@ -1,3 +1,9 @@
+clusto (0.5.8-1) unstable; urgency=low
+
+  * Minor bugfixes for puppet related scripts 
+
+ -- Jeremy Grosser <synack@digg.com>  Fri, 12 Feb 2010 16:50:44 -0800
+
 clusto (0.5.7-1) unstable; urgency=low
 
   * Add clusto-puppet-node and clean up unnecessary globals in dhcp_server
