@@ -5,19 +5,29 @@ import yaml
 
 import sys
 
+def lookup(name):
+    try:
+        server = clusto.get_by_name(name)
+        return server
+    except LookupError:
+        try:
+            server = clusto.get_by_name(name.split('.', 1)[0])
+            return server
+        except LookupError:
+            return False
+
 def main():
     if len(sys.argv) < 2:
         return -1
 
-    servername = sys.argv[1]
-    try:
-        server = clusto.get_by_name(servername)
-    except LookupError:
+    server = lookup(sys.argv[1])
+    if not server:
         return -1
 
     result = {
         'classes': ['site::base-node'],
     }
+
     for attr in server.attrs(key='puppet', merge_container_attrs=True):
         if attr.subkey == 'class':
             val = str(attr.value)
