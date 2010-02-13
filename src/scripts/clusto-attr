@@ -86,6 +86,9 @@ def main():
     if options.number:
         options.number = int(options.number)
 
+    if isinstance(options.value, str) and options.value.isdigit():
+        options.value = int(options.value)
+
     opts = dict([(k, v) for k, v in options.__dict__.items() if v != None])
     func(**opts)
 
