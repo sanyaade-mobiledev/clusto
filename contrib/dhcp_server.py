@@ -85,8 +85,8 @@ class DHCPResponse(object):
                 bootp_options[k] = v.encode('ascii', 'ignore')
 
         pkt = BOOTP(**bootp_options)/DHCP(options=options)
-        pkt.show()
-        return pkt
+        #pkt.show()
+        return pkt.build()
 
 class DHCPServer(object):
     def __init__(self, bind_address=('0.0.0.0', 67)):
@@ -102,7 +102,8 @@ class DHCPServer(object):
             packet = BOOTP(data)
             request = DHCPRequest(packet)
 
-            #print request.type, request.hwaddr
+            if request.type != 'discover':
+                print request.type, request.hwaddr
 
             methodname = 'handle_%s' % request.type
             if hasattr(self, methodname):
