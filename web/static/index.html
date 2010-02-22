@@ -4,7 +4,7 @@
 	<link rel="stylesheet" type="text/css" href="css/base.css" />
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript">
-	var apiurl = 'http://lmgmt.digg.internal:9999';
+	var apiurl = 'http://lmgmt.digg.internal:9996';
 
 	function break_str(s, breaklen) {
 		if(s.length < breaklen) {
@@ -27,6 +27,26 @@
 		return result;
 	}
 
+	function cmp_attrs(a, b) {
+		if(a.key > b.key)
+			return 1;
+		if(a.key < b.key)
+			return -1;
+		if(a.number > b.number)
+			return 1;
+		if(a.number < b.number)
+			return -1;
+		if(a.subkey > b.subkey)
+			return 1;
+		if(a.subkey < b.subkey)
+			return -1;
+		if(a.value < b.value)
+			return 1;
+		if(a.value > b.value)
+			return -1;
+		return 0;
+	}
+
 	function do_search(evt) {
 		query = $('#search').val();
 		if(query.length < 3) {
@@ -35,13 +55,21 @@
 		$.getJSON(apiurl + '/search?callback=?', {'q': query}, function(data) {
 			data.sort();
 			$('#search_results').html('')
+			exact = null;
 			$.each(data, function(i, item) {
-				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#top">' + item.split('/')[2] + '</a></li>');
+				name = item.split('/')[2];
+				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#top">' + name + '</a></li>');
 				$('a.searchresult[name=' + item + ']').click(item_detail);
+				if(name == query) {
+					exact = item;
+				}
 			});
 			$('#search_results').show();
 			if(data.length == 1) {
 				$('a.searchresult[name=' + data[0] + ']').trigger('click');
+			}
+			if(exact != null) {
+				$('a.searchresult[name=' + exact + ']').trigger('click');
 			}
 		});
 	}
@@ -52,17 +80,29 @@
 
 	function item_detail(evt) {
 		name = evt.target.name;
+		lastnum = -1;
+		lastkey= "";
+		color = 0;
 		$.getJSON(apiurl + name + '/?format=json&callback=?', function(data) {
 			$('#detail').html('<fieldset><legend>' + data['object'] + '</legend><ul class="attrs"></ul></fieldset><fieldset><legend>Contents</legend><ul class="contents"></ul></fieldset><fieldset><legend>Parents</legend><ul class="parents"></ul></fieldset><fieldset><legend>Actions</legend><ul class="actions"></ul></fieldset>');
-			data.attrs.sort();
+			data.attrs.sort(cmp_attrs);
 			$.each(data.attrs, function(i, attr) {
 				/*if(attr.value == null) { attr.value = '&nbsp;'; }
 				if(attr.subkey == null) { attr.subkey = '&nbsp;'; }
 				if(attr['number'] == null) { attr['number'] = '&nbsp;'; }*/
-				if(attr.key == 'sshdsakey' || attr.key == 'sshrsakey') {
+				if(attr.key == 'ssh-authorized-key') {
 					attr.value = break_str(attr.value, 40);
 				}
-				$('#detail .attrs').append('<li><div class="col key">' + attr.key + '</div><div class="col subkey">' + attr.subkey + '</div><div class="col value">' + attr.value + '</div><div class="col number">' + attr['number'] + '</div><div class="col datatype">' + attr.datatype + '</div></li>');
+				if(attr.key != lastkey || attr['number'] != lastnum) {
+					if(color == 1) {
+						color = 0;
+					}else{
+						color = 1;
+					}
+				}
+				$('#detail .attrs').append('<li class="color' + color + '"><div class="col key">' + attr.key + '</div><div class="col subkey">' + attr.subkey + '</div><div class="col value">' + attr.value + '</div><div class="col number">' + attr['number'] + '</div><div class="col datatype">' + attr.datatype + '</div></li>');
+				lastkey = attr.key;
+				lastnum = attr['number'];
 			});
 
 			data.contents.sort();
@@ -116,7 +156,7 @@
 			['Network switches', 'networkswitch'],
 			['Console servers', 'consoleserver'],
 			['Power strips', 'powerstrip'],
-			['Resources', 'resource']
+			['Resources', 'resourcemanager']
 		];
 		$.each(types, function(i, name) {
 			$('#filters').append('<fieldset class="clustotype" id="type_' + name[1] + '"><legend>' + name[0] + '</legend></fieldset>');
