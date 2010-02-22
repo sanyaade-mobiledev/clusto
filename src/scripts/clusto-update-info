@@ -9,6 +9,8 @@ from traceback import format_exc
 import sys
 import re
 
+ifpattern = re.compile('^(?P<type>[a-z]+)(?P<num>[0-9]+)$')
+
 class SilentPolicy(MissingHostKeyPolicy):
     def missing_host_key(self, client, hostname, key): pass
 
@@ -29,7 +31,40 @@ def discover_hardware(ip):
         name = line[3]
         blocks = int(line[2])
         blocks *= 1024
-        disks.append({'osname': name, 'size': str(blocks)})
+
+        hdinfo = {
+            'osname': name,
+            'size': str(blocks),
+        }
+
+        # Query info from hdparm (IDE and SATA)
+        stdout = client.exec_command('hdparm -I /dev/%s' % name)[1].read()
+        useful = ('model', 'serial', 'firmware')
+        for field in stdout.split('\n'):
+            field = field.strip(' \t')
+            for u in useful:
+                if field.lower().startswith(u):
+                    value = field.split(':', 1)[1]
+                    hdinfo[u] = value.strip(' \t')
+
+        # Attempt a SCSI query
+        if not [x for x in useful if x in hdinfo]:
+            stdout = client.exec_command('/usr/bin/sg_inq /dev/%s' % name)[1].read()
+            scsi_useful = {
+                'Product identification': 'model',
+                'Product revision level': 'firmware',
+                'Unit serial number': 'serial',
+            }
+            for field in [x.strip(' \t') for x in stdout.split('\n')]:
+                for u in scsi_useful:
+                    if field.startswith(u):
+                        key = scsi_useful[u]
+                        value = field.split(':', 1)[1]
+                        hdinfo[key] = value.strip(' \t')
+            if [x for x in useful if not x in hdinfo]:
+                sys.stdout.write('%s:missing ' % name)
+
+        disks.append(hdinfo)
 
     stdout = client.exec_command('dmidecode -t memory')[1].read()
     memory = []
@@ -132,8 +167,12 @@ def update_server(server, info):
 
     for ifnum in range(0, 2):
         ifname = 'eth%i' % ifnum
+        if not ifname in info['network']:
+            continue
+
         if server.attrs(subkey='mac', value=info['network'].get(ifname, {}).get('hwaddr', '')):
             continue
+        server.del_port_attr('nic-eth', ifnum + 1, 'mac')
         server.set_port_attr('nic-eth', ifnum + 1, 'mac', info['network'][ifname]['hwaddr'])
 
         if 'inet addr' in info['network'][ifname]:
@@ -160,29 +199,39 @@ def main():
 
     for server in obj:
         if server.type != 'server':
-            sys.stderr.write('%s: Not a server\n' % server.name)
+            sys.stdout.write('Not a server\n')
             continue
+
+        #if server.attr_values(key='disk', subkey='serial'):
+        #    continue
+
+        sys.stdout.write(server.name + ' ')
+        sys.stdout.flush()
 
         ip = server.get_ips()
         if not ip:
-            sys.stderr.write('%s: No IP assigned\n' % server.name)
+            sys.stdout.write('No IP assigned\n')
             continue
         ip = ip[0]
 
         try:
+            sys.stdout.write('discover_hardware ')
+            sys.stdout.flush()
             info = discover_hardware(ip)
         except:
-            sys.stderr.write('%s: Unable to discover. %s\n' % (server.name, sys.exc_info()[1]))
+            sys.stdout.write('Unable to discover. %s\n' % sys.exc_info()[1])
             continue
 
         try:
+            sys.stdout.write('update_server ')
             clusto.begin_transaction()
             update_server(server, info)
             clusto.commit()
-            sys.stderr.write('%s: Updated\n' % server.name)
+            sys.stdout.write('.\n')
         except:
-            sys.stderr.write('%s: Error updating clusto:\n%s\n' % (server.name, format_exc()))
+            sys.stdout.write('Error updating clusto:\n%s\n' % format_exc())
             clusto.rollback_transaction()
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     init_script()
