@@ -1,11 +1,24 @@
 #!/usr/bin/env python
-from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST, gethostbyname, gethostname
 from traceback import format_exc
 from struct import unpack
+from errno import EINTR
+from time import time
+import socket
+import signal
 
+from logging.handlers import SysLogHandler
 import logging
+
+log = logging.getLogger('clusto.dhcp')
+fmt = logging.Formatter('%(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S')
+syslog = SysLogHandler()
+syslog.setFormatter(fmt)
+log.addHandler(syslog)
+log.setLevel(logging.INFO)
+
 runtime = logging.getLogger('scapy.runtime')
 runtime.setLevel(logging.ERROR)
+
 from scapy.all import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 
 from clusto.scripthelpers import init_script
@@ -63,7 +76,7 @@ class DHCPResponse(object):
         for k, v in self.options.items():
             if k == 'enabled': continue
             if not k in DHCPRevOptions:
-                print 'Unknown DHCP option:', k
+                log.warning('Unknown DHCP option: %s' % k)
                 continue
             if isinstance(v, unicode):
                 v = v.encode('ascii', 'ignore')
@@ -90,20 +103,27 @@ class DHCPResponse(object):
 
 class DHCPServer(object):
     def __init__(self, bind_address=('0.0.0.0', 67)):
-        self.sock = socket(AF_INET, SOCK_DGRAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(bind_address)
-        self.sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self.sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.server_id = gethostbyname(gethostname())
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_id = socket.gethostbyname(socket.gethostname())
 
     def run(self):
         while True:
-            data, address = self.sock.recvfrom(4096)
+            try:
+                data, address = self.sock.recvfrom(4096)
+            except KeyboardInterrupt:
+                break
+            except socket.error, e:
+                if e.args[0] == EINTR:
+                    continue
+                log.error(format_exc())
+                break
             packet = BOOTP(data)
             request = DHCPRequest(packet)
 
-            if request.type != 'discover':
-                print request.type, request.hwaddr
+            log.debug('%s %s' % (request.type, request.hwaddr))
 
             methodname = 'handle_%s' % request.type
             if hasattr(self, methodname):
@@ -119,44 +139,62 @@ class ClustoDHCPServer(DHCPServer):
     def __init__(self):
         DHCPServer.__init__(self)
         self.offers = {}
+        self.cache = {}
+        self.ipmi_cache = {}
 
     def handle_request(self, request):
         chaddr = request.packet.chaddr
         if not chaddr in self.offers:
-            print 'Got a request before sending an offer from', request.hwaddr
+            log.warning('Got a request before sending an offer from %s' % request.hwaddr)
             return
         response = self.offers[chaddr]
         response.type = 'ack'
 
         self.send('255.255.255.255', response.build())
 
+    def query_clusto(self, key, attrs, cache=None, cache_timeout=60.0):
+        if key in cache:
+            expires, server = cache[key]
+            if time() < expires:
+                return server
+        
+        server = clusto.get_entities(attrs=attrs)
+        expires = time() + cache_timeout
+        cache[key] = (expires, server)
+        return server
+
+    def clear_cache(self, signum, frame):
+        log.info('Clearing cache (%i entries invalidated)' % (len(self.cache) + len(self.ipmi_cache)))
+        self.cache.clear()
+        self.ipmi_cache.clear()
+
     def handle_discover(self, request):
         self.update_ipmi(request)
 
-        server = clusto.get_entities(attrs=[{
+        attrs = [{
             'key': 'port-nic-eth',
             'subkey': 'mac',
             'number': 1,
             'value': request.hwaddr,
-        }])
+        }]
+        server = self.query_clusto(request.hwaddr, attrs, cache=self.cache)
 
         if not server:
-            #print 'Request from unknown device:', request.hwaddr
             return
 
         if len(server) > 1:
-            print 'More than one server with address %s: %s' % (request.hwaddr, ', '.join([x.name for x in server]))
+            log.warning('More than one server with address %s: %s' % (request.hwaddr, ', '.join([x.name for x in server])))
             return
         
         server = server[0]
 
         if not server.attrs(key='dhcp', subkey='enabled', value=1, merge_container_attrs=True):
-            print 'DHCP not enabled for', server.name
+            log.info('DHCP not enabled for %s' % server.name)
             return
 
         ip = server.get_ips()
         if not ip:
-            print 'No IP assigned for', server.name
+            log.info('No IP assigned for %s' % server.name)
             return
         else:
             ip = ip[0]
@@ -173,6 +211,8 @@ class ClustoDHCPServer(DHCPServer):
             'hostname': server.name,
         }
 
+        log.info('Sending offer to %s' % server.name)
+
         for attr in server.attrs(key='dhcp', merge_container_attrs=True):
             options[attr.subkey] = attr.value
 
@@ -181,7 +221,7 @@ class ClustoDHCPServer(DHCPServer):
         self.send('255.255.255.255', response.build())
 
     def update_ipmi(self, request):
-        server = clusto.get_entities(attrs=[{
+        attrs = [{
             'key': 'bootstrap',
             'subkey': 'mac',
             'value': request.hwaddr,
@@ -190,7 +230,8 @@ class ClustoDHCPServer(DHCPServer):
             'subkey': 'mac',
             'number': 1,
             'value': request.hwaddr,
-        }])
+        }]
+        server = self.query_clusto(request.hwaddr, attrs, cache=self.ipmi_cache)
 
         if not server:
             return
@@ -199,15 +240,19 @@ class ClustoDHCPServer(DHCPServer):
             server = server[0]
             if request.options.get('vendor_class_id', None) == 'udhcp 0.9.9-pre':
                 # This is an IPMI request
-                #print 'Associating IPMI address', request.hwaddr, 'with nic-eth:1 on', server.name
+                #logging.debug('Associating IPMI %s %s' % (request.hwaddr, server.name))
                 server.set_port_attr('nic-eth', 1, 'ipmi-mac', request.hwaddr)
             else:
-                #print 'Associating physical address with nic-eth:1 on', server.name
+                #logging.debug('Associating physical %s %s' % (requst.hwaddr, server.name))
                 server.set_port_attr('nic-eth', 1, 'mac', request.hwaddr)
         except:
-            print 'Error updating server MAC:', format_exc()
+            log.error('Error updating server MAC: %s' % format_exc())
 
 if __name__ == '__main__':
     init_script()
+
     server = ClustoDHCPServer()
+    signal.signal(signal.SIGHUP, server.clear_cache)
+
+    log.info('Clusto DHCP server starting')
     server.run()
