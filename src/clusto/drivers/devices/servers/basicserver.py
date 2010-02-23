@@ -18,7 +18,10 @@ class BasicServer(IPMixin, PortMixin, Device):
                  }
 
     
+    
 class BasicVirtualServer(BasicServer):
+
+    _clusto_type = "virtualserver"
     _driver_name = "basicvirtualserver"
 
     def create(self, pool, **kwargs):
