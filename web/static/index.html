@@ -58,7 +58,7 @@
 			exact = null;
 			$.each(data, function(i, item) {
 				name = item.split('/')[2];
-				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#top">' + name + '</a></li>');
+				$('#search_results').append('<li><a class="searchresult" name="' + item + '" href="#' + name.split('/').pop() + '">' + name + '</a></li>');
 				$('a.searchresult[name=' + item + ']').click(item_detail);
 				if(name == query) {
 					exact = item;
@@ -80,6 +80,7 @@
 
 	function item_detail(evt) {
 		name = evt.target.name;
+		document.location.hash = '#' + name.split('/').pop();
 		lastnum = -1;
 		lastkey= "";
 		color = 0;
@@ -107,20 +108,20 @@
 
 			data.contents.sort();
 			$.each(data.contents, function(i, child) {
-				$('#detail .contents').append('<li><a href="#top" class="child" name="' + child + '">' + child + '</a></li>');
+				$('#detail .contents').append('<li><a href="#' + child.split('/').pop() + '" class="child" name="' + child + '">' + child + '</a></li>');
 				$('a[name=' + child + ']').click(item_detail);
 			});
 
 			data.parents.sort();
 			$.each(data.parents, function(i, p) {
-				$('#detail .parents').append('<li><a href="#top" class="parent" name="' + p + '">' + p + '</a></li>');
+				$('#detail .parents').append('<li><a href="#' + p.split('/').pop() + '" class="parent" name="' + p + '">' + p + '</a></li>');
 				$('a[name=' + p + ']').click(item_detail);
 			});
 
 			data.actions.sort();
 			$.each(data.actions, function(i, action) {
 				aname = data['object'] + '/' + action;
-				$('#detail .actions').append('<li><a href="#top" class="action" name="' + aname + '">' + action + '</a></li>');
+				$('#detail .actions').append('<li><a href="#" class="action" name="' + aname + '">' + action + '</a></li>');
 				$('a[name=' + aname + ']').click(item_action);
 			});
 		});
@@ -140,7 +141,7 @@
 			$.getJSON(apiurl + '/' + type + '/?format=json&callback=?', function(items) {
 				items.sort();
 				$.each(items, function(x, item) {
-					$('#' + id).append('<a class="item" href="#top" name="' + item + '">' + item.split('/')[2] + '</a>');
+					$('#' + id).append('<a class="item" href="#' + item.split('/').pop() + '" name="' + item + '">' + item.split('/')[2] + '</a>');
 				});
 				$('#' + id + ' .item').click(item_detail);
 			});
@@ -164,6 +165,11 @@
 
 		$('#filters fieldset.clustotype').click(toggle_type);
 		$('#search').keyup(do_search);
+
+		if(document.location.hash) {
+			hash = document.location.hash.substr(1).split('/').pop();
+			$('#search').val(hash).trigger('keyup');
+		}
 	});
 	</script>
 </head>
