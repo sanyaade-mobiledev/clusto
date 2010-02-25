@@ -1,14 +1,16 @@
-#!/home/synack/src/clusto/env/bin/python
-import simplejson as json
+#!/usr/bin/env python
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 import xmlrpclib
 import cPickle
-import yaml
 
 import new
 import re
 
 from webob import Request, Response
-from ncore.daemon import become_daemon
 from clusto.scripthelpers import get_clusto_config
 from clusto.drivers import Driver
 import clusto
@@ -23,10 +25,15 @@ def xmldumps(obj, **kwargs):
 
 formats = {
     'json': (json.dumps, json.loads, {'indent': 4}),
-    'yaml': (yaml.dump, yaml.load, {'indent': 4}),
     'pickle': (cPickle.dumps, cPickle.loads, {}),
     'xml': (xmldumps, xmlrpclib.loads, {'methodresponse': True, 'allow_none': True}),
 }
+
+try:
+    import yaml
+    formats['yaml'] = (yaml.dump, yaml.load, {'indent': 4})
+except ImportError:
+    pass
 
 def conf(key):
     obj = config
@@ -218,9 +225,25 @@ class QueryAPI(object):
         api = EntityAPI(obj)
         return api.show(request)
 
+    @classmethod
+    def get_from_pools(self, request):
+        if not 'pools' in request.params:
+            return Response(status=400, body='400 Bad Request\nYou must specify at least one pool\n')
+        pools = request.params['pools'].split(',')
+
+        if 'types' in request.params:
+            clusto_types = request.params['types'].split(',')
+        else:
+            clusto_types = None
+
+        result = [unclusto(x) for x in clusto.get_from_pools(pools, clusto_types)]
+        return Response(status=200, body=dumps(request, result))
+
 class ClustoApp(object):
     def __init__(self):
         self.urls = [
+            ('^/favicon.ico$',
+                self.notfound),
             ('^/search$',
                 self.search),
             ('^/query/(?P<querytype>[a-z_]+)',
@@ -346,6 +369,9 @@ class ClustoApp(object):
                 result.append(unclusto(obj))
         return Response(status=200, body=dumps(request, result))
 
+    def notfound(self, request, match):
+        return Response(status=404)
+
     def __call__(self, environ, start_response):
         request = Request(environ)
         response = Response(status=404, body='404 Not Found\nUnmatched URL\n')
@@ -360,7 +386,6 @@ class ClustoApp(object):
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server, WSGIRequestHandler
-    #become_daemon(out_log='/tmp/cweb.log', err_log='/tmp/cweb.log')
 
     app = ClustoApp()
     
