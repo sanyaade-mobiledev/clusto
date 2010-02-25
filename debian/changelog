@@ -1,3 +1,11 @@
+clusto (0.5.9-1) unstable; urgency=low
+
+  * DHCP server cleanup, bugfixes
+  * BasicVirtualServer instances are now of the "virtualserver" type
+  * Various minor script fixes and additions
+
+ -- Jeremy Grosser <synack@digg.com>  Thu, 25 Feb 2010 02:10:39 -0800
+
 clusto (0.5.8-1) unstable; urgency=low
 
   * Minor bugfixes for puppet related scripts 
