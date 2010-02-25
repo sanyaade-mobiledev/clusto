@@ -62,7 +62,7 @@ class DHCPResponse(object):
     def __init__(self, type, offerip=None, options={}, request=None):
         self.type = type
         self.offerip = offerip
-        self.serverip = gethostbyname(gethostname())
+        self.serverip = socket.gethostbyname(socket.gethostname())
         self.options = options
         self.request = request
 

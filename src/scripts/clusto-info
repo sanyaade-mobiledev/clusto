@@ -19,9 +19,19 @@ def device_info(obj):
     contents = obj.contents()
     if contents:
         print 'Contents:'.ljust(20, ' '), ', '.join([x.name for x in contents])
+    print '\n',
     serial = obj.attr_values(key='system', subkey='serial')
     if serial:
         print 'Serial:'.ljust(20, ' '), ', '.join([x.rstrip('\r\n') for x in serial if x])
+    memory = obj.attr_value(key='system', subkey='memory')
+    if memory:
+        print 'Memory:'.ljust(20, ' '), memory / 1000, 'GB'
+    disk = obj.attr_value(key='system', subkey='disk')
+    if disk:
+        print 'Disk:'.ljust(20, ' '), disk, 'GB'
+    cpucount = obj.attr_value(key='system', subkey='cpucount')
+    if cpucount:
+        print 'CPU Cores:'.ljust(20, ' '), cpucount
     desc = obj.attr_values(key='description')
     if desc:
         print 'Description:'.ljust(20, ' '), '\n                    '.join(desc)
