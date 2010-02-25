@@ -1,3 +1,9 @@
+clusto (0.5.9-2) unstable; urgency=low
+
+  * Missing comma in setup.py 
+
+ -- Jeremy Grosser <synack@digg.com>  Thu, 25 Feb 2010 02:16:00 -0800
+
 clusto (0.5.9-1) unstable; urgency=low
 
   * DHCP server cleanup, bugfixes
