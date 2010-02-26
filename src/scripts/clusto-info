@@ -28,7 +28,7 @@ def device_info(obj):
         print 'Memory:'.ljust(20, ' '), memory / 1000, 'GB'
     disk = obj.attr_value(key='system', subkey='disk')
     if disk:
-        print 'Disk:'.ljust(20, ' '), disk, 'GB'
+        print 'Disk:'.ljust(20, ' '), '%i GB (%i)' % (disk, len(obj.attrs(key='disk', subkey='size')))
     cpucount = obj.attr_value(key='system', subkey='cpucount')
     if cpucount:
         print 'CPU Cores:'.ljust(20, ' '), cpucount
