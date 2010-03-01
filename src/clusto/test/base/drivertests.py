@@ -390,6 +390,35 @@ class TestDriverContainerFunctions(testbase.ClustoTestBase):
                          [x.number for x in d1.attrs(ignore_hidden=False)])
         
 
+    def testParents(self):
+
+        class OtherDriver(Driver):
+            _clusto_type = 'otherdriver'
+            _driver_name = 'otherdriver'
+
+
+        p1 = Pool('toppool')
+        d1 = Pool('grandparent')
+        d1a = Pool('othergrandparent')
+        d1b = OtherDriver('anothergrandparent')
+        d2 = Driver('parent')
+        d3 = Driver('child')
+
+        d1b.add_attr('foo', 'someval')
+        p1.insert(d1a)
+        d1b.insert(d2)
+        d1a.insert(d2)
+        d1.insert(d2)
+        d2.insert(d3)
+
+        self.assertEqual(sorted([d1,d1a, p1]),
+                         sorted(d3.parents(clusto_types=[Pool], search_parents=True)))
+
+        self.assertEqual([d2],
+                         d3.parents())
+
+        self.assertEqual(['someval'],
+                         d3.attr_values('foo', merge_container_attrs=True))
 
 class TestDriver(testbase.ClustoTestBase):
     
