@@ -649,7 +649,18 @@ class Driver(object):
     def parents(self, **kwargs):        
         """Return a list of Things that contain _this_ Thing. """
 
-        parents = self.referencers('_contains', **kwargs)
+        search_parents = kwargs.pop('search_parents', False)
+
+        if search_parents:
+            parents=self.parents(**kwargs)
+            allparents = self.parents()
+            for thing in allparents:
+                allparents.extend(thing.parents())
+
+            for thing in allparents:
+                parents.extend(thing.parents(**kwargs))
+        else:
+            parents = self.referencers('_contains', **kwargs)
 
         return parents
                        
