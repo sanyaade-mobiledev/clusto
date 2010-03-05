@@ -35,7 +35,7 @@ def main():
                 result['classes'].append(val)
             continue
 
-        if attr.subkey == 'environment':
+        if attr.subkey == 'environment' and not 'environment' in result:
             result['environment'] = str(attr.value)
             continue
 
@@ -48,8 +48,8 @@ def main():
             val = str(attr.value)
 
         subkey = str(attr.subkey)
-        if not subkey in result['parameters']:
-            result['parameters'][subkey] = val
+        #if not subkey in result['parameters']:
+        result['parameters'][subkey] = val
 
     if not [x for x in result.values() if x]:
         return -1
