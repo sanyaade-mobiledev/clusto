@@ -1,3 +1,9 @@
+clusto (0.5.11-1) unstable; urgency=low
+
+  * Add the ability to disable a puppet node
+
+ -- Jeremy Grosser <synack@digg.com>  Fri, 05 Mar 2010 16:15:47 -0800
+
 clusto (0.5.10-1) unstable; urgency=low
 
   * Use the most specific instance of key=puppet,subkey=environment
