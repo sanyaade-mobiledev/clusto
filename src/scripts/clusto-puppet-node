@@ -34,9 +34,6 @@ def main():
         if attr.subkey == 'disabled' and attr.value:
             disabled = True
 
-        if attr.subkey == 'php_version':
-            print repr(attr.value)
-
         if attr.subkey == 'class':
             val = str(attr.value)
             if not val in result['classes']:
