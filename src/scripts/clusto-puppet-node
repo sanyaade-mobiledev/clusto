@@ -28,7 +28,12 @@ def main():
         'classes': ['site::base-node'],
     }
 
+    disabled = False
+
     for attr in server.attrs(key='puppet', merge_container_attrs=True):
+        if attr.subkey == 'disabled' and attr.value:
+            disabled = True
+
         if attr.subkey == 'class':
             val = str(attr.value)
             if not val in result['classes']:
@@ -50,6 +55,10 @@ def main():
         subkey = str(attr.subkey)
         #if not subkey in result['parameters']:
         result['parameters'][subkey] = val
+
+    if disabled:
+        result['classes'] = []
+        result['parameters'] = {}
 
     if not [x for x in result.values() if x]:
         return -1
