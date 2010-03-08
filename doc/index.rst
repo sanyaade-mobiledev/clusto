@@ -13,11 +13,3 @@ Contents:
    install.rst
    tutorial.rst
    cmdline.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

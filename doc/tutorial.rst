@@ -30,6 +30,7 @@ Writing clusto scripts
 Initialization
 ~~~~~~~~~~~~~~
 ::
+
  from clusto.scripthelpers import init_script
  from clusto.drivers import *
  import clusto
