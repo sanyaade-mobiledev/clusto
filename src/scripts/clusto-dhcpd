@@ -14,7 +14,7 @@ fmt = logging.Formatter('%(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S')
 syslog = SysLogHandler()
 syslog.setFormatter(fmt)
 log.addHandler(syslog)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 runtime = logging.getLogger('scapy.runtime')
 runtime.setLevel(logging.ERROR)
@@ -131,7 +131,11 @@ class DHCPServer(object):
             methodname = 'handle_%s' % request.type
             if hasattr(self, methodname):
                 method = getattr(self, methodname)
-                method(request)
+                try:
+                    method(request)
+                except:
+                    log.error(format_exc())
+                    continue
 
     def send(self, address, data):
         while data:
@@ -152,24 +156,6 @@ class ClustoDHCPServer(DHCPServer):
         response.type = 'ack'
 
         self.send('255.255.255.255', response.build())
-
-    def query_clusto(self, key, attrs, cache=None, cache_timeout=300.0):
-        if key in cache:
-            expires, server = cache[key]
-            if time() < expires:
-                log.debug('Query served from cache: %s' % key)
-                return server
-        
-        server = clusto.get_entities(attrs=attrs)
-        expires = time() + cache_timeout
-        log.debug('Setting cache response for %s' % key)
-        cache[key] = (expires, server)
-        return server
-
-    def clear_cache(self, signum, frame):
-        log.info('Clearing cache (%i entries invalidated)' % (len(self.cache) + len(self.ipmi_cache)))
-        self.cache.clear()
-        self.ipmi_cache.clear()
 
     def handle_discover(self, request):
         self.update_ipmi(request)
@@ -254,7 +240,5 @@ class ClustoDHCPServer(DHCPServer):
 
 if __name__ == '__main__':
     server = ClustoDHCPServer()
-    signal.signal(signal.SIGHUP, server.clear_cache)
-
     log.info('Clusto DHCP server starting')
     server.run()
