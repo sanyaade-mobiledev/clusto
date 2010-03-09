@@ -182,11 +182,17 @@ class PortInfoAPI(EntityAPI):
 
     def set_port_attr(self, request):
         kwargs = {}
-        params = request.params.items()
+        params = request.params
         for arg in ('porttype', 'portnum', 'key', 'value'):
             if not arg in params:
                 return Response(status=400, body='Required argument "%s" is missing\n' % arg)
-            kwargs[arg] = request.params[arg]
+            kwargs[arg] = params[arg]
+
+        try:
+            kwargs['portnum'] = int(kwargs['portnum'])
+        except ValueError:
+            return Response(status=400, body='portnum must be an integer\n')
+
         self.obj.set_port_attr(**kwargs)
         return Response(status=200)
 
@@ -197,6 +203,7 @@ class PortInfoAPI(EntityAPI):
             if not arg in params:
                 return Response(status=400, body='Required argument "%s" is missing\n' % arg)
             kwargs[str(arg)] = params[arg]
+
         try:
             kwargs['portnum'] = int(kwargs['portnum'])
         except ValueError:
