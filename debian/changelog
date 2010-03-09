@@ -1,3 +1,9 @@
+clusto (0.5.13-1) unstable; urgency=low
+
+  * Add vendor-specific DHCP options for pxelinux
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 09 Mar 2010 13:36:24 -0800
+
 clusto (0.5.12-2) unstable; urgency=low
 
   * Remove debug statement 

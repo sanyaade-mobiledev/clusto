@@ -14,20 +14,23 @@ fmt = logging.Formatter('%(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S')
 syslog = SysLogHandler()
 syslog.setFormatter(fmt)
 log.addHandler(syslog)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 runtime = logging.getLogger('scapy.runtime')
 runtime.setLevel(logging.ERROR)
 
 from scapy.all import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 
-from clusto.scripthelpers import init_script
-from clusto.drivers import IPManager, PenguinServer
-import clusto
+from clustohttp import ClustoProxy
+clusto = ClustoProxy('http://clusto.digg.internal:9996')
 
 DHCPOptions.update({
     66: 'tftp_server',
     67: 'tftp_filename',
+    208: 'pxelinux.magic',
+    209: 'pxelinux.configfile',
+    210: 'pxelinux.pathprefix',
+    211: 'pxelinux.reboottime',
 })
 
 for k,v in DHCPOptions.iteritems():
@@ -139,8 +142,6 @@ class ClustoDHCPServer(DHCPServer):
     def __init__(self):
         DHCPServer.__init__(self)
         self.offers = {}
-        self.cache = {}
-        self.ipmi_cache = {}
 
     def handle_request(self, request):
         chaddr = request.packet.chaddr
@@ -152,14 +153,16 @@ class ClustoDHCPServer(DHCPServer):
 
         self.send('255.255.255.255', response.build())
 
-    def query_clusto(self, key, attrs, cache=None, cache_timeout=60.0):
+    def query_clusto(self, key, attrs, cache=None, cache_timeout=300.0):
         if key in cache:
             expires, server = cache[key]
             if time() < expires:
+                log.debug('Query served from cache: %s' % key)
                 return server
         
         server = clusto.get_entities(attrs=attrs)
         expires = time() + cache_timeout
+        log.debug('Setting cache response for %s' % key)
         cache[key] = (expires, server)
         return server
 
@@ -177,7 +180,7 @@ class ClustoDHCPServer(DHCPServer):
             'number': 1,
             'value': request.hwaddr,
         }]
-        server = self.query_clusto(request.hwaddr, attrs, cache=self.cache)
+        server = clusto.get_entities(attrs=attrs)
 
         if not server:
             return
@@ -192,29 +195,30 @@ class ClustoDHCPServer(DHCPServer):
             log.info('DHCP not enabled for %s' % server.name)
             return
 
-        ip = server.get_ips()
+        ip = server.attrs(key='ip', subkey='ipstring')
         if not ip:
             log.info('No IP assigned for %s' % server.name)
             return
         else:
-            ip = ip[0]
+            ip = ip[0]['value']
 
-        ipman = IPManager.get_ip_manager(ip)
+        ipman = dict([(x['key'], x['value']) for x in clusto.get_ip_manager(ip).attrs() if x['subkey'] == 'property'])
+        ipy = IP('%s/%s' % (ip, ipman['netmask']))
 
         options = {
             'server_id': self.server_id,
             'lease_time': 3600,
             'renewal_time': 1600,
-            'subnet_mask': ipman.netmask,
-            'broadcast_address': ipman.ipy.broadcast().strNormal(),
-            'router': ipman.gateway,
+            'subnet_mask': ipman['netmask'],
+            'broadcast_address': ipy.broadcast().strNormal(),
+            'router': ipman['gateway'],
             'hostname': server.name,
         }
 
         log.info('Sending offer to %s' % server.name)
 
         for attr in server.attrs(key='dhcp', merge_container_attrs=True):
-            options[attr.subkey] = attr.value
+            options[attr['subkey']] = attr['value']
 
         response = DHCPResponse(type='offer', offerip=ip, options=options, request=request)
         self.offers[request.packet.chaddr] = response
@@ -231,7 +235,7 @@ class ClustoDHCPServer(DHCPServer):
             'number': 1,
             'value': request.hwaddr,
         }]
-        server = self.query_clusto(request.hwaddr, attrs, cache=self.ipmi_cache)
+        server = clusto.get_entities(attrs=attrs)
 
         if not server:
             return
@@ -249,8 +253,6 @@ class ClustoDHCPServer(DHCPServer):
             log.error('Error updating server MAC: %s' % format_exc())
 
 if __name__ == '__main__':
-    init_script()
-
     server = ClustoDHCPServer()
     signal.signal(signal.SIGHUP, server.clear_cache)
 
