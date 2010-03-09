@@ -180,6 +180,30 @@ class PortInfoAPI(EntityAPI):
 
         return Response(status=200, body=dumps(request, result))
 
+    def set_port_attr(self, request):
+        kwargs = {}
+        params = request.params.items()
+        for arg in ('porttype', 'portnum', 'key', 'value'):
+            if not arg in params:
+                return Response(status=400, body='Required argument "%s" is missing\n' % arg)
+            kwargs[arg] = request.params[arg]
+        self.obj.set_port_attr(**kwargs)
+        return Response(status=200)
+
+    def get_port_attr(self, request):
+        kwargs = {}
+        params = request.params
+        for arg in ('porttype', 'portnum', 'key'):
+            if not arg in params:
+                return Response(status=400, body='Required argument "%s" is missing\n' % arg)
+            kwargs[str(arg)] = params[arg]
+        try:
+            kwargs['portnum'] = int(kwargs['portnum'])
+        except ValueError:
+            return Response(status=400, body='portnum must be an integer\n')
+
+        return Response(status=200, body=dumps(request, self.obj.get_port_attr(**kwargs)))
+
 class RackAPI(EntityAPI):
     def insert(self, request):
         '''
@@ -209,10 +233,17 @@ class ResourceAPI(EntityAPI):
 class QueryAPI(object):
     @classmethod
     def get_entities(self, request):
-        kwargs = {}
-        for k, v in request.POST.items():
+        kwargs = {'attrs': []}
+        for k, v in request.params.items():
+            if k in ('format', 'callback'): continue
             v = loads(request, v)
-            kwargs[k] = v
+            kwargs[str(k)] = v
+
+        attrs = []
+        for attr in kwargs['attrs']:
+            attrs.append(dict([(str(k), v) for k, v in attr.items()]))
+        kwargs['attrs'] = attrs
+
         result = [unclusto(x) for x in clusto.get_entities(**kwargs)]
         return Response(status=200, body=dumps(request, result))
 
@@ -312,7 +343,6 @@ class ClustoApp(object):
         except LookupError: pass
 
         obj = clusto.typelist[objtype](objname)
-        clusto.commit()
 
         obj = EntityAPI(obj)
         response = obj.show(request)
