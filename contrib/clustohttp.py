@@ -79,7 +79,7 @@ class EntityProxy(object):
             for k, v in kwargs.items():
                 if isinstance(v, bool):
                     v = int(v)
-                if not type(v) in (int, str):
+                if not type(v) in (int, str, unicode):
                     v = json.dumps(v)
                 data[k] = v
             if data:
@@ -118,14 +118,18 @@ def test():
     server = server[0]
     print server
     assert server.name == 's0104'
-    print server.get_port_attr('nic-eth', 1, 'mac')
-    print server.parents()
+    attr = server.get_port_attr('nic-eth', 1, 'mac')
+    server.set_port_attr('nic-eth', 1, 'mac', attr)
+    newattr = server.get_port_attr('nic-eth', 1, 'mac')
+    print repr((attr, newattr))
+    assert newattr == attr
+    #print server.parents()
     #obj = clusto.get_by_name('s1100')
     #pprint(obj.ports())
     #pprint(obj.attrs(key='dhcp', merge_container_attrs=True))
-    webservers = clusto.get_from_pools(['webservers-lolcat', 'production'])
-    pprint(webservers)
-    pprint(webservers[0].contents())
+    #webservers = clusto.get_from_pools(['webservers-lolcat', 'production'])
+    #pprint(webservers)
+    #pprint(webservers[0].contents())
 
 if __name__ == '__main__':
     test()
