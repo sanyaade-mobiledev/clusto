@@ -12,7 +12,7 @@ import re
 
 from webob import Request, Response
 from clusto.scripthelpers import get_clusto_config
-from clusto.drivers import Driver
+from clusto.drivers import Driver, IPManager
 import clusto
 
 config = get_clusto_config()
@@ -276,6 +276,18 @@ class QueryAPI(object):
 
         result = [unclusto(x) for x in clusto.get_from_pools(pools, clusto_types)]
         return Response(status=200, body=dumps(request, result))
+
+    @classmethod
+    def get_ip_manager(self, request):
+        if not 'ip' in request.params:
+            return Response(status=400, body='400 Bad Request\nYou must specify an IP\n')
+
+        print repr(request.params['ip'])
+        try:
+            ipman = IPManager.get_ip_manager(request.params['ip'])
+        except:
+            return Response(status=404, body='404 Not Found\n')
+        return Response(status=200, body=dumps(request, unclusto(ipman)))
 
 class ClustoApp(object):
     def __init__(self):
