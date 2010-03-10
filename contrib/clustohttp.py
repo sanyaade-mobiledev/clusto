@@ -99,6 +99,9 @@ class EntityProxy(object):
 
     def parents(self):
         return [EntityProxy(urljoin(self.url, x)) for x in self.show()['parents']]
+
+    def attrs(self, **kwargs):
+        return self.__getattr__('attrs')(**kwargs)['attrs']
     
     def set_port_attr(self, porttype, portnum, key, value):
         return self.__getattr__('set_port_attr')(porttype=porttype, portnum=portnum, key=key, value=value)
