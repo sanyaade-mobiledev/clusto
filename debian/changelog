@@ -1,3 +1,9 @@
+clusto (0.5.15-1) unstable; urgency=low
+
+  * Fixing more DHCP server bugs 
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 09 Mar 2010 17:15:41 -0800
+
 clusto (0.5.14-1) unstable; urgency=low
 
   * DHCP server now uses HTTP to communicate with the backend
