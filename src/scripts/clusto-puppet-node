@@ -42,7 +42,6 @@ def main():
 
         if attr.subkey == 'environment' and not 'environment' in result:
             result['environment'] = str(attr.value)
-            continue
 
         if not 'parameters' in result:
             result['parameters'] = {}
