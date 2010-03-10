@@ -177,7 +177,8 @@ class ClustoDHCPServer(DHCPServer):
         
         server = server[0]
 
-        if not server.attrs(key='dhcp', subkey='enabled', value=1, merge_container_attrs=True):
+        enabled = server.attrs(key='dhcp', subkey='enabled', merge_container_attrs=True)
+        if not enabled or not enabled[0]['value']:
             log.info('DHCP not enabled for %s' % server.name)
             return
 
