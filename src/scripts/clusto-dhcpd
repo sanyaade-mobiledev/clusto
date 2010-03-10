@@ -20,6 +20,7 @@ runtime = logging.getLogger('scapy.runtime')
 runtime.setLevel(logging.ERROR)
 
 from scapy.all import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
+from IPy import IP
 
 from clustohttp import ClustoProxy
 clusto = ClustoProxy('http://clusto.digg.internal:9996')
@@ -190,7 +191,7 @@ class ClustoDHCPServer(DHCPServer):
             ip = ip[0]['value']
 
         ipman = dict([(x['key'], x['value']) for x in clusto.get_ip_manager(ip).attrs() if x['subkey'] == 'property'])
-        ipy = IP('%s/%s' % (ip, ipman['netmask']))
+        ipy = IP('%s/%s' % (ip, ipman['netmask']), make_net=True)
 
         options = {
             'server_id': self.server_id,
