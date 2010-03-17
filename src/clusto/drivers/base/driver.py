@@ -663,7 +663,31 @@ class Driver(object):
             parents = self.referencers('_contains', **kwargs)
 
         return parents
-                       
+
+    def siblings(self, parent_filter=None, parent_kwargs=None,
+                 additional_pools=None, **kwargs):
+        """Return a list of Things that have the same parents as me.
+
+        parameters:
+           parent_filter - a function used to filter out unwanted parents
+           parent_kwargs - arguments to be passed to self.parents()
+           additional_pools - a list of additional pools to use as sibling parents
+           **kwargs - arguments to clusto.get_from_pools()
+        """
+
+        if parent_kwargs is None:
+            parent_kwargs = dict(clusto_types=[clusto.drivers.Pool])
+            
+        parents = self.parents(**parent_kwargs)
+
+        if parent_filter:
+            parents = filter(parent_filter, parents)
+            
+        if additional_pools:
+            parents.extend(additional_pools)
+
+        return [s for s in clusto.get_from_pools(parents, **kwargs) if s != self]
+
     @classmethod
     def get_by_attr(cls, *args, **kwargs):
         """Get list of Drivers that have by attributes search """

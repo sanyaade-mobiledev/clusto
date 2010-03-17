@@ -304,3 +304,60 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual(l, [])
             
+
+    def testSiblings(self):
+
+        d1 = Driver('d1')
+        d2 = Driver('d2')
+        d3 = Driver('d3')
+        d4 = Driver('d4')
+        d5 = Driver('d5')
+        d6 = Driver('d6')
+        d7 = Driver('d7')
+        d8 = Driver('d8')
+
+        db = Pool('db')
+        web = Pool('web')
+        dev = Pool('dev')
+        prod = Pool('prod')
+        alpha = Pool('alpha')
+        beta = Pool('beta')
+
+        db.set_attr('pooltype', 'role')
+        web.set_attr('pooltype', 'role')
+        
+        db.insert(d1)
+        db.insert(d2)
+        db.insert(d3)
+        db.insert(d7)
+        db.insert(d8)
+
+        web.insert(d4)
+        web.insert(d5)
+        web.insert(d6)
+        web.insert(d7)
+
+        map(prod.insert, [d1,d2,d4,d5])
+
+        map(dev.insert, [d3,d6,d7,d8])
+
+        map(alpha.insert, [d7, d8])
+        map(beta.insert, [d3,d6])
+
+        
+        self.assertEquals(sorted([d2]),
+                          sorted(d1.siblings()))
+        
+        self.assertEquals(sorted(d3.siblings()),
+                          sorted([]))
+
+        self.assertEquals(sorted(d3.siblings(parent_filter=lambda x: not x.attr_values('pooltype', 'role'),
+                                             additional_pools=[web])),
+                          sorted([d6]))
+
+        self.assertEquals(sorted(d7.siblings(parent_filter=lambda x: not x.attr_values('pooltype', 'role'),
+                                             additional_pools=[db])),
+                          sorted([d8]))
+
+
+        
