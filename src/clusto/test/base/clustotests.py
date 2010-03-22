@@ -256,6 +256,8 @@ class TestClusto(testbase.ClustoTestBase):
         self.assertEqual(clusto.get('00:11:22:33:44:55')[0], s2)
         self.assertEqual(clusto.get('10.0.0.1')[0], s3)
         self.assertEqual(clusto.get('P0000000000')[0], s1)
+        self.assertEqual(clusto.get('foo'), None)
+        self.assertRaises(ValueError, clusto.get, None)
 
     def testDeleteEntity(self):
 

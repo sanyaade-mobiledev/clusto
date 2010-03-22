@@ -202,6 +202,9 @@ def get_by_serial(serial):
     }])
 
 def get(term):
+    if not isinstance(term, basestring):
+        raise ValueError('get(term) must be a string')
+
     try:
         return [get_by_name(term)]
     except LookupError:
