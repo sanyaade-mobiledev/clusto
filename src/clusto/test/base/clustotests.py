@@ -4,7 +4,7 @@ from clusto.test import testbase
 import clusto
 from clusto.schema import *
 from clusto.drivers.base import *
-from clusto.drivers import BasicDatacenter, Pool, BasicServer
+from clusto.drivers import BasicDatacenter, Pool, BasicServer, IPManager
 from sqlalchemy.exceptions import InvalidRequestError
 
 class TestClustoPlain(testbase.ClustoTestBase):
@@ -241,6 +241,21 @@ class TestClusto(testbase.ClustoTestBase):
         self.assertEqual(clusto.get_entities(attrs=[{'subkey':'A'},
                                                    {'value':'test'}]),
                          [d1])
+
+    def testGet(self):
+        s1 = BasicServer('s1')
+        s2 = BasicServer('s2')
+        s3 = BasicServer('s3')
+        ipm = IPManager('testnet', baseip='10.0.0.0', netmask='255.255.255.0')
+
+        s1.set_attr(key='system', subkey='serial', value='P0000000000')
+        s2.set_port_attr('nic-eth', 1, 'mac', '00:11:22:33:44:55')
+        s3.bind_ip_to_osport('10.0.0.1', 'eth0')
+
+        self.assertEqual(clusto.get('s1')[0], s1)
+        self.assertEqual(clusto.get('00:11:22:33:44:55')[0], s2)
+        self.assertEqual(clusto.get('10.0.0.1')[0], s3)
+        self.assertEqual(clusto.get('P0000000000')[0], s1)
 
     def testDeleteEntity(self):
 

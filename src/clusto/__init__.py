@@ -3,7 +3,7 @@
 from clusto.schema import *
 from clusto.exceptions import *
 
-from drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta
+from drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta, IPManager
 from sqlalchemy.exceptions import InvalidRequestError
 from sqlalchemy import create_engine
 
@@ -13,6 +13,7 @@ from clusto import drivers
 import threading
 import logging
 import time
+import re
 
 driverlist = DRIVERLIST
 typelist = TYPELIST
@@ -187,7 +188,40 @@ def get_or_create(name, driver):
         logging.info('Created %s' % obj)
     return obj
 
-              
+def get_by_mac(mac):
+    return get_entities(attrs=[{
+        'subkey': 'mac',
+        'value': mac
+    }])
+
+def get_by_serial(serial):
+    return get_entities(attrs=[{
+        'key': 'system',
+        'subkey': 'serial',
+        'value': serial,
+    }])
+
+def get(term):
+    try:
+        return [get_by_name(term)]
+    except LookupError:
+        pass
+
+    patterns = [
+        ('^(?P<serial>P[0-9]{10})$', get_by_serial, 0),
+        ('^(?P<ip>([0-9]{1,3}(\.|$)){4})$', IPManager.get_devices, 0),
+        ('^(?P<mac>([0-9a-f]{1,2}([:-]|$)){6})$', get_by_mac, re.IGNORECASE),
+    ]
+
+    for pattern, method, flags in patterns:
+        match = re.match(pattern, term, flags)
+        if match:
+            try:
+                return method(**match.groupdict())
+            except:
+                pass
+    return None
+
 def rename(oldname, newname):
     """Rename an Entity from oldname to newname.
 
