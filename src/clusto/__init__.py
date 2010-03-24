@@ -38,11 +38,16 @@ def checkDBcompatibility(dbver):
 init_semaphore = threading.Semaphore()
 def init_clusto():
     """Initialize a clusto database. """
+
     init_semaphore.acquire()
-    METADATA.create_all(SESSION.bind)
-    c = ClustoMeta()
-    flush()
-    init_semaphore.release()
+    try:
+        METADATA.create_all(SESSION.bind)
+        c = ClustoMeta()
+        flush()
+    except Exception, x:
+        raise x
+    finally:
+        init_semaphore.release()
 
 
 def flush():
