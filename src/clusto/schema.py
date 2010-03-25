@@ -27,7 +27,7 @@ from functools import wraps
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
            'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
-           'working_version', "OperationalError"]
+           'working_version', 'OperationalError', 'ClustoEmptyCommit']
 
 
 METADATA = MetaData()
@@ -42,21 +42,34 @@ CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
                           
                           )
 
+class ClustoEmptyCommit(Exception):
+    pass
 
 class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
 
     def after_begin(self, session, transaction, connection):
+
         sql = CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
                                                 description=SESSION.clusto_description)
 
         session.execute(sql)
-        #session.flush()
-        #v = ClustoVersioning(user=SESSION.clusto_user,
-        #                     description=SESSION.clusto_description)
-        #session.add(v)
+
         SESSION.clusto_description = None
-        return EXT_CONTINUE
+        SESSION.flushed = set()
+
+    def before_commit(self, session):
+
+        if not any([session.is_modified(x) for x in session]) \
+               and hasattr(SESSION, 'flushed') \
+               and not SESSION.flushed:
+            raise ClustoEmptyCommit()
+
+    def after_commit(self, session):
+        SESSION.flushed = set()
         
+    def after_flush(self, session, flush_context):
+        SESSION.flushed.update(x for x in session)
+
 
 SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True,
                                       extension=ClustoSession()))

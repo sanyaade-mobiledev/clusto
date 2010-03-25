@@ -356,6 +356,9 @@ def commit():
                         continue
                     else:
                         raise x
+                except ClustoEmptyCommit, x:
+                    rollback_transaction()
+                    return
             else:
                 raise exc
         _dec_transaction_counter()
