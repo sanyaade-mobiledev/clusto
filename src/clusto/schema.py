@@ -120,7 +120,12 @@ Index('idx_attrs_entity_version',
 
 Index('idx_attrs_key', ATTR_TABLE.c.key)
 Index('idx_attrs_subkey', ATTR_TABLE.c.subkey)
-Index('idx_attrs_str_value', ATTR_TABLE.c.string_value)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s (string_value(20))', on='mysql').execute_at("after-create", ATTR_TABLE)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s ((substring(string_value,0,20)))', on='postgresql').execute_at("after-create", ATTR_TABLE)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s (string_value)', on='sqlite').execute_at("after-create", ATTR_TABLE)
 
 COUNTER_TABLE = Table('counters', METADATA,
                       Column('counter_id', Integer, primary_key=True),
