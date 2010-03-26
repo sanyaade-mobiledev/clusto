@@ -201,4 +201,60 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         self.assertEqual(sorted([e1,e2]),
                          sorted((d.entity for d in p1renamed.contents())))
 
+
+
+    def testSetAttrIncrementsVersion(self):
+
+        curver = clusto.get_latest_version_number()
         
+        d = clusto.drivers.Driver('d1')
+
+        self.assertEqual(curver + 1, clusto.get_latest_version_number())
+
+        Attribute(d.entity, 'cat', 'baz')
+
+        clusto.begin_transaction()
+        SESSION.clusto_description = "TEST"
+
+        #Attribute(d.entity, 'foo', 'cat')
+        #SESSION.add(Attribute(d.entity, 'coo', 'daa'))
+
+        Attribute.query().all()
+
+        a = Attribute(d.entity, 'foo', 'bar')
+
+        clusto.commit()
+        #clusto.rollback_transaction()
+            
+        #self.assertEqual(['bar', 'bar'], d.attr_values('foo'))
+
+        self.assert_('bar' in d.attr_values('foo'))
+        self.assertEqual(curver + 3, clusto.get_latest_version_number())
+        
+    def testEmptyCommits(self):
+
+
+        server = clusto.drivers.BasicServer('s1')
+
+        curver = clusto.get_latest_version_number()
+        server.attrs()
+
+        self.assertEqual(curver, clusto.get_latest_version_number())
+        
+
+        try:
+            clusto.begin_transaction()
+
+            SESSION.clusto_description = "TEST"
+
+            Entity.query().all()
+
+            clusto.commit()
+
+        except:
+            
+            clusto.rollback_transaction()
+
+        self.assertEqual(curver, clusto.get_latest_version_number())
+
+        self.assertEqual([], server.attr_values('foo'))

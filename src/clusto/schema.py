@@ -27,7 +27,7 @@ from functools import wraps
 __all__ = ['ATTR_TABLE', 'Attribute', 'and_', 'ENTITY_TABLE', 'Entity', 'func',
            'METADATA', 'not_', 'or_', 'SESSION', 'select', 'VERSION',
            'latest_version', 'CLUSTO_VERSIONING', 'Counter', 'ClustoVersioning',
-           'working_version', "OperationalError"]
+           'working_version', 'OperationalError', 'ClustoEmptyCommit']
 
 
 METADATA = MetaData()
@@ -42,21 +42,34 @@ CLUSTO_VERSIONING = Table('clustoversioning', METADATA,
                           
                           )
 
+class ClustoEmptyCommit(Exception):
+    pass
 
 class ClustoSession(sqlalchemy.orm.interfaces.SessionExtension):
 
     def after_begin(self, session, transaction, connection):
+
         sql = CLUSTO_VERSIONING.insert().values(user=SESSION.clusto_user,
                                                 description=SESSION.clusto_description)
 
         session.execute(sql)
-        #session.flush()
-        #v = ClustoVersioning(user=SESSION.clusto_user,
-        #                     description=SESSION.clusto_description)
-        #session.add(v)
+
         SESSION.clusto_description = None
-        return EXT_CONTINUE
+        SESSION.flushed = set()
+
+    def before_commit(self, session):
+
+        if not any([session.is_modified(x) for x in session]) \
+               and hasattr(SESSION, 'flushed') \
+               and not SESSION.flushed:
+            raise ClustoEmptyCommit()
+
+    def after_commit(self, session):
+        SESSION.flushed = set()
         
+    def after_flush(self, session, flush_context):
+        SESSION.flushed.update(x for x in session)
+
 
 SESSION = scoped_session(sessionmaker(autoflush=True, autocommit=True,
                                       extension=ClustoSession()))
@@ -120,7 +133,12 @@ Index('idx_attrs_entity_version',
 
 Index('idx_attrs_key', ATTR_TABLE.c.key)
 Index('idx_attrs_subkey', ATTR_TABLE.c.subkey)
-Index('idx_attrs_str_value', ATTR_TABLE.c.string_value)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s (string_value(20))', on='mysql').execute_at("after-create", ATTR_TABLE)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s ((substring(string_value,0,20)))', on='postgresql').execute_at("after-create", ATTR_TABLE)
+
+DDL('CREATE INDEX idx_attrs_str_value on %(table)s (string_value)', on='sqlite').execute_at("after-create", ATTR_TABLE)
 
 COUNTER_TABLE = Table('counters', METADATA,
                       Column('counter_id', Integer, primary_key=True),

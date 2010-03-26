@@ -1,3 +1,10 @@
+clusto (0.5.17-1) unstable; urgency=low
+
+  * fix empty commits
+  * add clusto.get()
+
+ -- Ron Gorodetzky <ron@digg.com>  Thu, 25 Mar 2010 03:18:15 -0700
+
 clusto (0.5.16-1) unstable; urgency=low
 
   * added siblings function
