@@ -1,3 +1,9 @@
+clusto (0.5.18-3) unstable; urgency=low
+
+  * Allow clusto-hadoop-node to take hostnames 
+
+ -- Jeremy Grosser <synack@digg.com>  Mon, 29 Mar 2010 15:28:54 -0700
+
 clusto (0.5.18-2) unstable; urgency=low
 
   * Add clusto-hadoop-node to scripts list in setup.py 
