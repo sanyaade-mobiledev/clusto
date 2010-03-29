@@ -30,6 +30,9 @@ def update_clusto(trap):
     if trap['operation'] != 1:
         return
 
+    if not trap['mac'].startswith('00'):
+        return
+
     switch = IPManager.get_devices(trap['switch'])
     if not switch:
         log.warning('Unknown trap source: %s' % trap['switch'])
