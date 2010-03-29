@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+from clusto.scripthelpers import init_script
+from clusto.drivers import IPManager, BasicRack
+import clusto
+
+from traceback import format_exc
+import sys
+
+def get_rack(ip):
+    device = IPManager.get_devices(ip)
+    if not device or len(device) > 1:
+        return None
+
+    device = device[0]
+    rack = device.parents(clusto_types=[BasicRack])
+    if not rack or len(rack) > 1:
+        return None
+
+    rack = rack[0]
+    return '/%s' % rack.name
+
+def main():
+    if len(sys.argv) < 2:
+        sys.stderr.write('Usage: %s <ip>' % sys.argv[0])
+        return -1
+
+    try:
+        rack = get_rack(sys.argv[1])
+        print rack
+    except:
+        print '/default-rack'
+    return 0
+
+if __name__ == '__main__':
+    init_script()
+    sys.exit(main())
