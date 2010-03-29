@@ -1,3 +1,9 @@
+clusto (0.5.18-2) unstable; urgency=low
+
+  * Add clusto-hadoop-node to scripts list in setup.py 
+
+ -- Jeremy Grosser <synack@digg.com>  Mon, 29 Mar 2010 15:14:34 -0700
+
 clusto (0.5.18-1) unstable; urgency=low
 
   * Bugfixes for snmp/dhcp
