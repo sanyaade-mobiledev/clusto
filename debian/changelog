@@ -1,3 +1,10 @@
+clusto (0.5.18-1) unstable; urgency=low
+
+  * Bugfixes for snmp/dhcp
+  * New hadoop rack awareness script
+
+ -- Jeremy Grosser <synack@digg.com>  Mon, 29 Mar 2010 15:10:45 -0700
+
 clusto (0.5.17-1) unstable; urgency=low
 
   * fix empty commits
