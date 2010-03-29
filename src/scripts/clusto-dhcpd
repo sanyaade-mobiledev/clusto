@@ -6,14 +6,12 @@ from time import time
 import socket
 import signal
 
-from logging.handlers import SysLogHandler
 import logging
-
 log = logging.getLogger('clusto.dhcp')
-fmt = logging.Formatter('%(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S')
-syslog = SysLogHandler()
-syslog.setFormatter(fmt)
-log.addHandler(syslog)
+fmt = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S')
+handler = logging.FileHandler('/var/log/clusto.log')
+handler.setFormatter(fmt)
+log.addHandler(handler)
 log.setLevel(logging.INFO)
 
 runtime = logging.getLogger('scapy.runtime')
@@ -28,10 +26,10 @@ clusto = ClustoProxy('http://clusto.digg.internal:9996')
 DHCPOptions.update({
     66: 'tftp_server',
     67: 'tftp_filename',
-    208: 'pxelinux.magic',
-    209: 'pxelinux.configfile',
-    210: 'pxelinux.pathprefix',
-    211: 'pxelinux.reboottime',
+    208: 'pxelinux-magic',
+    209: 'pxelinux-configfile',
+    210: 'pxelinux-pathprefix',
+    211: 'pxelinux-reboottime',
 })
 
 for k,v in DHCPOptions.iteritems():
@@ -77,14 +75,20 @@ class DHCPResponse(object):
         options = [
             ('message-type', self.type)
         ]
+        pxelinux = False
         for k, v in self.options.items():
             if k == 'enabled': continue
             if not k in DHCPRevOptions:
                 log.warning('Unknown DHCP option: %s' % k)
                 continue
+            if k.startswith('pxelinux'):
+                pxelinux = True
             if isinstance(v, unicode):
                 v = v.encode('ascii', 'ignore')
             options.append((k, v))
+
+        if pxelinux:
+            options.append(('pxelinux-magic', '\xf1\x00\x75\x7e'))
 
         bootp_options = {
             'op': 2,
