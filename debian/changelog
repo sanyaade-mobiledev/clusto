@@ -1,3 +1,9 @@
+clusto (0.5.19-1) unstable; urgency=low
+
+  * Datacenter awareness for hadoop 
+
+ -- Jeremy Grosser <synack@digg.com>  Tue, 30 Mar 2010 03:12:16 -0700
+
 clusto (0.5.18-3) unstable; urgency=low
 
   * Allow clusto-hadoop-node to take hostnames 
