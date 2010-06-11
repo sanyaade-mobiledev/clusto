@@ -1,0 +1,250 @@
+#!/usr/bin/env python
+from clusto.scripthelpers import init_script
+import clusto
+import sys
+from optparse import OptionParser
+from clusto.drivers import IPManager
+import os
+
+def format_line(name, weight, rwpool, hdtype, pools, special_attrs, pad=10):
+    _special_attrs = ""
+    
+    if len(special_attrs) > 1:
+        for sa in special_attrs:
+            _special_attrs = _special_attrs + "%s," % sa
+    else:
+        try:
+            _special_attrs = special_attrs[0]
+        except:
+            pass
+
+    #FIXME  speical_attrs needs to be formatted
+    print name.ljust(pad, ' '),rwpool.ljust(pad, ' '),str(weight).ljust(pad, ' '), \
+       hdtype.ljust(pad, ' '),pools.ljust(pad, ' '), _special_attrs.ljust(pad, ' ')
+
+def check_pools(parents):
+    pools = []
+    for p in parents:
+        try:
+            pool = p.attrs(key="puppet", subkey="cluster_id")[0].value
+            pools.append(pool)
+        except:
+            pass
+    return pools
+
+def hasparent(parents, pool):
+    for p in parents:
+        if p.name == pool:
+            return True
+
+    return False
+
+def set_weight(objects,options):
+    for object in objects:
+        me = get_object(object)
+
+        if not options.weight:
+            print "weight must be used with -w|--weight"
+            sys.exit(1)
+
+        me.set_attr(key='mysql', subkey='weight', value=options.value)
+
+def _show_server(me, options):
+    try:
+        weight = me.attrs(key="mysql", subkey="weight")[0].value
+    except:
+        weight = 0
+
+    parents = me.parents(clusto_types=['pool'])
+    pls = check_pools(parents)
+    pools = ""
+    for p in pls:
+        pools += "%s " % p
+
+    if hasparent(parents, "mysql-read"):
+        rwpool = "read"
+    elif hasparent(parents, "mysql-write"):
+        rwpool = "write"
+
+    special_attrs = []
+    # rpl-mirror-binlog-enabled
+    if me.attrs(key="mycnf", subkey="rpl-mirror-binlog-enabled") != []:
+        special_attrs.append("rpl-mirror-binlog-enabled")
+
+
+    # FIXME  this is sort of cheesy
+    if hasparent(parents, "ssd"):
+        hdtype = "ssd"
+    else:
+        hdtype = "hdd"
+
+    if options.ip:
+        ip = IPManager.get_ips(me)[0]
+        name = me.name + "(%s)" % ip
+    else:
+        name = me.name 
+
+    format_line(name, weight, rwpool, hdtype, pools, special_attrs)
+
+def print_attrs(attr, pad=10):
+
+        print attr.key.ljust(pad, ' '), attr.subkey.ljust(pad, ' '),attr.value.ljust(pad, ' ')
+
+def show(obj, options):
+
+    if options.ip:
+        name_pad = 20
+    else:
+        name_pad = 10
+
+    pad = 10
+    print "name".ljust(name_pad, ' '),"rwpool".ljust(pad, ' '),"weight".ljust(pad, ' '), \
+                      "hdtype".ljust(pad, ' '),"pools".ljust(pad, ' '), "special attrs".ljust(pad, ' '), "\n"
+    me = get_object(obj)
+    if me._clusto_type == "server":
+        _show_server(me, options)
+    elif me._clusto_type == "pool":
+        servers = me.contents() 
+        for s in servers:
+            _show_server(s, options)
+    else:
+        print "%s is an unknown type" % me.name
+        sys.exit(1)
+
+def get_object(obj):
+
+    try:
+        try:
+            me = IPManager.get_devices(obj)[0]
+        except:
+            pass
+        try:
+            me = clusto.get_by_name(obj)  
+        except:
+            pass
+
+        parents = me.parents(clusto_types=['pool'])
+        if me._clusto_type == "server":
+            if not hasparent(parents, "mysql-read") and not \
+                                            hasparent(parents, "mysql-write"):
+                print "%s is not in \"mysql-read\" or \"mysql-write\" pools, "  \
+                    "exiting\n" % me.name
+                sys.exit(1)
+
+        return me
+
+    except:
+        print "%s is not a valid object" % obj
+        sys.exit(1)
+
+def format_attr(attr, pad=10):
+   
+    print attr.key.ljust(pad, ' '), attr.subkey.ljust(pad, ' '),"=", str(attr.value).ljust(20, ' ')
+
+def show_attrs(objects, options, pad=10):
+    for object in objects:
+        me = get_object(object)
+        print "\n","name".ljust(pad, ' '), me.name
+        mysqlattrs = me.attrs(key="mysql", merge_container_attrs=options.merge_container_attrs)
+        mycnfattrs = me.attrs(key="mycnf", merge_container_attrs=options.merge_container_attrs)
+
+        attrs = mysqlattrs + mycnfattrs
+
+        for attr in attrs:
+            if options.key: 
+                if attr.subkey == options.key:
+                    format_attr(attr)
+    
+            if options.value:
+                if str(attr.value) == str(options.value):
+                    format_attr(attr)
+            else:
+                    format_attr(attr)
+
+def connect(obj, options):
+    cluster = get_object(options.cluster)
+    dbattrs = cluster.attrs(key="puppet", merge_container_attrs=False)
+    for attr in dbattrs:
+        if attr.subkey == "port":
+            port = attr.value
+    
+    me = get_object(obj[0])
+    mycnfattrs = me.attrs(key="mycnf", merge_container_attrs=True)
+    for attr in mycnfattrs:
+        if attr.subkey == "password":
+            password = attr.value 
+
+    ip = IPManager.get_ips(me)[0]
+    
+    if options.user:
+        username = options.user
+    else:
+        username = "root"
+
+    if options.db:
+        db = options.db
+    else:
+        db = ""
+
+    cmd = "mysql --user %s --host %s --port %s -p%s %s" % (username,ip,port,password,db)
+    os.system(cmd)
+
+def main():
+    parser = OptionParser(usage="usage: %prog (show|show-attrs|weight|connect) object")
+    parser.add_option("-w", "--weight", dest="weight", help='used with weight')
+    parser.add_option('-x', '--xml', dest='xml', action='store_true', \
+                      help='Output of a pool or node will be in xml format')
+    parser.add_option("-k", "--key", dest="key", \
+                        help='use with show-attrs to filter output on a given key')
+    parser.add_option("-v", "--value", dest="value", \
+                        help='use with show-attrs to filter output on a given value')
+    parser.add_option("-m", "--merge", dest="merge_container_attrs", action='store_true', 
+                        help='use with show-attrs to merge attributes with vertical objects')
+    parser.add_option("-i", "--ip", dest="ip",  action='store_true', 
+                        help='use with show to display ip addresses')
+    parser.add_option("-c", "--cluster", dest="cluster", 
+                        help='use with connect to specify which db instance to connect to')
+    parser.add_option("-u", "--user", dest="user", 
+                        help='use with connect to specify which user to connect with')
+    parser.add_option("-d", "--db", dest="db", 
+                        help='use with connect to specify which database to use')
+
+    (options, args) = parser.parse_args(sys.argv[1:]) 
+
+    if len(args) <> 2:
+        parser.print_help("incorrect number of options")
+        sys.exit(1)
+
+    action, object  = args[:2]
+
+    if "," in object:
+        objects = object.split(",")
+   
+    else:
+        objects = [object]
+
+    action = action.lower()
+    
+    if action == "show":
+        for object in objects:
+            show(object, options)
+    elif action == "show-attrs":
+        show_attrs(objects, options)
+    elif action == "weight":
+        set_weight(objects,options)
+    elif action == "connect":
+        if len(objects) > 1:
+            print "can only connect to one db"
+            sys.exit(1)
+        if not options.cluster:
+            print "must use -c|--cluster with connect"
+            sys.exit(1)
+        connect(objects,options)
+
+    else:
+        print "unknown action \"%s\"" % action
+        sys.exit(1)
+
+if __name__ == '__main__':
+    init_script()
+    sys.exit(main())
