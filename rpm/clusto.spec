@@ -1,13 +1,15 @@
 %include %{_rpmconfigdir}/macros.python
 
-# Defaults to --with-mysql unless --without mysql is specified, should this change?
+# Defaults to --with-mysql
 %{!?_without_mysql: %{!?_with_mysql: %define _with_mysql --with-mysql}}
+# Defaults to --with-httpd
+%{!?_without_httpd: %{!?_with_httpd: %define _with_httpd --with-httpd}}
 # Defaults to --without-psycopg2
 %{!?_with_psycopg2: %{!?_without_psycopg2: %define _without_psycopg2 --without-psycopg2}}
 
 Name:		clusto
 Version:	0.5.29
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Tools and libraries for organizing and managing infrastructure
 
 Group:		Applications/System
@@ -33,6 +35,7 @@ Requires:   python-IPy
 Requires:   scapy >= 2.0
 %{?_with_mysql:Requires: MySQL-python}
 %{?_with_psycopg2:Requires: python-psycopg2}
+%{?_with_httpd:Requires: python-webob}
 
 %description
 Clusto is a cluster management tool. It helps you keep track of your inventory,
@@ -78,6 +81,9 @@ cp contrib/* %{buildroot}%{_libexecdir}/%{name}/
 
 
 %changelog
+* Sun Jul 25 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.29-3
+- Added python-webob
+
 * Mon Jul 12 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.29-2
 - Fixed %files section
 
