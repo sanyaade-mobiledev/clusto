@@ -21,6 +21,8 @@ setup(name = "clusto",
                           'scapy',
                           'pcapy',
                           'WebOb',
+                          'mako',
+                          'boto'
                           ],
       zip_safe=False,
       package_dir = {'':'src'},
