@@ -1,3 +1,16 @@
+clusto (0.5.31-7) unstable; urgency=low
+
+  [ Ron Gorodetzky ]
+  * make tests use new connect call
+  * fix get_entities to only fix unicode on strings
+  * keep del_attrs from removing hidden attrs by default
+  * fix connect calls in concurrentusage test
+
+  [ Jorge A Gallegos ]
+  * More unicode fixes
+
+ -- Jorge A Gallegos <kad@digg.com>  Mon, 11 Oct 2010 23:10:33 -0700
+
 clusto (0.5.31-6) unstable; urgency=low
 
   * Adding the web interface to the package
