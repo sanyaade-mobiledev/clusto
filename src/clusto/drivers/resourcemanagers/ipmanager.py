@@ -27,8 +27,8 @@ class IPManager(ResourceManager):
     def ipy(self):
         if not hasattr(self, '__ipy'):
 
-            self.__ipy = IPy.IP(''.join([str(self.baseip), '/', self.netmask]),
-                                make_net=True)
+            self.__ipy = IPy.IP(''.join([u'%s' % str(self.baseip), '/', 
+                                u'%s' % self.netmask]), make_net=True)
 
 
         return self.__ipy
@@ -46,7 +46,7 @@ class IPManager(ResourceManager):
                                         % resource)
 
         if self.baseip and (ip not in self.ipy):
-            raise ResourceTypeException("The ip %s is out of range for this IP manager.  Should be in %s/%s"
+            raise ResourceTypeException(u"The ip %s is out of range for this IP manager.  Should be in %s/%s"
                                         % (str(ip), self.baseip, self.netmask))
 
 
@@ -57,7 +57,7 @@ class IPManager(ResourceManager):
 
         resource, number = self.ensure_type(resource, number)
 
-        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=str(IPy.IP(resource+self.__int_ip_const)))
+        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=u'%s' % str(IPy.IP(resource+self.__int_ip_const)))
         
                      
     def allocator(self, thing=None):
@@ -130,7 +130,7 @@ class IPManager(ResourceManager):
         
 
         if not ipman:
-            raise ResourceException("No resource manager for %s exists."
+            raise ResourceException(u"No resource manager for %s exists."
                                     % str(ip))
         
         return ipman
