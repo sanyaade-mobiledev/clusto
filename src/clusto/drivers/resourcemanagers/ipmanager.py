@@ -138,7 +138,7 @@ class IPManager(ResourceManager):
     @classmethod
     def get_ips(cls, device):
 
-        ret = [str(IPy.IP(x.value+cls.__int_ip_const))
+        ret = [u'%s' % str(IPy.IP(x.value+cls.__int_ip_const))
                for x in cls.resources(device)]
 
         return ret
