@@ -6,8 +6,8 @@
 %{!?_with_psycopg2: %{!?_without_psycopg2: %define _without_psycopg2 --without-psycopg2}}
 
 Name:		clusto
-Version:	0.5.31
-Release:	6%{?dist}
+Version:	0.5.32
+Release:	1%{?dist}
 Summary:	Tools and libraries for organizing and managing infrastructure
 
 Group:		Applications/System
@@ -82,6 +82,15 @@ cp -R web/static/* %{buildroot}%{_datadir}/%{name}/web/
 
 
 %changelog
+* Mon 18 Oct 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.32-1
+- 755 (Jorge Gallegos)
+- Adding ability to pass a default argument to the config getter
+  (Jorge Gallegos)
+- keep del_attrs from removing hidden attrs by default (Ron
+  Gorodetzky)
+- initial feature complete version (William Francis)
+- new clusto-mysql script (William Francis)
+
 * Thu Sep 30 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.31-6
 - Adding the web interface to the package (Jorge A Gallegos)
 

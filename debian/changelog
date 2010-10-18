@@ -1,3 +1,18 @@
+clusto (0.5.32-1) unstable; urgency=low
+
+  [ Jorge A Gallegos ]
+  * 755
+  * Adding ability to pass a default argument to the config getter
+
+  [ Ron Gorodetzky ]
+  * keep del_attrs from removing hidden attrs by default
+
+  [ William Francis ]
+  * initial feature complete version
+  * new clusto-mysql script
+
+ -- Jorge A Gallegos <kad@digg.com>  Mon, 18 Oct 2010 14:41:04 -0700
+
 clusto (0.5.31-8) unstable; urgency=low
 
   * More unicode fixes, this is getting tiring
