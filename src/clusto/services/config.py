@@ -35,10 +35,16 @@ for filename in files:
 if not config:
     sys.stderr.write('Unable to find services.conf!\n')
 
-def conf(key):
+def conf(key, **kwargs):
     obj = config
     for k in key.split('.'):
-        obj = obj[k]
+        try:
+            obj = obj[k]
+        except KeyError, ke:
+            if 'default' in kwargs.keys():
+                return kwargs['default']
+            else:
+                raise KeyError(ke)
     return obj
 
 def get_logger(name, level='INFO'):
