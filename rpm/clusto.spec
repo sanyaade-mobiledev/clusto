@@ -7,7 +7,7 @@
 
 Name:		clusto
 Version:	0.5.32
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Tools and libraries for organizing and managing infrastructure
 
 Group:		Applications/System
@@ -82,6 +82,12 @@ cp -R web/static/* %{buildroot}%{_datadir}/%{name}/web/
 
 
 %changelog
+* Mon 19 Oct 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.32-2
+- The DHCP server now queries the DB directly instead of going thru
+  the API
+- Fixing the whole suggests/recommends thing
+- We need sqlalchemy 0.6.4
+
 * Mon 18 Oct 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.32-1
 - 755 (Jorge Gallegos)
 - Adding ability to pass a default argument to the config getter
