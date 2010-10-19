@@ -7,7 +7,8 @@ Standards-Version: 3.7.2
 
 Package: clusto
 Architecture: any
-Depends: ${python:Depends}, ipython, python-sqlalchemy, python-scapy (>= 2.0.1), python-ipy, python-libvirt
-Suggests: python-psycopg2, python-mysqldb, python-yaml
+Depends: ${python:Depends}, ipython, python-sqlalchemy (>= 0.6.4), python-ipy, python-sqlite
+Recommends: python-psycopg2, python-mysqldb, python-yaml, python-simplejson
+Suggests: python-libvirt, python-scapy (>= 2.0.1), python-memcache
 Provides: ${python:Provides}
 Description: Clusto is a tool/library for organizing and managing infrastructure
