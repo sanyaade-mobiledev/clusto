@@ -1,3 +1,18 @@
+clusto (0.5.32-3) unstable; urgency=low
+
+  * aptitude is stupid
+
+ -- Jorge A Gallegos <kad@digg.com>  Sat, 23 Oct 2010 11:45:55 -0700
+
+clusto (0.5.32-2) unstable; urgency=low
+
+  * The DHCP server now queries the DB directly instead of going thru
+    the API
+  * Fixing the whole suggests/recommends thing
+  * We need sqlalchemy 0.6.4
+
+ -- Jorge A Gallegos <kad@digg.com>  Tue, 19 Oct 2010 15:35:52 -0700
+
 clusto (0.5.32-1) unstable; urgency=low
 
   [ Jorge A Gallegos ]

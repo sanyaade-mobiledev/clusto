@@ -17,8 +17,7 @@ loading.setLevel(logging.ERROR)
 from scapy.all import BOOTP, DHCP, DHCPTypes, DHCPOptions, DHCPRevOptions
 from IPy import IP
 
-from clustohttp import ClustoProxy
-clusto = ClustoProxy(conf('dhcp.api_url'))
+import clusto
 
 extra = conf('dhcp.extra_options')
 extra = dict([(int(k), str(v)) for k, v in extra.items()])
@@ -177,7 +176,7 @@ class ClustoDHCPServer(DHCPServer):
         server = server[0]
 
         enabled = server.attrs(key='dhcp', subkey='enabled', merge_container_attrs=True)
-        if not enabled or not enabled[0]['value']:
+        if not enabled or not enabled[0].value:
             log.info('DHCP not enabled for %s' % server.name)
             return
 
@@ -186,9 +185,16 @@ class ClustoDHCPServer(DHCPServer):
             log.info('No IP assigned for %s' % server.name)
             return
         else:
-            ip = ip[0]['value']
+            ip = ip[0].value
 
-        ipman = dict([(x['key'], x['value']) for x in clusto.get_ip_manager(ip).attrs() if x['subkey'] == 'property'])
+        ipman = server.attrs(key='ip', subkey='manager')
+        if not ipman:
+            log.info('Could not find the ip manager for %s' % server.name)
+            return
+        else:
+            ipman = ipman[0].value
+        ipman = dict([(x.key, x.value) for x in ipman.attrs(subkey='property')])
+        #ipman = dict([(x['key'], x['value']) for x in clusto.get_ip_manager(ip).attrs() if x['subkey'] == 'property'])
         ipy = IP('%s/%s' % (ip, ipman['netmask']), make_net=True)
 
         options = {
@@ -198,13 +204,13 @@ class ClustoDHCPServer(DHCPServer):
             'subnet_mask': ipman['netmask'],
             'broadcast_address': ipy.broadcast().strNormal(),
             'router': ipman['gateway'],
-            'hostname': server.name,
+            'hostname': server.hostname,
         }
 
-        log.info('Sending offer to %s' % server.name)
+        log.info('Sending offer to %s, options: %s' % (server.name, options))
 
         for attr in server.attrs(key='dhcp', merge_container_attrs=True):
-            options[attr['subkey']] = attr['value']
+            options[attr.subkey] = attr.value
 
         response = DHCPResponse(type='offer', offerip=ip, options=options, request=request)
         self.offers[request.packet.chaddr] = response
@@ -237,3 +243,4 @@ class ClustoDHCPServer(DHCPServer):
                 server.set_port_attr('nic-eth', 1, 'mac', request.hwaddr)
         except:
             log.error('Error updating server MAC: %s' % format_exc())
+
