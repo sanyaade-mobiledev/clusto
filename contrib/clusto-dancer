@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+from optparse import OptionParser
+import os
+import sys
+import yaml
+
+import clusto
+from clusto import scripthelpers
+
+
+def main():
+    usage = '%prog [options]'
+    parser = OptionParser(usage=usage)
+    parser.add_option('-c', '--config', dest='config', help="Config file")
+    parser.add_option('-b', '--base-dir', dest='basedir', help="Base directory")
+    parser.add_option('-f', '--force', dest='force', action='store_true',
+        default=False, help='Overwrite group files')
+    options, args = parser.parse_args()
+
+    if not options.config or not options.basedir:
+        print 'You need both options'
+        parser.print_help()
+        return 1
+
+    if not os.path.isdir(options.basedir):
+        print 'Base path %s does not exist' % options.basedir
+        return 2
+
+    if not os.access(options.basedir, os.W_OK):
+        print 'You do not have write access to %s' % options.basedir
+        return 3
+
+    if not os.path.isfile(options.config):
+        print 'Please supply a valid config file'
+        return 4
+
+    f = open(options.config, 'rb')
+    config = f.read()
+    f.close()
+
+    try:
+        config = yaml.load(config)
+    except:
+        print 'The config seems to not be a valid YAML file'
+        return 5
+
+    groups = {}
+#   Fetch the ip addresses of all the groups
+    for pools in config['pools']:
+        for pool, subpools in pools.items():
+            for subpool in subpools:
+                group_key = '%s-%s' % (pool, subpool)
+                if group_key in groups.keys():
+                    print 'Skipping repeated group %s' % group_key
+                else:
+                    group_path = os.path.join(options.basedir, 'group', group_key)
+                    if os.path.exists(group_path):
+                        if not options.force:
+                            print 'Skipping existing group file %s, use -f to force' % group_path
+                            continue
+                    server_list = [_.get_ips()[0] for _ in clusto.get_from_pools([pool, subpool]) if _.get_ips()]
+                    #server_list = ['1']
+                    groups[group_key] = server_list
+
+    group_path = os.path.join(options.basedir, 'group')
+    try:
+        os.makedirs(group_path)
+    except OSError, ose:
+        if ose.errno != 17:
+            raise ose
+        else:
+            print 'Group dir in the base path %s already exists, skipping' % options.basedir
+
+    for group_key, server_list in groups.items():
+        group_path = os.path.join(options.basedir, 'group', group_key)
+        print 'Writing group file %s' % group_path
+        f = open(group_path, 'w')
+        for server in server_list:
+            f.write('%s\n' % server)
+        f.close()
+
+    return
+
+if __name__ == '__main__':
+    scripthelpers.init_script()
+    sys.exit(main())
+
