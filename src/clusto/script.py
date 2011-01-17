@@ -70,10 +70,8 @@ class Script(object):
     def run(self, *args, **kwargs):
         raise NotImplementedError()
 
-    def load_config(self, filename):
+    def load_config(self, filename, dsn=None):
         '''Find, parse, and return the configuration data needed by clusto.'''
-
-        filename = filename or os.environ.get('CLUSTOCONFIG')
 
         if filename:
             if not os.path.exists(os.path.realpath(filename)):
@@ -95,6 +93,9 @@ class Script(object):
         if 'CLUSTODSN' in os.environ:
             self.config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
 
+        if dsn:
+            self.config.set('clusto', 'dsn', dsn)
+
         if not self.config.has_option('clusto', 'dsn'):
             raise CmdLineError("No database given for clusto data.")
 
@@ -103,7 +104,7 @@ class Script(object):
 
         return self.config
 
-    def init_script(self, config, logger=None, initializedb=False):
+    def init_script(self, args, logger=None):
         '''Initialize the clusto environment for clusto scripts.
 
         Connects to the clusto database, returns a python SafeConfigParser and a
@@ -113,12 +114,14 @@ class Script(object):
 
         if logger:
             self.set_logger(logger)
-        self.load_config(config)
+        if 'CLUSTOCONFIG' in os.environ:
+            filename = os.environ['CLUSTOCONFIG']
+        else:
+            filename = args.config
+        self.load_config(filename, args.dsn)
+        self.debug('Connecting to %s' % self.config.get('clusto', 'dsn'))
         clusto.connect(self.config)
 
-        if initializedb:
-            clusto.init_clusto()
-        
         return self.config
 
 def demodule(module):
@@ -171,7 +174,7 @@ def main():
     klass = klass()
     klass.set_logger(log)
     try:
-        klass.init_script(config=args.config, logger=log)
+        klass.init_script(args=args, logger=log)
         klass.run(args)
     except Exception as e:
         log.error(str(e))
