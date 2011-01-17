@@ -37,7 +37,7 @@ def main():
     this_parser = argparse.ArgumentParser(parents=[parent_parser],
         description=s._get_description())
     args = this_parser.parse_args()
-    s.init_script(args.config, script.get_logger(args.loglevel))
+    s.init_script(args=args, logger=script.get_logger(args.loglevel))
     return(s.run(args))
 
 if __name__ == '__main__':
