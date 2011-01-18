@@ -46,6 +46,9 @@ class Script(object):
             help=self._get_description())
         return parser
 
+    def add_subparser(self, subparser):
+        self._setup_subparser(subparser)
+
     def set_logger(self, logger):
         self.logger = logger
 
@@ -130,7 +133,7 @@ def demodule(module):
     klass = getattr(module, klass)
     return klass
 
-def setup_parser(add_help=False):
+def setup_base_parser(add_help=False):
     import argparse
     parser = argparse.ArgumentParser(prog=os.path.basename(sys.argv[0]),
         description='Clusto script', conflict_handler='resolve',
@@ -153,16 +156,16 @@ def main():
     # These modules should only be imported if called from the cli
     from clusto import commands
 
-    parser = setup_parser(add_help=True)
+    parser = setup_base_parser(add_help=True)
     subparsers = parser.add_subparsers(title='Available clusto commands', dest='subparser_name')
     for module in commands.__all__:
         try:
             klass = demodule(module)
             klass = klass()
-            klass._setup_subparser(subparsers)
+            klass.add_subparser(subparsers)
             klass = None
-        except:
-            pass
+        except Exception, e:
+            print e
     args = parser.parse_args()
 
     log = get_logger(args.loglevel)
