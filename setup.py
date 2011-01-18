@@ -28,8 +28,9 @@ setuptools.setup(
     ],
     entry_points = {
         'console_scripts': [
-            'clusto = clusto.script:main',
+            'clusto = clusto.script_helper:main',
             'clusto-shell = clusto.commands.shell:main',
+            'clusto-info = clusto.commands.info:main',
         ],
     },
     zip_safe = False,
@@ -42,7 +43,6 @@ setuptools.setup(
         #os.path.join(srcdir, 'scripts', 'clusto-fai'),
         #os.path.join(srcdir, 'scripts', 'clusto-kvm'),
         #os.path.join(srcdir, 'scripts', 'clusto-httpd'),
-        #os.path.join(srcdir, 'scripts', 'clusto-info'),
         #os.path.join(srcdir, 'scripts', 'clusto-list-pool'),
         #os.path.join(srcdir, 'scripts', 'clusto-mysql'),
         #os.path.join(srcdir, 'scripts', 'clusto-pool'),

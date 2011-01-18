@@ -1,1 +1,1 @@
-__all__ = [ 'shell', 'allocate' ]
+__all__ = [ 'shell', 'info' ]

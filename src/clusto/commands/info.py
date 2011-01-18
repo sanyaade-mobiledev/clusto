@@ -1,77 +1,131 @@
 #!/usr/bin/env python
-from clusto.scripthelpers import init_script
-from clusto.drivers import IPManager, VMManager
-import clusto
 
-import sys
+import argparse
 import re
+import sys
 
-def format_line(key, value, pad=20):
-    if isinstance(value, list):
-        value = ', '.join(value)
-    key += ':'
-    print key.ljust(pad, ' '), value
+import clusto
+from clusto.drivers import IPManager
+from clusto import script_helper
 
-def device_info(obj):
-    print 'Name:'.ljust(20, ' '), obj.name
-    print 'Type:'.ljust(20, ' '), obj.type
 
-    ip = IPManager.get_ips(obj)
-    if ip:
-        format_line('IP', ip)
-    parents = obj.parents()
-    if parents:
-        format_line('Parents', [x.name for x in parents])
-    contents = obj.contents()
-    if contents:
-        format_line('Contents', [x.name for x in contents])
-    if obj.type == 'virtualserver':
-        hv = VMManager.resources(obj)
-        if hv:
-            format_line('Hypervisor', [x.value.name for x in hv])
+class Info(script_helper.Script):
+    '''
+    This is a script that displays information about a certain object
+    (or list of objects) and displays it to stdout.
+    '''
 
-    print '\n',
+    def __init__(self):
+        script_helper.Script.__init__(self)
 
-    serial = obj.attr_values(key='system', subkey='serial')
-    if serial:
-        format_line('Serial', [x.rstrip('\r\n') for x in serial if x])
-    memory = obj.attr_value(key='system', subkey='memory')
-    if memory:
-        format_line('Memory', '%i GB' % (memory / 1000))
-    disk = obj.attr_value(key='system', subkey='disk')
-    if disk:
-        format_line('Disk', '%i GB (%i)' % (disk, len(obj.attrs(key='disk', subkey='size'))))
-    cpucount = obj.attr_value(key='system', subkey='cpucount')
-    if cpucount:
-        format_line('CPU Cores', cpucount)
-    desc = obj.attr_values(key='description')
-    if desc:
-        format_line('Description', '\n                    '.join(desc))
+    def format_line(self, key, value, pad=20):
+        if value:
+            if isinstance(value, list):
+                value = ', '.join(value)
+            key += ':'
+            print key.ljust(pad, ' '), value
 
-    ifaces = [('nic-eth(%i)' % x.number).ljust(20, ' ') + ' %s = %s' % (x.subkey, x.value) for x in obj.attrs(key='port-nic-eth') if x.subkey.find('mac') != -1]
-    if ifaces:
-        print '\n', '\n'.join(ifaces)
+    def print_summary(self, items):
+        self.debug('Printing with format=summary')
+        for item in items:
+            self.format_line('Name', item.pop('name'))
+            self.format_line('Type', item.pop('type'))
+            if 'ip' in item.keys():
+                self.format_line('IP', item.pop('ip'))
+            self.format_line('Description', item.pop('description'))
+            if 'parents' in item.keys():
+                self.format_line('Parents', item.pop('parents'))
+            if 'contents' in item.keys():
+                self.format_line('Contents', item.pop('contents'))
+            print '\n'
+            keys = sorted(item.keys())
+            for k in keys:
+                self.format_line(k.capitalize(), item[k])
+            print '-' * 80
+
+
+    def print_oneline(self, items):
+        self.debug('Printing with format=oneline')
+        for item in items:
+            line = '%s(%s);' % (item.pop('name'), item.pop('type'))
+            line += '%s;' % (','.join([ '"%s"' % _ for _ in item.pop('description') ]))
+            if 'ip' in item.keys():
+                line += 'ip=%s;' % (','.join([ _ for _ in item.pop('ip') ]))
+            if 'parents' in item.keys():
+                line += 'parents=%s;' % (','.join([ _ for _ in item.pop('parents') ]))
+            if 'contents' in item.keys():
+                line += 'contents=%s;' % (','.join([ _ for _ in item.pop('contents') ]))
+            keys = sorted(item.keys())
+            for k in keys:
+                line += '%s=%s;' % (k, item[k])
+            print line
+
+    def run(self, args):
+        if not args.items:
+            print 'You need to provide at least one item. Use --help'
+            return 0
+        item_list = []
+        self.debug('Fetching the list of items: %s' % ','.join(args.items))
+        for item in args.items:
+            obj = clusto.get(item)
+            if not obj:
+                self.warn("The item %s couldn't be found" % item)
+                continue
+            obj = obj[0]
+            self.debug('Object found! %s' % obj)
+            item_attrs = {
+                'name': obj.name,
+                'type': obj.type,
+            }
+#           Fetch system attrs
+            for attr in obj.attrs(key='system'):
+                item_attrs[attr.subkey] = attr.value
+#           fetch description(s)
+            values = obj.attrs(key='description')
+            if values:
+                item_attrs['description'] = [ _.value for _ in values]
+            else:
+                item_attrs['description'] = ''
+#           fetch parent(s)
+            values = obj.parents()
+            if values:
+                item_attrs['parents'] = [ _.name for _ in values ]
+#           fetch content(s)
+            values = obj.contents()
+            if values:
+                item_attrs['contents'] = [ _.name for _ in values ]
+#           fetch ip(s)
+            values = IPManager.get_ips(obj)
+            if values:
+                item_attrs['ip'] = [ _ for _ in values ]
+#           fetch mac(s)
+            values = [ _ for _ in obj.attrs(key='port-nic-eth') if _.subkey.find('mac') != -1 ]
+            if values:
+                for value in values:
+                    item_attrs['mac%d' % value.number] = value.value
+            item_list.append(item_attrs)
+        getattr(self, 'print_%s' % args.format)(item_list)
+
+    def _add_arguments(self, parser):
+        parser.add_argument('--format', choices=['summary', 'oneline'], default='summary',
+            help='What format to use to display the info, defaults to "summary"')
+        parser.add_argument('items', nargs='*', metavar='item',
+            help='List of one or more objects to show info')
+
+    def add_subparser(self, subparsers):
+        parser = self._setup_subparser(subparsers)
+        self._add_arguments(parser)
 
 def main():
-    if len(sys.argv) < 2:
-        print 'Usage: %s <name, ip, or mac>' % sys.argv[0]
-        return
-
-    query = sys.argv[1]
-    
-    result = clusto.get(query)
-    if not result:
-        sys.stderr.write('Object not found\n')
-        return -1
-
-    for obj in result:
-        device_info(obj)
-    return 0
+    info = Info()
+    parent_parser = script_helper.setup_base_parser()
+    this_parser = argparse.ArgumentParser(parents=[parent_parser],
+        description=info._get_description())
+    info._add_arguments(this_parser)
+    args = this_parser.parse_args()
+    info.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    return(info.run(args))
 
 if __name__ == '__main__':
-    init_script()
-    ret = main()
-    if not ret:
-        sys.exit(0)
-    else:
-        sys.exit(ret)
+    sys.exit(main())
+
