@@ -16,7 +16,8 @@ from clusto import *
 
 class Shell(script_helper.Script):
     '''
-    This is an interactive clusto shell.
+    This is a powerful, interactive clusto shell. The full clusto API
+    is available in python idioms.
 
     Use at your own risk
     '''
@@ -32,13 +33,13 @@ class Shell(script_helper.Script):
         ipshell()
 
 def main():
-    s = Shell()
-    parent_parser = script_helper.setup_parser()
+    shell = Shell()
+    parent_parser = script_helper.setup_base_parser()
     this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=s._get_description())
+        description=shell._get_description())
     args = this_parser.parse_args()
-    s.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
-    return(s.run(args))
+    shell.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    return(shell.run(args))
 
 if __name__ == '__main__':
     sys.exit(main())
