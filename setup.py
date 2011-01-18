@@ -17,8 +17,8 @@ setuptools.setup(
     version = "0.6.0",
     packages = setuptools.find_packages(srcdir),
     author = "Ron Gorodetzky",
-    author_email = "rongoro@gmail.com",
-    description = "Clusto, cluster management and inventory system",
+    author_email = "ron@fflick.com",
+    description = "Cluster management and inventory system",
     install_requires = [
         'argparse',
         'sqlalchemy>=0.6.4',
@@ -35,7 +35,7 @@ setuptools.setup(
     zip_safe = False,
     package_dir = { '': srcdir },
     scripts = [
-        os.path.join(srcdir, 'scripts', 'clusto-allocate'),
+        #os.path.join(srcdir, 'scripts', 'clusto-allocate'),
         #os.path.join(srcdir, 'scripts', 'clusto-attr'),
         #os.path.join(srcdir, 'scripts', 'clusto-console'),
         #os.path.join(srcdir, 'scripts', 'clusto-dhcpd'),
@@ -49,7 +49,6 @@ setuptools.setup(
         #os.path.join(srcdir, 'scripts', 'clusto-puppet-node'),
         #os.path.join(srcdir, 'scripts', 'clusto-hadoop-node'),
         #os.path.join(srcdir, 'scripts', 'clusto-reboot'),
-        #os.path.join(srcdir, 'scripts', 'clusto-shell'),
         #os.path.join(srcdir, 'scripts', 'clusto-snmptrapd'),
         #os.path.join(srcdir, 'scripts', 'clusto-tree'),
         #os.path.join(srcdir, 'scripts', 'clusto-update-info'),
