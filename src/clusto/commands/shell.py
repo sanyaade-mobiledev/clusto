@@ -10,11 +10,11 @@ from IPython.Shell import IPShellEmbed
 import sys
 
 import clusto
-from clusto import script
+from clusto import script_helper
 from clusto import *
 
 
-class Shell(script.Script):
+class Shell(script_helper.Script):
     '''
     This is an interactive clusto shell.
 
@@ -22,7 +22,7 @@ class Shell(script.Script):
     '''
 
     def __init__(self):
-        script.Script.__init__(self)
+        script_helper.Script.__init__(self)
 
     def run(self, args):
         opts = ['-prompt_in1', 'clusto [\#]> ', '-prompt_out', 'out [\#]> ']
@@ -33,11 +33,11 @@ class Shell(script.Script):
 
 def main():
     s = Shell()
-    parent_parser = script.setup_parser()
+    parent_parser = script_helper.setup_parser()
     this_parser = argparse.ArgumentParser(parents=[parent_parser],
         description=s._get_description())
     args = this_parser.parse_args()
-    s.init_script(args=args, logger=script.get_logger(args.loglevel))
+    s.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
     return(s.run(args))
 
 if __name__ == '__main__':
