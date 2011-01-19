@@ -27,6 +27,9 @@ class CmdLineError(Exception):
 
 
 class Script(object):
+    '''
+    Base script helper class
+    '''
 
     logger = None
     config = None
@@ -35,6 +38,11 @@ class Script(object):
         pass
 
     def _get_description(self):
+        '''
+        Returns the docstring for the class if there's one,
+        otherwise it returns a generic blurb
+        '''
+
         if self.__class__.__doc__:
             help_string = self.__class__.__doc__
         else:
@@ -42,39 +50,76 @@ class Script(object):
         return help_string
 
     def _setup_subparser(self, subparsers):
-        parser = subparsers.add_parser(self.__class__.__name__.lower(),
-            help=self._get_description())
+        '''
+        Sets up the command subparser, this should (in theory at least)
+        only be called from within add_subparser()
+        '''
+
+        command_name = self.__class__.__name__.lower().replace('_', '-')
+        parser = subparsers.add_parser(command_name, help=self._get_description())
         return parser
 
     def add_subparser(self, subparser):
+        '''
+        Adds the command subparser to the base parser. This method should
+        always call _setup_subparser so the command becomes available in
+        the argparse namespace, otherwise it won't be listed
+        '''
+
         self._setup_subparser(subparser)
 
     def set_logger(self, logger):
+        '''
+        Sets the class logger to whatever logging facility we provide
+        '''
         self.logger = logger
 
     def log(self, msg, level=logging.INFO):
+        '''
+        I dislike having to type self.logger.log()
+        '''
         self.logger.log(level=level, msg=msg)
 
     def error(self, msg):
+        '''
+        Passthrough to self.logger.error()
+        '''
         self.log(msg, level=logging.ERROR)
 
     def warn(self, msg):
+        '''
+        Passthrough to self.logger.warn()
+        '''
         self.log(msg, level=logging.WARN)
 
     def fatal(self, msg):
+        '''
+        Passthrough to self.logger.fatal()
+        '''
         self.log(msg, level=logging.FATAL)
 
     def debug(self, msg):
+        '''
+        Passthrough to self.logger.debug()
+        '''
         self.log(msg, level=logging.DEBUG)
 
     def info(self, msg):
+        '''
+        Passthrough to self.logger.info()
+        '''
         self.log(msg)
 
     def run(self, *args, **kwargs):
+        '''
+        Main command loop, should be implemented in child classes
+        '''
         raise NotImplementedError()
 
     def load_config(self, filename, dsn=None):
-        '''Find, parse, and return the configuration data needed by clusto.'''
+        '''
+        Find, parse, and return the configuration data needed by clusto
+        '''
 
         if filename:
             if not os.path.exists(os.path.realpath(filename)):
@@ -103,16 +148,17 @@ class Script(object):
             raise CmdLineError("No database given for clusto data.")
 
     def get_config(self):
-        '''Returns the config object'''
+        '''
+        Returns the config object
+        '''
 
         return self.config
 
     def init_script(self, args, logger=None):
-        '''Initialize the clusto environment for clusto scripts.
+        '''
+        Initialize the clusto environment for clusto scripts.
 
-        Connects to the clusto database, returns a python SafeConfigParser and a
-        logger.
-
+        Connects to the clusto database, returns a python SafeConfigParser
         '''
 
         if logger:
@@ -128,12 +174,23 @@ class Script(object):
         return self.config
 
 def demodule(module):
+    '''
+    Returns a class out of a given module name by doing:
+    some_name_in_this_form => SomeNameInThisForm()
+    '''
+
     klass = ''.join([_.capitalize() for _ in module.split('_')])
     module = __import__('clusto.commands.%s' % module, fromlist=['clusto.commands'])
     klass = getattr(module, klass)
     return klass
 
 def setup_base_parser(add_help=False):
+    '''
+    Setups the base parser with common options, this is used here down below
+    or can alternatively be used in the commands main() call for standalone
+    script support
+    '''
+
     import argparse
     parser = argparse.ArgumentParser(prog=os.path.basename(sys.argv[0]),
         description='Clusto script', conflict_handler='resolve',
@@ -146,6 +203,10 @@ def setup_base_parser(add_help=False):
     return parser
 
 def get_logger(loglevel='INFO'):
+    '''
+    Returns a basic std{out,err} logger
+    '''
+
     format='%(name)s: %(levelname)-8s %(message)s'
     logging.basicConfig(format=format)
     log = logging.getLogger('clusto')
@@ -153,23 +214,30 @@ def get_logger(loglevel='INFO'):
     return log
 
 def main():
-    # These modules should only be imported if called from the cli
+    # should only be imported if called from the cli
     from clusto import commands
 
     parser = setup_base_parser(add_help=True)
     subparsers = parser.add_subparsers(title='Available clusto commands', dest='subparser_name')
-    for module in commands.__all__:
-        try:
-            klass = demodule(module)
-            klass = klass()
-            klass.add_subparser(subparsers)
-            klass = None
-        except Exception, e:
-            print e
+    help_subparser = subparsers.add_parser('help', help='Print clusto help')
+    for dirpath, dirname, filenames in os.walk(commands.__path__[0]):
+        for fn in filenames:
+            if not fn.endswith('pyc') and not fn.startswith('__'):
+                module = fn.split('.')[0]
+                try:
+                    klass = demodule(module)
+                    klass = klass()
+                    klass.add_subparser(subparsers)
+                    klass = None
+                except Exception, e:
+                    pass
     args = parser.parse_args()
 
     log = get_logger(args.loglevel)
     if len(sys.argv) < 2:
+        parser.print_help()
+        return 0
+    if args.subparser_name == 'help':
         parser.print_help()
         return 0
     log.debug('Loading from clusto frontend: %s' % args.subparser_name)
