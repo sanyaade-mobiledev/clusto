@@ -7,7 +7,7 @@
 
 Name:		clusto
 Version:	0.5.32
-Release:	2%{?dist}
+Release:	4%{?dist}
 Summary:	Tools and libraries for organizing and managing infrastructure
 
 Group:		Applications/System
@@ -82,6 +82,14 @@ cp -R web/static/* %{buildroot}%{_datadir}/%{name}/web/
 
 
 %changelog
+* Wed Jan 19 2011 Jorge A Gallegos <kad@blegh.net> - 0.5.32-4
+- add connection cycling (Ron Gorodetzky)
+- Fix stupid mistake in spec dates (Jorge A Gallegos)
+- clusto-dancer should be in the contrib dir (Jorge A Gallegos)
+
+* Wed Jan 19 2011 Jorge A Gallegos <kad@blegh.net> - 0.5.32-3
+- aptitude is stupid (Jorge A Gallegos)
+
 * Tue Oct 19 2010 Jorge A Gallegos <kad@blegh.net> - 0.5.32-2
 - The DHCP server now queries the DB directly instead of going thru
   the API
