@@ -3,7 +3,6 @@
 # vim: tabstop=4 softtabstop=4 expandtab shiftwidth=4 fileencoding=utf-8
 
 import argparse
-import re
 import sys
 
 import clusto
