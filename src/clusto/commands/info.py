@@ -8,6 +8,24 @@ import clusto
 from clusto.drivers import IPManager
 from clusto import script_helper
 
+JSON=False
+YAML=False
+try:
+    import yaml
+    YAML=True
+except ImportError:
+    pass
+
+try:
+    import simplejson as json
+    JSON=True
+except ImportError:
+    try:
+        import json
+        JSON=True
+    except:
+        pass
+
 
 class Info(script_helper.Script):
     '''
@@ -60,6 +78,15 @@ class Info(script_helper.Script):
                 line += '%s=%s;' % (k, item[k])
             print line
 
+    def print_json(self, items):
+        self.debug('Printing with format=json')
+        print json.dumps(items, sort_keys=True, indent=2)
+
+    def print_yaml(self, items):
+        self.debug('Printing with format=yaml')
+        print yaml.safe_dump(items, encoding='utf-8',
+            explicit_start=True, default_flow_style=False)
+
     def run(self, args):
         if not args.items:
             print 'You need to provide at least one item. Use --help'
@@ -107,7 +134,12 @@ class Info(script_helper.Script):
         getattr(self, 'print_%s' % args.format)(item_list)
 
     def _add_arguments(self, parser):
-        parser.add_argument('--format', choices=['summary', 'oneline'], default='summary',
+        choices = ['summary', 'oneline']
+        if JSON:
+            choices.append('json')
+        if YAML:
+            choices.append('yaml')
+        parser.add_argument('--format', choices=choices, default='summary',
             help='What format to use to display the info, defaults to "summary"')
         parser.add_argument('items', nargs='*', metavar='item',
             help='List of one or more objects to show info')
