@@ -6,6 +6,7 @@
 # Copyright 2011, Jorge A Gallegos <kad@blegh.net>
 
 import ConfigParser
+import glob
 import logging
 import os
 import sys
@@ -138,12 +139,27 @@ class Script(object):
         if not self.config.has_section('clusto'):
             self.config.add_section('clusto')
 
+        if self.config.has_option('clusto', 'include'):
+            for pattern in self.config.get('clusto', 'include').split():
+                for filename in glob.glob(pattern):
+                    fn = os.path.realpath(filename)
+                    self.debug('Trying to add config file: "%s"' % fn)
+                    try:
+                        self.config.read(fn)
+                    except ConfigParser.ParsingError, cppe:
+                        self.warn(cppe)
+                    except Exception, e:
+                        self.debug(e)
         if 'CLUSTODSN' in os.environ:
             self.config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
 
         if dsn:
             self.config.set('clusto', 'dsn', dsn)
 
+        conf = {}
+        for sect in self.config.sections():
+            conf[sect] = dict([ _ for _ in self.config.items(sect) ])
+        self.debug(conf)
         if not self.config.has_option('clusto', 'dsn'):
             raise CmdLineError("No database given for clusto data.")
 
