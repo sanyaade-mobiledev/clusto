@@ -55,7 +55,7 @@ class Script(object):
         only be called from within add_subparser()
         '''
 
-        command_name = self.__class__.__name__.lower().replace('_', '-')
+        command_name = self.__module__.split('.')[-1].lower().replace('_', '-')
         parser = subparsers.add_parser(command_name, help=self._get_description())
         return parser
 
@@ -241,7 +241,7 @@ def main():
         parser.print_help()
         return 0
     log.debug('Loading from clusto frontend: %s' % args.subparser_name)
-    klass = demodule(args.subparser_name)
+    klass = demodule(args.subparser_name.replace('-', '_'))
     klass = klass()
     klass.set_logger(log)
     try:
