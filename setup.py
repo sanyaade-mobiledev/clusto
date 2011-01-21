@@ -5,7 +5,6 @@
 # Clusto cluster management tool
 # Copyright 2009, Ron Gorodetzky ron@fflick.com
 
-import glob
 import os
 import setuptools
 import sys
