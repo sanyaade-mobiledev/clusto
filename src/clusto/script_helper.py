@@ -163,12 +163,16 @@ class Script(object):
         if not self.config.has_option('clusto', 'dsn'):
             raise CmdLineError("No database given for clusto data.")
 
-    def get_config(self):
+    def get_conf(self, path, default=None):
         '''
-        Returns the config object
+        Returns the config value
         '''
 
-        return self.config
+        (section, option) = path.split('.')
+        if self.config.has_option(section, option):
+            return self.config.get(section, option)
+        else:
+            return default
 
     def init_script(self, args, logger=None):
         '''
