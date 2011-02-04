@@ -3,20 +3,19 @@
 # vim: tabstop=4 softtabstop=4 expandtab shiftwidth=4 fileencoding=utf-8
 #
 # Clusto cluster management tool
-# Copyright 2009, Ron Gorodetzky ron@fflick.com
+# Copyright 2009, Ron Gorodetzky ron@parktree.net
 
 import os
 import setuptools
 import sys
 
-srcdir = os.path.join(os.path.dirname(sys.argv[0]), 'src')
 
 setuptools.setup(
     name = "clusto",
     version = "0.6.0",
-    packages = setuptools.find_packages(srcdir),
+    packages = setuptools.find_packages('src'),
     author = "Ron Gorodetzky",
-    author_email = "ron@fflick.com",
+    author_email = "ron@parktree.net",
     description = "Cluster management and inventory system",
     install_requires = [
         'argparse',
@@ -28,17 +27,17 @@ setuptools.setup(
     entry_points = {
         'console_scripts': [
             'clusto = clusto.script_helper:main',
-            'clusto-shell = clusto.commands.shell:main',
+            'clusto-attr = clusto.commands.attr:main',
             'clusto-info = clusto.commands.info:main',
-            'clusto-pool= clusto.commands.pool:main',
             'clusto-list-pool= clusto.commands.list_pool:main',
+            'clusto-pool= clusto.commands.pool:main',
+            'clusto-shell = clusto.commands.shell:main',
         ],
     },
-    zip_safe = False,
-    package_dir = { '': srcdir },
+    zip_safe = True,
+    package_dir = { '': 'src' },
     scripts = [
         #os.path.join(srcdir, 'scripts', 'clusto-allocate'),
-        #os.path.join(srcdir, 'scripts', 'clusto-attr'),
         #os.path.join(srcdir, 'scripts', 'clusto-console'),
         #os.path.join(srcdir, 'scripts', 'clusto-dhcpd'),
         #os.path.join(srcdir, 'scripts', 'clusto-fai'),
