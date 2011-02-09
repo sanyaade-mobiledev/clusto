@@ -156,10 +156,6 @@ class Script(object):
         if dsn:
             self.config.set('clusto', 'dsn', dsn)
 
-        conf = {}
-        for sect in self.config.sections():
-            conf[sect] = dict([ _ for _ in self.config.items(sect) ])
-        self.debug(conf)
         if not self.config.has_option('clusto', 'dsn'):
             raise CmdLineError("No database given for clusto data.")
 
