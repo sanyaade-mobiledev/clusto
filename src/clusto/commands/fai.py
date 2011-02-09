@@ -87,9 +87,9 @@ class Fai(script_helper.Script):
         print 'IP: %s' % ip
         print 'MAC: %s' % mac
         print 'FAI classes: %s' % ' '.join([ _.value for _ in disk_class ])
-        print 'Pools: %s' % ' '.join([ _.name for _ in obj.parents(clusto_types=['pool']) ])
+        print 'Parents: %s' % ' '.join([ _.name for _ in obj.parents() ])
 
-        sys.stdout.write('Are you absolutely sure you want to FAI %s (yes/no)? ' % obj.name)
+        sys.stdout.write('Are you absolutely sure you want to FAI %s (yes/No)? ' % obj.name)
         sys.stdout.flush()
 
         try:
