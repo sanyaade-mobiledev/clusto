@@ -28,6 +28,7 @@ setuptools.setup(
         'console_scripts': [
             'clusto = clusto.script_helper:main',
             'clusto-attr = clusto.commands.attr:main',
+            'clusto-fai = clusto.commands.fai:main',
             'clusto-info = clusto.commands.info:main',
             'clusto-list-pool= clusto.commands.list_pool:main',
             'clusto-pool= clusto.commands.pool:main',
