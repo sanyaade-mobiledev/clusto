@@ -187,12 +187,16 @@ def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=Tr
 
     return reduce(set.intersection, resultsets)
 
-def get_by_name(name):
+def get_by_name(name, assert_driver=None):
     name = u'%s' % name
     try:
         entity = Entity.query().filter_by(name=name).one()
 
         retval = Driver(entity)
+
+        if assert_driver:
+            if not isinstance(retval, assert_driver):
+                raise TypeError("The object %s is not an instance of %s" % (name, assert_driver))
 
         return retval
     except InvalidRequestError:
