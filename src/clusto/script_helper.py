@@ -218,14 +218,14 @@ def setup_base_parser(add_help=False):
     parser.add_argument('--dsn', help='Alternate DSN to use')
     return parser
 
-def get_logger(loglevel='INFO'):
+def get_logger(name='', loglevel='INFO'):
     '''
     Returns a basic std{out,err} logger
     '''
 
     format='%(name)s: %(levelname)-8s %(message)s'
     logging.basicConfig(format=format)
-    log = logging.getLogger('clusto')
+    log = logging.getLogger('clusto.command.%s' % name)
     log.setLevel(levels[loglevel])
     return log
 
@@ -249,7 +249,7 @@ def main():
                     pass
     args = parser.parse_args()
 
-    log = get_logger(args.loglevel)
+    log = get_logger(args.subparser_name, args.loglevel)
     if len(sys.argv) < 2:
         parser.print_help()
         return 0
