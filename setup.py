@@ -23,6 +23,8 @@ setuptools.setup(
         'IPython',
         'scapy',
         'IPy',
+        'epydoc',
+        'sphinx',
     ],
     entry_points = {
         'console_scripts': [
@@ -35,12 +37,12 @@ setuptools.setup(
             'clusto-pool= clusto.commands.pool:main',
             'clusto-reboot = clusto.commands.reboot:main',
             'clusto-shell = clusto.commands.shell:main',
+            'clusto-console = clusto.commands.console:main',
         ],
     },
     zip_safe = True,
     package_dir = { '': 'src' },
     scripts = [
-        os.path.join('src', 'scripts', 'clusto-console'),
         #os.path.join(srcdir, 'scripts', 'clusto-dhcpd'),
         #os.path.join(srcdir, 'scripts', 'clusto-kvm'),
         #os.path.join(srcdir, 'scripts', 'clusto-httpd'),
