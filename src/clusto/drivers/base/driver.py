@@ -153,6 +153,9 @@ class Driver(object):
     def __contains__(self, other):
         return self.has_attr(key="_contains", value=other)
 
+    def __iter__(self):
+        return iter(self.contents())
+
     def _choose_best_driver(self):
         """
         Examine the attributes of our entity and set the best driver class and
