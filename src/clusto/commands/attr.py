@@ -106,7 +106,7 @@ class Attr(script_helper.Script):
                 'subkey': attr.subkey,
                 'number': attr.number,
                 'type': attr.datatype,
-                'value': attr.value
+                'value': unicode(attr.value)
             }
             result.append(row)
         return (getattr(self, 'run_show_%s' % self.format)(result))
