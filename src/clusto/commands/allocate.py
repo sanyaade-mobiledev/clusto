@@ -107,13 +107,10 @@ class Allocate(script_helper.Script):
         self.debug('Target pool list: %s' % pools)
 
         try:
-            pool = clusto.get_by_name(pool)
+            pool = clusto.get_by_name(pool, assert_driver=drivers.pool.Pool)
         except Exception as e:
             self.debug(e)
             self.error('The pool "%s" does not exist' % pool)
-            return 1
-        if not isinstance(pool, drivers.Pool):
-            self.error('Looks like "%s" is not a pool' % pool.name)
             return 1
 
         try:
@@ -129,7 +126,11 @@ class Allocate(script_helper.Script):
             self.error('The parent "%s" is not a rack or a datacenter' % args.parent)
             return 2
 
-        unallocated = [ _ for _ in parent.contents(clusto_types=[drivers.servers.BasicServer], search_children=True) if _ in pool and _.get_ips() ]
+        self.info('Searching for servers in "%s", this may take a while' % parent.name)
+
+        unallocated = [ _ for _ in parent.contents(clusto_types=[drivers.servers.BasicServer], search_children=True) ]
+        unallocated = [ _ for _ in unallocated if _ in pool and _.get_ips() ]
+        self.debug('The unallocated list size is %d' % len(unallocated))
         if len(unallocated) < number:
             self.error('There are not enough servers in "%s" to fulfill your request' % args.parent)
             return 3
@@ -144,6 +145,7 @@ class Allocate(script_helper.Script):
         if args.spindles:
             filters.append(self.__make_filter('spindles', args.spindles))
 
+        self.debug('Applying filters: %s' % filters)
         servers = []
         if not filters:
             servers = self.__sort_servers(unallocated)[:number]
@@ -157,9 +159,9 @@ class Allocate(script_helper.Script):
             for p in pools:
                 p.insert(s)
 
-        print ('Allocated the following list of servers matching your filters '
+        self.info('Allocated the following list of servers matching your filters '
             'were allocated from the pool "%s"' % pool.name)
-        print 'The servers were also added to the pools %s' % ','.join([ _.name for _ in pools ])
+        self.info('The servers were also added to the pools %s' % ','.join([ _.name for _ in pools ]))
         for s in servers:
             if s.get_ips():
                 print s.get_ips()[0]
