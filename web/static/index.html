@@ -4,7 +4,8 @@
 	<link rel="stylesheet" type="text/css" href="css/base.css" />
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript">
-	var apiurl = 'http://' + location.href.split('/').slice(2, 3) + ':9996';
+	//var apiurl = 'http://' + location.href.split('/').slice(2, 3) + ':9996';
+	var apiurl = '/api';
 
 	function break_str(s, breaklen) {
 		if(s.length < breaklen) {
@@ -152,12 +153,12 @@
 		types = [
 			['Pools', 'pool'],
 			['Datacenters', 'datacenter'],
-			['Racks', 'rack'],
+			['Zones', 'zone'],
+			//['Racks', 'rack'],
 			['Servers', 'server'],
-			['Network switches', 'networkswitch'],
-			['Console servers', 'consoleserver'],
-			['Power strips', 'powerstrip'],
-			['Resources', 'resourcemanager']
+			//['Network switches', 'networkswitch'],
+			//['Console servers', 'consoleserver'],
+			//['Power strips', 'powerstrip'],
 		];
 		$.each(types, function(i, name) {
 			$('#filters').append('<fieldset class="clustotype" id="type_' + name[1] + '"><legend>' + name[0] + '</legend></fieldset>');
