@@ -47,9 +47,7 @@ def dumps(request, obj, **kwargs):
     return Response(result, content_type=content_type, **kwargs)
 
 def loads(request, obj):
-    format = request.params.get('format', 'json')
-    dumpfunc, loadfunc, kwargs = formats[format]
-    return loadfunc(obj)
+    return json.loads(obj)
 
 class EntityAPI(object):
     def __init__(self, obj):
