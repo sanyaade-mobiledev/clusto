@@ -1,3 +1,13 @@
+clusto (0.5.32-4sg5) lucid; urgency=low
+
+  [ Jeremy Grosser ]
+  * Set source format
+  * Remove sqlalchemy from build depends
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 23 Mar 2011 22:01:36 +0000
+
 clusto (0.5.32-4sg0) lucid; urgency=low
 
   * SimpleGeo release
