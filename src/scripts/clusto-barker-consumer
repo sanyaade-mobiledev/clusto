@@ -7,7 +7,6 @@ import clusto
 import kombu
 
 from traceback import format_exc
-from pprint import pprint
 
 QUEUE_HOST = conf('barker.hostname')
 QUEUE_EXCHANGE = conf('barker.exchange')
@@ -23,10 +22,6 @@ EC2_SUBKEYS = {
 }
 
 def barker_callback(body, message):
-    #body = json.loads(body)
-    #print '-' * 80
-    #pprint(body)
-
     if not 'ec2' in body:
         return
     if not 'instance-id' in body['ec2']:
@@ -66,6 +61,8 @@ def barker_callback(body, message):
                         value=int(system['memory']['MemTotal']) / 1024)
         server.set_attr(key='system', subkey='hostname',
                         value=system['hostname'])
+        server.set_attr(key='system', subkey='os',
+                        value=system['operatingsystemrelease'])
 
         server.del_attrs(key='disk')
         blockmap = [(v.replace('/dev/', ''), k) for k, v in ec2['block-device-mapping'].items() if k != 'root']
