@@ -1,38 +1,13 @@
-clusto (0.5.32-4sg8) lucid; urgency=low
+clusto (0.5.33-1) unstable; urgency=low
+
+  [ Ron Gorodetzky ]
+  * EC2 support
 
   [ Jeremy Grosser ]
-  * Depend on webob for clusto-httpd
-  * Fix http json.loads
-  * Add system.os
+  * Remove XenVirtualServer
+  * Dependency hacking, trying to make it easier to get running
 
-  [ SimpleGeo Nerds ]
-
- -- SimpleGeo Nerds <nerds@simplegeo.com>  Thu, 24 Mar 2011 18:20:17 +0000
-
-clusto (0.5.32-4sg7) lucid; urgency=low
-
-  [ Jeremy Grosser ]
-  * Install clusto-barker-consumer
-
-  [ SimpleGeo Nerds ]
-
- -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 23 Mar 2011 22:05:05 +0000
-
-clusto (0.5.32-4sg5) lucid; urgency=low
-
-  [ Jeremy Grosser ]
-  * Set source format
-  * Remove sqlalchemy from build depends
-
-  [ SimpleGeo Nerds ]
-
- -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 23 Mar 2011 22:01:36 +0000
-
-clusto (0.5.32-4sg0) lucid; urgency=low
-
-  * SimpleGeo release
-
- -- Jeremy Grosser <jeremy@synack.me>  Wed, 23 Mar 2011 21:42:58 +0000
+ -- Jeremy Grosser <jeremy@synack.me>  Tue, 05 Apr 2011 18:02:19 +0000
 
 clusto (0.5.32-4) unstable; urgency=low
 
