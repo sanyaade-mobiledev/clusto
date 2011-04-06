@@ -10,6 +10,8 @@ import setuptools
 import sys
 
 
+srcdir = os.path.join(os.path.dirname(sys.argv[0]), 'src')
+
 setuptools.setup(
     name = "clusto",
     version = "0.6.0",
