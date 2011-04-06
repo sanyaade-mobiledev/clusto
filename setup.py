@@ -33,6 +33,7 @@ setuptools.setup(
             'clusto-allocate = clusto.commands.allocate:main',
             'clusto-attr = clusto.commands.attr:main',
             'clusto-console = clusto.commands.console:main',
+            'clusto-deallocate = clusto.commands.deallocate:main',
             'clusto-fai = clusto.commands.fai:main',
             'clusto-info = clusto.commands.info:main',
             'clusto-list-pool= clusto.commands.list_pool:main',
@@ -54,7 +55,6 @@ setuptools.setup(
         #os.path.join(srcdir, 'scripts', 'clusto-tree'),
         #os.path.join(srcdir, 'scripts', 'clusto-update-info'),
         #os.path.join(srcdir, 'scripts', 'clusto-vm'),
-        #os.path.join(srcdir, 'scripts', 'clusto-deallocate'),
       ],
       test_suite = "clusto.test.alltests.gettests",
       dependency_links = [ 'http://www.secdev.org/projects/scapy/' ]
