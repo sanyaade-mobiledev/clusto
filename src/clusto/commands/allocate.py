@@ -169,13 +169,7 @@ class Allocate(script_helper.Script):
                 print s.name
 
 def main():
-    allocate = Allocate()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=allocate._get_description())
-    allocate._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    allocate.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    allocate, args = script_helper.init_arguments(Allocate)
     return(allocate.run(args))
 
 

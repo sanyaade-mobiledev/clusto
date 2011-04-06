@@ -61,13 +61,7 @@ class Console(script_helper.Script):
 
 
 def main():
-    console = Console()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=console._get_description())
-    console._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    console.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    console, args = script_helper.init_arguments(Console)
     return(console.run(args))
 
 if __name__ == '__main__':

@@ -111,13 +111,7 @@ class Fai(script_helper.Script):
 
 
 def main():
-    fai = Fai()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=fai._get_description())
-    fai._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    fai.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    fai, args = script_helper.init_arguments(Fai)
     return(fai.run(args))
 
 if __name__ == '__main__':

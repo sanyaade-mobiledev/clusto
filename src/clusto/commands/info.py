@@ -151,13 +151,7 @@ class Info(script_helper.Script):
         self._add_arguments(parser)
 
 def main():
-    info = Info()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=info._get_description())
-    info._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    info.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    info, args = script_helper.init_arguments(Info)
     return(info.run(args))
 
 if __name__ == '__main__':

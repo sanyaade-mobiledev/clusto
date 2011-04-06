@@ -5,6 +5,7 @@
 # Base script helper
 # Copyright 2011, Jorge A Gallegos <kad@blegh.net>
 
+import argparse
 import ConfigParser
 import glob
 import logging
@@ -170,6 +171,9 @@ class Script(object):
         else:
             return default
 
+    def _add_arguments(self, *args, **kwargs):
+        pass
+
     def init_script(self, args, logger=None):
         '''
         Initialize the clusto environment for clusto scripts.
@@ -228,6 +232,15 @@ def get_logger(name='', loglevel='INFO'):
     log = logging.getLogger('clusto.command.%s' % name)
     log.setLevel(levels[loglevel])
     return log
+
+def init_arguments(klass):
+    obj = klass()
+    parent_parser = setup_base_parser()
+    this_parser = argparse.ArgumentParser(parents=[parent_parser],
+        description=obj._get_description())
+    obj._add_arguments(this_parser)
+    args = this_parser.parse_args()
+    return obj, args
 
 def main():
     # should only be imported if called from the cli

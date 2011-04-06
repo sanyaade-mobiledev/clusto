@@ -154,13 +154,7 @@ class Attr(script_helper.Script):
 
 
 def main():
-    attr = Attr()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=attr._get_description())
-    attr._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    attr.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    attr, args = script_helper.init_arguments(Attr)
     return(attr.run(args))
 
 if __name__ == '__main__':

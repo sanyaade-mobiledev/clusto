@@ -52,13 +52,7 @@ class ListPool(script_helper.Script):
 
 
 def main():
-    lp = ListPool()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=lp._get_description())
-    lp._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    lp.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    lp, args = script_helper.init_arguments(ListPool)
     return(lp.run(args))
 
 if __name__ == '__main__':

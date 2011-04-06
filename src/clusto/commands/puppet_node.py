@@ -99,13 +99,7 @@ class PuppetNode(script_helper.Script):
 
 
 def main():
-    pn = PuppetNode()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=pn._get_description())
-    pn._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    pn.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    pn, args = script_helper.init_arguments(PuppetNode)
     return(pn.run(args))
 
 if __name__ == '__main__':

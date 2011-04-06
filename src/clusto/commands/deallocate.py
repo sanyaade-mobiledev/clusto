@@ -130,13 +130,7 @@ class Deallocate(script_helper.Script):
         self.info('Done.')
 
 def main():
-    deallocate = Deallocate()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=deallocate._get_description())
-    deallocate._add_arguments(this_parser)
-    args = this_parser.parse_args()
-    deallocate.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    deallocate, args = script_helper.init_arguments(Deallocate)
     return(deallocate.run(args))
 
 if __name__ == '__main__':
