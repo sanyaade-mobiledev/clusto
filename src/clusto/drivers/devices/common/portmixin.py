@@ -75,7 +75,7 @@ class PortMixin:
 
         
             if not dev.port_free(porttype, num):
-                msg = "port %s%d on %s is already in use"
+                msg = "port %s:%d on %s is already in use"
                 raise ConnectionException(msg % (porttype, num, dev.name))
 
         try:
