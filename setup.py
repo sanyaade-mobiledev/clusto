@@ -3,7 +3,7 @@
 # vim: tabstop=4 softtabstop=4 expandtab shiftwidth=4 fileencoding=utf-8
 #
 # Clusto cluster management tool
-# Copyright 2009, Ron Gorodetzky ron@parktree.net
+# Copyright 2009, Ron Gorodetzky rongoro@gmail.com
 
 import os
 import setuptools
@@ -15,11 +15,11 @@ setuptools.setup(
     version = "0.6.0",
     packages = setuptools.find_packages('src'),
     author = "Ron Gorodetzky",
-    author_email = "ron@parktree.net",
+    author_email = "rongoro@gmail.com",
     description = "Cluster management and inventory system",
     install_requires = [
         'argparse',
-        'sqlalchemy>=0.6.4',
+        'sqlalchemy>=0.6.3',
         'IPython',
         'scapy',
         'IPy',
@@ -46,14 +46,14 @@ setuptools.setup(
     zip_safe = True,
     package_dir = { '': 'src' },
     scripts = [
-        #os.path.join(srcdir, 'scripts', 'clusto-dhcpd'),
-        #os.path.join(srcdir, 'scripts', 'clusto-kvm'),
-        #os.path.join(srcdir, 'scripts', 'clusto-httpd'),
-        #os.path.join(srcdir, 'scripts', 'clusto-mysql'),
-        #os.path.join(srcdir, 'scripts', 'clusto-hadoop-node'),
-        #os.path.join(srcdir, 'scripts', 'clusto-snmptrapd'),
-        #os.path.join(srcdir, 'scripts', 'clusto-tree'),
-        #os.path.join(srcdir, 'scripts', 'clusto-update-info'),
+        os.path.join(srcdir, 'scripts', 'clusto-dhcpd'),
+        os.path.join(srcdir, 'scripts', 'clusto-kvm'),
+        os.path.join(srcdir, 'scripts', 'clusto-httpd'),
+        os.path.join(srcdir, 'scripts', 'clusto-mysql'),
+        os.path.join(srcdir, 'scripts', 'clusto-hadoop-node'),
+        os.path.join(srcdir, 'scripts', 'clusto-snmptrapd'),
+        os.path.join(srcdir, 'scripts', 'clusto-tree'),
+        os.path.join(srcdir, 'scripts', 'clusto-update-info'),
         #os.path.join(srcdir, 'scripts', 'clusto-vm'),
       ],
       test_suite = "clusto.test.alltests.gettests",
