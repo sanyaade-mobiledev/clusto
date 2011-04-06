@@ -40,10 +40,12 @@ def connect(config, echo=False):
     except:
         SESSION.memcache = None
 
+
 def checkDBcompatibility(dbver):
 
     if dbver == VERSION:
         return True
+
 
 init_semaphore = threading.Semaphore()
 def init_clusto():
@@ -64,7 +66,6 @@ def flush():
     """Flush changes made to clusto objects to the database."""
 
     SESSION.flush()
-
 
 
 def clear():
@@ -115,18 +116,12 @@ def get_driver(entity):
 def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
     """Get entities matching the given criteria
 
-    @param names: list of names to match
-    @type names: list of strings
-
-    @param clustotypes: list of clustotypes to match
-    @param clustotypes: list of strings or Drivers
-
-    @param clustodrivers: list of clustodrives to get
-    @type clustodrives: list of strings or Drivers
-
-    @param attrs: list of attribute parameters
-    @type attrs: list of dictionaries with the following
-                 valid keys: key, number, subkey, value
+    parameters:
+      names - list of strings; names to match
+      clustotypes - list of strings or Drivers; clustotypes to match
+      clustodrivers - list of strings or Drivers; clustodrivers to get
+      attrs - list of dicts with the following valid keys: key, number, subkey,
+              value ; attribute parameters
     """
 
     query = Entity.query()
@@ -154,13 +149,14 @@ def get_entities(names=(), clusto_types=(), clusto_drivers=(), attrs=()):
 
     return [Driver(entity) for entity in query.all()]
 
+
 def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=True):
     """Get entitis that are in all the given pools
 
     parameters:
-      pools - the list of pools you want the intersection for
-      clusto_types - a list of clusto types you'd like to filter on
-      clusto_drivers - a list of clusto drivers you'd like to filter on
+      pools - list of Pools or strings; pools you want the intersection for
+      clusto_types - list of Drivers or strings; clusto types to filter on
+      clusto_drivers - list of Drivers or strings; clusto drivers to filter on
     """
 
     pool_names = []
@@ -188,7 +184,15 @@ def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=Tr
     return reduce(set.intersection, resultsets)
 
 def get_by_name(name, assert_driver=None):
+    """Return the entity with the given name.
+
+    parameters:
+      name - string; the name of the entity
+      assert_driver - class; driver class you want to assert this object as
+    """
+
     name = u'%s' % name
+
     try:
         entity = Entity.query().filter_by(name=name).one()
 
@@ -202,13 +206,37 @@ def get_by_name(name, assert_driver=None):
     except InvalidRequestError:
         raise LookupError(name + " does not exist.")
 
+
+def get_by_names(names):
+    """Return a list of entities matching the given list of names.
+
+    This will return the entities in the same order as the passed argument,
+    placing None in the slot with names that don't exist.
+    
+    parameters:
+      name - list of strings; names of the entities
+    """
+
+    entities = Entity.query().filter(Entity.name.in_(names)).all()
+
+    retvals = [None for x in xrange(len(names))]
+
+    for entity in entities:
+        try:
+            retvals[names.index(entity.name)] = Driver(entity)
+        except:
+            pass
+
+    return retvals
+
+    
 get_by_attr = drivers.base.Driver.get_by_attr
 
-def get_or_create(name, driver):
+def get_or_create(name, driver, **kwargs):
     try:
         obj = get_by_name(name)
     except LookupError:
-        obj = driver(name)
+        obj = driver(name, **kwargs)
         logging.info('Created %s' % obj)
     return obj
 
@@ -359,9 +387,9 @@ def rollback_transaction():
 def change_driver(thingname, newdriver):
     """Change the Driver of a given Entity
 
-    params:
-      thingname: the name of the entity
-      newdriver: the new driver to set for the entity
+    parameters:
+      thingname - string; the name of the entity
+      newdriver - Driver; the new driver to set for the entity
     """
     if not issubclass(newdriver, Driver):
         raise DriverException("%s is not a driver" % str(newdriver))

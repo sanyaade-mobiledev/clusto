@@ -7,8 +7,6 @@ except ImportError:
 from webob import Request, Response
 from traceback import format_exc
 from urllib import unquote_plus
-import xmlrpclib
-import cPickle
 import new
 import re
 
@@ -17,21 +15,6 @@ import clusto
 
 from clusto.services.config import conf, get_logger
 log = get_logger('clusto.http', 'INFO')
-
-def xmldumps(obj, **kwargs):
-    return xmlrpclib.dumps((obj,), **kwargs)
-
-formats = {
-    'json': (json.dumps, json.loads, {'indent': 4}),
-    'pickle': (cPickle.dumps, cPickle.loads, {}),
-    'xml': (xmldumps, xmlrpclib.loads, {'methodresponse': True, 'allow_none': True}),
-}
-
-try:
-    import yaml
-    formats['yaml'] = (yaml.dump, yaml.load, {'indent': 4})
-except ImportError:
-    pass
 
 def unclusto(obj):
     '''
@@ -52,19 +35,19 @@ def unclusto(obj):
         return '/%s/%s' % (obj.type, obj.name)
     return str(obj)
 
-def dumps(request, obj):
-    format = request.params.get('format', 'json')
-    dumpfunc, loadfunc, kwargs = formats[format]
-    result = dumpfunc(obj, **kwargs)
-    if format == 'json' and 'callback' in request.params:
+def dumps(request, obj, **kwargs):
+    result = json.dumps(obj, indent=2, **kwargs)
+    if 'callback' in request.params:
         callback = request.params['callback']
         result = '%s(%s)' % (callback, result)
-    return result
+        content_type = 'text/javascript'
+    else:
+        content_type = 'application/json'
+
+    return Response(result, content_type=content_type, **kwargs)
 
 def loads(request, obj):
-    format = request.params.get('format', 'json')
-    dumpfunc, loadfunc, kwargs = formats[format]
-    return loadfunc(obj)
+    return json.loads(obj)
 
 class EntityAPI(object):
     def __init__(self, obj):
@@ -103,7 +86,7 @@ class EntityAPI(object):
         kwargs = dict(request.params.items())
         for attr in self.obj.attrs(**kwargs):
             result['attrs'].append(unclusto(attr))
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     def insert(self, request):
         '''
@@ -150,7 +133,7 @@ class EntityAPI(object):
         result['parents'] = [unclusto(x) for x in self.obj.parents()]
         result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
 
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
 class PortInfoAPI(EntityAPI):
     def ports(self, request):
@@ -170,7 +153,7 @@ class PortInfoAPI(EntityAPI):
                 'othernum': othernum,
             })
 
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     def set_port_attr(self, request):
         kwargs = {}
@@ -201,7 +184,7 @@ class PortInfoAPI(EntityAPI):
         except ValueError:
             return Response(status=400, body='portnum must be an integer\n')
 
-        return Response(status=200, body=dumps(request, self.obj.get_port_attr(**kwargs)))
+        return dumps(request, self.obj.get_port_attr(**kwargs))
 
 class RackAPI(EntityAPI):
     def insert(self, request):
@@ -227,7 +210,7 @@ class ResourceAPI(EntityAPI):
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
         clusto.commit()
-        return Response(status=201, body=dumps(request, unclusto(device)))
+        return dumps(request, unclusto(device), status=201)
 
 class QueryAPI(object):
     @classmethod
@@ -244,7 +227,7 @@ class QueryAPI(object):
         kwargs['attrs'] = attrs
 
         result = [unclusto(x) for x in clusto.get_entities(**kwargs)]
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     @classmethod
     def get_by_name(self, request):
@@ -267,7 +250,7 @@ class QueryAPI(object):
             clusto_types = None
 
         result = [unclusto(x) for x in clusto.get_from_pools(pools, clusto_types)]
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     @classmethod
     def get_ip_manager(self, request):
@@ -278,7 +261,7 @@ class QueryAPI(object):
             ipman = IPManager.get_ip_manager(request.params['ip'])
         except:
             return Response(status=404, body='404 Not Found\n')
-        return Response(status=200, body=dumps(request, unclusto(ipman)))
+        return dumps(request, unclusto(ipman))
 
 class ClustoApp(object):
     def __init__(self):
@@ -310,14 +293,14 @@ class ClustoApp(object):
         }
 
     def default_delegate(self, request, match):
-        return Response(status=200, body=dumps(request, ['/' + x for x in clusto.typelist.keys()]))
+        return dumps(request, ['/' + x for x in clusto.typelist.keys()])
 
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']
         result = []
         for obj in clusto.get_entities(clusto_types=(objtype,)):
             result.append(unclusto(obj))
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     def action_delegate(self, request, match):
         if request.method == 'GET':
@@ -407,7 +390,7 @@ class ClustoApp(object):
         for obj in clusto.get_entities():
             if obj.name.find(query) != -1:
                 result.append(unclusto(obj))
-        return Response(status=200, body=dumps(request, result))
+        return dumps(request, result)
 
     def notfound(self, request, match):
         return Response(status=404)
@@ -422,7 +405,8 @@ class ClustoApp(object):
                 try:
                     response = handler(request, match)
                 except:
-                    response = Response(status=500, body=format_exc())
+                    response = Response(status=500, body=format_exc(),
+                                        content_type='text/plain')
                 break
 
         return response(environ, start_response)

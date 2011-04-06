@@ -2,12 +2,12 @@ Source: clusto
 Section: net
 Priority: extra
 Maintainer: Jeremy Grosser <jgrosser@digg.com>
-Build-Depends: cdbs, debhelper (>= 5), python-sqlalchemy (>= 0.6.0), python-setuptools, python-support (>= 0.3), python-all-dev
+Build-Depends: cdbs, debhelper (>= 5), python-setuptools, python-support (>= 0.3), python-all-dev
 Standards-Version: 3.7.2
 
 Package: clusto
 Architecture: any
-Depends: ${python:Depends}, ipython, python-sqlalchemy (>= 0.6.4), python-ipy, python-sqlite, python-libvirt, python-scapy (>= 2.0.1), python-memcache
-Recommends: python-psycopg2, python-mysqldb, python-yaml, python-simplejson
+Depends: ${python:Depends}, ipython, python-sqlalchemy, python-scapy (>= 2.0.1), python-ipy, python-boto, python-mako, python-webob
+Suggests: python-psycopg2, python-mysqldb, python-yaml, python-simplejson, python-sqlite, python-memcache, python-kombu
 Provides: ${python:Provides}
 Description: Clusto is a tool/library for organizing and managing infrastructure

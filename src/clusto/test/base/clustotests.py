@@ -46,6 +46,19 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual(q.name, 'e1')
 
+    def testGetByNames(self):
+
+        names = ['e3','e1','e2']
+        entities = [clusto.get_by_name(x) for x in names]
+
+        self.assertEqual(entities, clusto.get_by_names(names))
+
+        self.assertEqual([clusto.get_by_name('e3'),
+                          None,
+                          clusto.get_by_name('e1')],
+                         clusto.get_by_names(['e3', 'shouldfail', 'e1']))
+
+
     def testSimpleRename(self):
 
         clusto.rename('e1', 'f1')
@@ -395,3 +408,19 @@ class TestClusto(testbase.ClustoTestBase):
         self.assertEquals(sorted(d7.siblings(parent_filter=lambda x: not x.attr_values('pooltype', 'role'),
                                              additional_pools=[db])),
                           sorted([d8]))
+
+
+    def testUnderscore(self):
+
+        d1 = Driver('with_underscore')
+        d2 = Driver('withZunderscore')
+
+        self.assertEqual(clusto.get_by_name('with_underscore'),
+                         d1)
+
+        d1.add_attr('keyZfoo', 'bar')
+        d1.add_attr('key_foo', 'baz')
+
+        self.assertEqual(len(d1.attrs('key_foo')), 1)
+
+        self.assertEqual(len(d1.attr_query('key_foo')), 1)

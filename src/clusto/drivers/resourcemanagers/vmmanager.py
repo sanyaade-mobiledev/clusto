@@ -7,7 +7,7 @@ use of the ResourceManager plumbing where appropriate.
 """
 
 import clusto
-from clusto.drivers.devices.servers import BasicServer, BasicVirtualServer
+
 from clusto.drivers.base import ResourceManager
 from clusto.exceptions import ResourceException
 
@@ -39,7 +39,7 @@ class VMManager(ResourceManager):
         
     def insert(self, thing):
         # insert into self and also add attributes that will help with  allocation
-        if thing.type != BasicServer._clusto_type:
+        if thing.type != "server":
             raise ResourceException("Only servers can be inserted into "
                                     "this manager but %s is of type %s."
                                     % (thing.name, thing.type))
@@ -104,7 +104,7 @@ class VMManager(ResourceManager):
         mem = host.attr_value('system', subkey='memory')
         disk = host.attr_value('system', subkey='disk')
         cpu = host.attr_value('system', subkey='cpucount')
-        vms = host.referencers(clusto_types=[BasicVirtualServer])
+        vms = host.referencers(clusto_types=["virtualserver"])
 
         for v in vms:
             mem -= v.attr_value('system', subkey='memory')
@@ -125,7 +125,7 @@ class VMManager(ResourceManager):
             raise ResourceException("%s is already assigned to %s"
                                     % (thing.name, res.value))
 
-        hosts = self.contents(clusto_types=[BasicServer])
+        hosts = self.contents(clusto_types=["server"])
 
         hosts = sorted(hosts,
                        key=lambda x: x.attr_value('system', subkey='disk'))
@@ -157,18 +157,6 @@ class VMManager(ResourceManager):
 
         return attr
     
-
-class EC2VMManager(VMManager):
-
-    _driver_name = "ec2vmmanager"
-
-    _properties = {'budget':None,
-                   'current_cost':None,
-                   'accountstuff':None} # i'd have to lookup again what ec2 actually needs
-
-    def allocator(self):
-        """allocate VMs on ec2 while keeping track of current costs and staying within the budget"""
-        pass
 
 class XenVMManager(VMManager):
     """Manage Xen Instances

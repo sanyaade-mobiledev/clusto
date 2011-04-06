@@ -19,7 +19,7 @@ def main():
     options, args = parser.parse_args()
 
     if not options.config or not options.basedir:
-        print 'You need both options'
+        print 'You need both the config and the base-dir options'
         parser.print_help()
         return 1
 

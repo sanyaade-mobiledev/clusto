@@ -14,6 +14,7 @@ class IPManager(ResourceManager):
 
 
     _driver_name="ipmanager"
+    _clusto_type="ipmanager"
 
     _properties = {'gateway': None,
                    'netmask': '255.255.255.255',
@@ -21,7 +22,16 @@ class IPManager(ResourceManager):
 
     _attr_name = "ip"
 
-    __int_ip_const = 2147483648
+    _int_ip_const = 2147483648
+
+
+    @classmethod
+    def _ipy_to_int(cls, ipy):
+        return int(ipy.int() - cls._int_ip_const)
+
+    @classmethod
+    def _int_to_ipy(cls, num):
+        return IPy.IP(num + cls._int_ip_const)
     
     @property
     def ipy(self):
@@ -38,7 +48,7 @@ class IPManager(ResourceManager):
 
         try:
             if isinstance(resource, int):
-                ip = IPy.IP(resource+self.__int_ip_const)
+                ip = self._int_to_ipy(resource)
             else:
                 ip = IPy.IP(resource)
         except ValueError:
@@ -50,14 +60,14 @@ class IPManager(ResourceManager):
                                         % (str(ip), self.baseip, self.netmask))
 
 
-        return (int(ip.int()-self.__int_ip_const), number)
+        return (self._ipy_to_int(ip), number)
 
 
     def additional_attrs(self, thing, resource, number):
 
         resource, number = self.ensure_type(resource, number)
 
-        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=u'%s' % str(IPy.IP(resource+self.__int_ip_const)))
+        thing.add_attr(self._attr_name, number=number, subkey='ipstring', value=str(self._int_to_ipy(resource)))
         
                      
     def allocator(self, thing=None):
@@ -69,8 +79,8 @@ class IPManager(ResourceManager):
         lastip = self.attr_query('_lastip')
                 
         if not lastip:
-            # I subtract self.__int_ip_const to keep in int range
-            startip=int(self.ipy.net().int() + 1) - self.__int_ip_const 
+            # I subtract self._int_ip_const to keep in int range
+            startip=int(self.ipy.net().int() + 1) - self._int_ip_const 
         else:
             startip = lastip[0].value
 
@@ -79,10 +89,10 @@ class IPManager(ResourceManager):
         ## generate new ips the slow naive way
         nextip = int(startip)
         if self.gateway:
-            gateway = IPy.IP(self.gateway).int() - self.__int_ip_const
+            gateway = IPy.IP(self.gateway).int() - self._int_ip_const
         else:
             gateway = None
-        endip = self.ipy.broadcast().int() - self.__int_ip_const
+        endip = self.ipy.broadcast().int() - self._int_ip_const
 
         for i in range(2):
             while nextip < endip:
@@ -119,7 +129,7 @@ class IPManager(ResourceManager):
             ipman = ip.entity
             return Driver(ipman)
 
-        for ipmantest in clusto.get_entities(clusto_drivers=[cls]):
+        for ipmantest in clusto.get_entities(clusto_types=[cls]):
             try:
                 ipmantest.ensure_type(ip)
             except ResourceTypeException:
@@ -138,7 +148,7 @@ class IPManager(ResourceManager):
     @classmethod
     def get_ips(cls, device):
 
-        ret = [u'%s' % str(IPy.IP(x.value+cls.__int_ip_const))
+        ret = [str(cls._int_to_ipy(x.value))
                for x in cls.resources(device)]
 
         return ret

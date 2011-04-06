@@ -12,7 +12,7 @@ runtime.setLevel(logging.ERROR)
 loading = logging.getLogger('scapy.loading')
 loading.setLevel(logging.ERROR)
 
-from scapy.all import SNMP, SNMPget, SNMPset, SNMPnext, SNMPvarbind
+#from scapy.all import SNMP, SNMPget, SNMPset, SNMPnext, SNMPvarbind
 from socket import socket, AF_INET, SOCK_DGRAM
 
 class SNMPMixin:

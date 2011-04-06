@@ -28,6 +28,10 @@ setuptools.setup(
         'epydoc',
         'sphinx',
         'PyYAML',
+        'WebOb',
+        'mako',
+        'boto',
+        'kombu',
     ],
     entry_points = {
         'console_scripts': [
@@ -56,6 +60,9 @@ setuptools.setup(
         os.path.join(srcdir, 'scripts', 'clusto-snmptrapd'),
         os.path.join(srcdir, 'scripts', 'clusto-tree'),
         os.path.join(srcdir, 'scripts', 'clusto-update-info'),
+        os.path.join(srcdir, 'scripts', 'clusto-barker-consumer'),
+        os.path.join(srcdir, 'scripts', 'clusto-puppet-node2'),
+        os.path.join(srcdir, 'scripts', 'clusto-update-db'),
         #os.path.join(srcdir, 'scripts', 'clusto-vm'),
       ],
       test_suite = "clusto.test.alltests.gettests",

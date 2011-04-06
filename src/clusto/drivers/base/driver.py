@@ -13,6 +13,10 @@ from clusto.exceptions import *
 
 from clusto.drivers.base.clustodriver import *
 
+try:
+    import simplejson as json
+except:
+    import json
 
 class Driver(object):
     """Base Driver.
@@ -264,8 +268,10 @@ class Driver(object):
                 if isinstance(value, Driver):
                     value = value.entity.entity_id
                 query = query.filter_by(relation_id=value)
-
             else:
+                if typename == 'json':
+                    typename = 'string'
+                    value = json.dumps(value)
                 query = query.filter_by(**{typename+'_value':value})
 
         if number is not ():
@@ -281,7 +287,7 @@ class Driver(object):
                 raise TypeError("number must be either a boolean or an integer.")
 
         if ignore_hidden and ((key and not key.startswith('_')) or key is ()):
-            query = query.filter(not_(Attribute.key.like('\\_%', escape='\\')))
+            query = query.filter(not_(Attribute.key.like('@_%', escape='@')))
 
         if sort_by_keys:
             query = query.order_by(Attribute.key)
@@ -474,6 +480,8 @@ class Driver(object):
         vals = self.attr_values(*args, **kwargs)
 
         if vals:
+            if kwargs.get('merge_container_attrs', False):
+                return vals[0]
             if len(vals) != 1:
                 raise DriverException("args match more than one value")
             return vals[0]
@@ -768,3 +776,8 @@ class Driver(object):
     @property
     def name(self):
         return self.entity.name
+
+
+    def update_metadata(self, *args, **kwargs):
+        """Update entity's metadata"""
+        pass
