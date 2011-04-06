@@ -262,9 +262,10 @@ def main():
     klass.set_logger(log)
     try:
         klass.init_script(args=args, logger=log)
-        klass.run(args)
+        return(klass.run(args))
     except Exception as e:
         log.error(str(e))
+        return 99
 
 
 if __name__ == '__main__':
