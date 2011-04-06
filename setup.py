@@ -3,7 +3,7 @@
 # vim: tabstop=4 softtabstop=4 expandtab shiftwidth=4 fileencoding=utf-8
 #
 # Clusto cluster management tool
-# Copyright 2009, Ron Gorodetzky rongoro@gmail.com
+# Copyright 2009, Ron Gorodetzky ron@parktree.net
 
 import os
 import setuptools
@@ -14,10 +14,10 @@ srcdir = os.path.join(os.path.dirname(sys.argv[0]), 'src')
 
 setuptools.setup(
     name = "clusto",
-    version = "0.6.0",
+    version = "0.6.0-dev",
     packages = setuptools.find_packages('src'),
     author = "Ron Gorodetzky",
-    author_email = "rongoro@gmail.com",
+    author_email = "ron@parktree.net",
     description = "Cluster management and inventory system",
     install_requires = [
         'argparse',
