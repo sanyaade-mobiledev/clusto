@@ -212,7 +212,9 @@ def get_by_names(names):
       name - list of strings; names of the entities
     """
 
-    entities = Entity.query().filter(Entity.name.in_(names)).all()
+    unicode_names = [unicode(name) for name in names]
+
+    entities = Entity.query().filter(Entity.name.in_(unicode_names)).all()
 
     retvals = [None for x in xrange(len(names))]
 

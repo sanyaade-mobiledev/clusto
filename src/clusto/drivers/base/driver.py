@@ -250,12 +250,17 @@ class Driver(object):
             query = query.filter_by(entity_id=entity.entity_id)
 
         if key is not ():
+            key = unicode(key)
+        
             if glob:
                 query = query.filter(Attribute.key.like(key.replace('*', '%')))
             else:
                 query = query.filter_by(key=key)
 
         if subkey is not ():
+            if subkey is not None:
+                subkey = unicode(subkey)
+        
             if glob and subkey:
                 query = query.filter(Attribute.subkey.like(subkey.replace('*', '%')))
             else:
@@ -272,6 +277,10 @@ class Driver(object):
                 if typename == 'json':
                     typename = 'string'
                     value = json.dumps(value)
+                
+                if typename == 'string':
+                    value = unicode(value)
+                
                 query = query.filter_by(**{typename+'_value':value})
 
         if number is not ():
@@ -287,7 +296,7 @@ class Driver(object):
                 raise TypeError("number must be either a boolean or an integer.")
 
         if ignore_hidden and ((key and not key.startswith('_')) or key is ()):
-            query = query.filter(not_(Attribute.key.like('@_%', escape='@')))
+            query = query.filter(not_(Attribute.key.like(u'@_%', escape=u'@')))
 
         if sort_by_keys:
             query = query.order_by(Attribute.key)

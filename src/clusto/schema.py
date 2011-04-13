@@ -164,7 +164,7 @@ class Counter(object):
 
     def __init__(self, entity, keyname, start=0):
         self.entity = entity
-        self.attr_key = keyname
+        self.attr_key = unicode(keyname)
 
         self.value = start
 
@@ -182,7 +182,7 @@ class Counter(object):
 
         try:
             ctr = SESSION.query(cls).filter(and_(cls.entity==entity,
-                                                 cls.attr_key==keyname)).one()
+                                                 cls.attr_key==unicode(keyname))).one()
 
         except sqlalchemy.orm.exc.NoResultFound:
             ctr = cls(entity, keyname, default)
@@ -236,10 +236,13 @@ class Attribute(ProtectedObj):
                  subkey=None, number=None):
 
         self.entity = entity
-        self.key = key
+        self.key = unicode(key)
 
         self.value = value
 
+        if subkey is not None:
+            subkey = unicode(subkey)
+            
         self.subkey = subkey
         self.version = working_version()
         if isinstance(number, bool) and number == True:
@@ -361,10 +364,13 @@ class Attribute(ProtectedObj):
                 value = int(value)
             elif self.datatype == 'json':
                 value = json.dumps(value)
-                
-        setattr(self, self.get_value_type(value), value)
-
-
+        
+        value_type = self.get_value_type(value)
+        
+        if value_type == 'string_value':
+            value = unicode(value)
+        
+        setattr(self, value_type, value)
 
     value = property(_get_value, _set_value)
 
@@ -382,12 +388,15 @@ class Attribute(ProtectedObj):
                 cls.version<=SESSION.clusto_version]
 
         if key:
-            args.append(Attribute.key==key)
+            args.append(Attribute.key==unicode(key))
 
         if number is not ():
             args.append(Attribute.number==number)
 
         if subkey is not ():
+            if subkey is not None:
+                subkey = unicode(subkey)
+        
             args.append(Attribute.subkey==subkey)
 
         if value is not ():
@@ -401,7 +410,8 @@ class Attribute(ProtectedObj):
                     e = value
 
                 args.append(getattr(Attribute, 'relation_id') == e.entity_id)
-
+            elif valtype == 'string_value':
+                args.append(getattr(Attribute, 'string_value') == unicode(value))
             else:
                 args.append(getattr(Attribute, valtype) == value)
 
@@ -432,7 +442,7 @@ class Entity(ProtectedObj):
         @type attrslist: C{list} of C{tuple}s of length 2
         """
 
-        self.name = name
+        self.name = unicode(name)
 
         self.driver = driver
         self.type = clustotype

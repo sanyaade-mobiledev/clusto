@@ -18,7 +18,7 @@ class TestEntitySchema(testbase.ClustoTestBase):
         e1 = Entity('e1')
         e2 = Entity('e2')
 
-        res = Entity.query().filter_by(name='e1')
+        res = Entity.query().filter_by(name=u'e1')
 
         self.assertEqual(res.count(),1)
 
@@ -37,7 +37,7 @@ class TestEntitySchema(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        self.assertEqual(str(Entity.query().filter_by(name='e1')[0]), expectedout)
+        self.assertEqual(str(Entity.query().filter_by(name=u'e1')[0]), expectedout)
         
 
     def testDeleteEntity(self):
@@ -66,9 +66,9 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
     def testAddingAttribute(self):
 
-        e = Entity.query().filter_by(name='e2').one()
+        e = Entity.query().filter_by(name=u'e2').one()
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
 
                 
         self.assertEqual(e.name, 'e2')
@@ -79,18 +79,18 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = Attribute.query().filter_by(entity_id=e.entity_id,
-                                               key='two').one() 
+                                               key=u'two').one() 
         self.assertEqual(q.value, 2)
 
         q = Attribute.query().filter_by(entity_id=e.entity_id,
-                                               key='one').one()
+                                               key=u'one').one()
 
         self.assertEqual(q.value, 1)
         
 
     def testAddingDateAttribute(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
 
         d = datetime.datetime(2007,12,16,7,46)
         
@@ -99,7 +99,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = Attribute.query().filter_by(entity_id=e1.entity_id,
-                                               key='somedate').one()
+                                               key=u'somedate').one()
 
         self.assertEqual(q.value, d)
         
@@ -123,7 +123,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         
     def testRelationAttribute(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
         
         e4 = Entity('e4')
         e4.add_attr(key='e1', value=e1)
@@ -131,7 +131,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
 
-        e4 = Entity.query().filter_by(name='e4').one()
+        e4 = Entity.query().filter_by(name=u'e4').one()
 
         attr = e4.attrs[0]
 
@@ -139,34 +139,34 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
     def testStringAttribute(self):
 
-        e2 = Entity.query().filter_by(name='e2').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         e2.add_attr(key='somestring', value='thestring')
 
         clusto.flush()
 
         q = Attribute.query().filter_by(entity=e2,
-                                               key='somestring').one()
+                                               key=u'somestring').one()
 
-        self.assertEqual(q.value, 'thestring')
+        self.assertEqual(q.value, u'thestring')
 
     def testJSONAttribute(self):
 
-        e2 = Entity.query().filter_by(name='e2').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         e2.add_attr(key="somejson", value=['foo', 'bar'])
 
         clusto.flush()
 
         q = Attribute.query().filter_by(entity=e2,
-                                        key='somejson').one()
+                                        key=u'somejson').one()
 
         self.assertEqual(q.value, ['foo', 'bar'])
 
         e2.add_attr(key="otherjson", value={'foo':200, 'bar':'test'})
 
         q = Attribute.query().filter_by(entity=e2,
-                                        key="otherjson").one()
+                                        key=u"otherjson").one()
 
         self.assertEqual(q.value, {'foo':200, 'bar':'test'})
 
@@ -178,13 +178,13 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = Attribute.query().filter_by(entity=e4,
-                                               key='someint').one()
+                                               key=u'someint').one()
 
         self.assertEqual(q.value, 10)
 
     def testMultipleAttributes(self):
 
-        e2 = Entity.query().filter_by(name='e2').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         e2.add_attr(key='somestring', number=1, subkey='foo',
                                    value='thestring')
@@ -196,15 +196,15 @@ class TestEntityAttributes(testbase.ClustoTestBase):
         clusto.flush()
 
         q = Attribute.query().filter_by(entity=e2,
-                                               key='somestring').all()
+                                               key=u'somestring').all()
 
         self.assertEqual([a.value for a in q], 
                          ['thestring', 'thestring'])
 
     def testEntityDeleteRelations(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
-        e2 = Entity.query().filter_by(name='e2').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         e1.add_attr('pointer1', e2)
 
@@ -221,7 +221,7 @@ class TestEntityAttributes(testbase.ClustoTestBase):
                                         )).count()
                          , 1)
 
-        e2new = Entity.query().filter_by(name='e2').one()
+        e2new = Entity.query().filter_by(name=u'e2').one()
 
         e2new.delete()
 
@@ -246,14 +246,14 @@ class TestEntityAttributes(testbase.ClustoTestBase):
 
 
     def testAccessRelationAttributesMultipleTimes(self):
-        e1 = Entity.query().filter_by(name='e1').one()
-        e2 = Entity.query().filter_by(name='e2').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         e1.add_attr('foo', 2)
         e1.add_attr('foo', e2)
 
         clusto.flush()
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
         self.assertEqual(len(list(e1.attrs)), 2)
         self.assertEqual(len(list(e1.attrs)), 2)
         self.assertEqual(len(list(e1.attrs)), 2)
@@ -275,9 +275,9 @@ class TestEntityReferences(testbase.ClustoTestBase):
     
     def testReference(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
-        e2 = Entity.query().filter_by(name='e2').one()
-        e3 = Entity.query().filter_by(name='e3').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
+        e3 = Entity.query().filter_by(name=u'e3').one()
 
         self.assertEqual(e1.references[0].entity,
                          e2.references[0].entity)
@@ -287,10 +287,10 @@ class TestEntityReferences(testbase.ClustoTestBase):
 
     def testReferenceDelete(self):
 
-        e1 = Entity.query().filter_by(name='e1').one()
+        e1 = Entity.query().filter_by(name=u'e1').one()
 
 
-        e3 = Entity.query().filter_by(name='e3').one()
+        e3 = Entity.query().filter_by(name=u'e3').one()
 
         
         e3.delete()
@@ -299,12 +299,12 @@ class TestEntityReferences(testbase.ClustoTestBase):
 
         clusto.flush()
 
-        e1a = Entity.query().filter_by(name='e1').one()
+        e1a = Entity.query().filter_by(name=u'e1').one()
 
         self.assertEqual(len(list(e1a.references)), 0)
         self.assertEqual(id(e1a), id(e1))
 
-        e2 = Entity.query().filter_by(name='e2').one()
+        e2 = Entity.query().filter_by(name=u'e2').one()
 
         self.assertEqual(len(list(e2.references)), 0)
 
