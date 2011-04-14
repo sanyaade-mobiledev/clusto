@@ -1,3 +1,9 @@
+clusto (0.5.33-1.1) unstable; urgency=low
+
+  * Making basicrack.py more portable by adding _ensure_device_compatible function
+
+ -- Joshua Tobin <joshuatobin@gmail.com>  Thu, 14 Apr 2011 20:27:49 +0000
+
 clusto (0.5.33-1) unstable; urgency=low
 
   [ Ron Gorodetzky ]
