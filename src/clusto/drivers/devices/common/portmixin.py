@@ -43,16 +43,13 @@ class PortMixin:
     
     def _ensure_portnum(self, porttype, num):
 
-
+        if not isinstance(num, int):
+            raise TypeError("Port number '%s' needs to be an integer." % str(num))
+        elif num < 1:
+            raise TypeError("Port number '%s' needs to be greater than 0." % str(num))
         if not self._portmeta.has_key(porttype) \
-                or not isinstance(num, int) \
-                or num < 1 \
                 or num > self._portmeta[porttype]['numports']:
-
-            msg = "No port %s:%s exists on %s." % (porttype, str(num), self.name)
-                    
-            raise ConnectionException(msg)
-                
+            raise ConnectionException("No port %s:%s exists on %s." % (porttype, str(num), self.name))
 
         return num
 
