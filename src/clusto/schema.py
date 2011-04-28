@@ -367,7 +367,7 @@ class Attribute(ProtectedObj):
         
         value_type = self.get_value_type(value)
         
-        if value_type == 'string_value':
+        if value_type == 'string_value' and value is not None:
             value = unicode(value)
         
         setattr(self, value_type, value)
@@ -411,7 +411,10 @@ class Attribute(ProtectedObj):
 
                 args.append(getattr(Attribute, 'relation_id') == e.entity_id)
             elif valtype == 'string_value':
-                args.append(getattr(Attribute, 'string_value') == unicode(value))
+                if value is not None:
+                    value = unicode(value)
+                    
+                args.append(getattr(Attribute, 'string_value') == value)
             else:
                 args.append(getattr(Attribute, valtype) == value)
 
