@@ -228,7 +228,7 @@ class Driver(object):
         return d
 
     @classmethod
-    def do_attr_query(cls, key=(), value=(), number=(),
+    def do_attr_query(cls, key=(), value=(), number=(), start_timestamp=(), end_timestamp=(),
                     subkey=(), ignore_hidden=True, sort_by_keys=False,
                     glob=False, count=False, querybase=None, return_query=False,
                     entity=None):
@@ -245,6 +245,10 @@ class Driver(object):
             query = query.filter(and_(Attribute.entity_id==Entity.entity_id,
                                       Entity.driver == cls._driver_name,
                                       Entity.type == cls._clusto_type))
+
+        if start_timestamp != () and end_timestamp != ():
+            query = query.filter(and_((Attribute.datetime_value >= start_timestamp)))
+            query = query.filter(and_(Attribute.datetime_value <= end_timestamp))
 
         if entity:
             query = query.filter_by(entity_id=entity.entity_id)
