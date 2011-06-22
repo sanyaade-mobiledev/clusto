@@ -9,7 +9,7 @@ def make_all_ec2_objects(aws_access_key_id=None, aws_secret_access_key=None):
                             "aws_secret_access_key if you don't already have "
                             "an EC2VMManager")
         
-        ec2man = clusto.drivers.EC2VMManger('ec2vmman',
+        ec2man = clusto.drivers.EC2VMManager('ec2vmman',
                                             aws_access_key_id=aws_access_key_id,
                                             aws_secret_access_key=aws_secret_access_key)
 
