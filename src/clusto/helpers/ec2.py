@@ -16,6 +16,20 @@ def make_all_ec2_objects(aws_access_key_id=None, aws_secret_access_key=None):
     else:
         ec2man = ec2man.pop()
 
+    ec2ipman = clusto.get_entities(clusto_types=[clusto.drivers.EC2IPManager])
+
+    if not ec2ipman:
+        if not aws_access_key_id and not aws_secret_access_key:
+            raise Exception("you must specify both an aws_access_key_id and an "
+                            "aws_secret_access_key if you don't already have "
+                            "an EC2IPManager")
+
+        ec2ipman = clusto.drivers.EC2IPManager('ec2ipman',
+                                            aws_access_key_id=aws_access_key_id,
+                                            aws_secret_access_key=aws_secret_access_key)
+    else:
+        ec2ipman = ec2ipman.pop()
+
     conn = ec2man._ec2_connection()
 
     for region in conn.get_all_regions():
