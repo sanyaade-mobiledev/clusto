@@ -6,7 +6,7 @@ Clusto schema
 VERSION = 3
 from sqlalchemy import *
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
 
 #from sqlalchemy.ext.sessioncontext import SessionContext
 #from sqlalchemy.ext.assignmapper import assign_mapper
