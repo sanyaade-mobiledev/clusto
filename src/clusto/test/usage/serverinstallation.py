@@ -2,7 +2,7 @@
 from clusto.test import testbase
 
 from clusto.drivers import BasicServer, BasicRack, IPManager
-from clusto.drivers import BasicNetworkSwitch, BasicPowerStrip, PowerTowerXM
+from clusto.drivers import BasicNetworkSwitch, BasicPowerStrip
 from clusto.exceptions import ConnectionException
 import clusto
 
@@ -21,7 +21,7 @@ class ServerInstallationTest(testbase.ClustoTestBase):
 
         s1 = BasicServer('s1')
         
-        p1 = PowerTowerXM('p1')
+        p1 = BasicPowerStrip('p1')
 
         r1.insert(p1, (10,11))
         r1.insert(sw1, 12)

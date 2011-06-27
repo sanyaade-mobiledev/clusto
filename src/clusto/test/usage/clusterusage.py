@@ -1,7 +1,6 @@
 from clusto.test import testbase
 
-from clusto.drivers import BasicServer, APCRack, IPManager, Pool
-from clusto.drivers import Cisco4948, PowerTowerXM, BasicDatacenter
+from clusto.drivers import BasicServer, BasicRack, BasicPowerStrip, BasicNetworkSwitch, BasicDatacenter, IPManager, Pool
 from clusto.exceptions import ConnectionException
 import clusto
 
@@ -17,12 +16,12 @@ class ClusterUsageTest(testbase.ClustoTestBase):
 
             try:
                 clusto.begin_transaction()
-                r = APCRack(rackprefix)
-                pwr = PowerTowerXM(rackprefix+'-pwr1', withslave=True)
+                r = BasicRack(rackprefix)
+                pwr = BasicPowerStrip(rackprefix+'-pwr1', withslave=True)
 
-                sw = Cisco4948(rackprefix+'-sw1')
+                sw = BasicNetworkSwitch(rackprefix+'-sw1')
                 sw.connect_ports('nic-eth', 48, pwr, 1)
-                pwr.connect_ports('pwr-nema-5', 'aa8', sw, 1)
+                pwr.connect_ports('pwr-nema-5', 1, sw, 1)
 
                 r.insert(pwr, [1,2,3,4])
                 r.insert(sw, [5])
@@ -32,7 +31,7 @@ class ClusterUsageTest(testbase.ClustoTestBase):
                     r.insert(s, [6+i])
                     s.connect_ports('nic-eth', 1, sw, i+1)
                     s.connect_ports('pwr-nema-5', 1,
-                                    pwr, 'ab'[i/10%2] + 'ab'[i/5%2] + str(i%5 + 1))
+                                    pwr, i+2)
                 clusto.commit()
             except Exception, x:
                 clusto.rollback_transaction()
