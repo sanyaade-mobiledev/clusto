@@ -16,6 +16,7 @@ import clusto
 from clusto.services.config import conf, get_logger
 log = get_logger('clusto.http', 'INFO')
 
+
 def unclusto(obj):
     '''
     Convert an object to a representation that can be safely serialized into
@@ -37,7 +38,7 @@ def unclusto(obj):
 
 
 def dumps(request, obj, **kwargs):
-    result = json.dumps(obj, indent=2, **kwargs)
+    result = json.dumps(obj, indent=2, sort_keys=True, **kwargs)
     if 'callback' in request.params:
         callback = request.params['callback']
         result = '%s(%s)' % (callback, result)
@@ -50,10 +51,26 @@ def dumps(request, obj, **kwargs):
 def loads(request, obj):
     return json.loads(obj)
 
+
 class EntityAPI(object):
     def __init__(self, obj):
         self.obj = obj
         self.url = '/%s/%s' % (self.obj.type, self.obj.name)
+
+    def _dict(self):
+        result = {
+            'object': self.url,
+            'driver': self.obj.driver,
+        }
+
+        attrs = []
+        for x in self.obj.attrs():
+            attrs.append(unclusto(x))
+        result['attrs'] = attrs
+        result['contents'] = [unclusto(x) for x in self.obj.contents()]
+        result['parents'] = [unclusto(x) for x in self.obj.parents()]
+        result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
+        return result
 
     def addattr(self, request):
         '''
@@ -64,7 +81,17 @@ class EntityAPI(object):
         '''
         kwargs = dict(request.params.items())
         self.obj.add_attr(**kwargs)
-        clusto.commit()
+        return self.show(request)
+
+    def setattr(self, request):
+        '''
+        Set an attribute on this object.
+
+        Requires HTTP parameters "key" and "value"
+        Optional parameters are "subkey" and "number"
+        '''
+        kwargs = dict(request.params.items())
+        self.obj.set_attr(**kwargs)
         return self.show(request)
 
     def delattr(self, request):
@@ -74,7 +101,6 @@ class EntityAPI(object):
         Requires HTTP parameter "key"
         '''
         self.obj.del_attrs(request.params['key'])
-        clusto.commit()
         return self.show(request)
 
     def attrs(self, request):
@@ -101,7 +127,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device)
-        clusto.commit()
         return self.show(request)
 
     def remove(self, request):
@@ -116,7 +141,6 @@ class EntityAPI(object):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.remove(device)
-        clusto.commit()
         return self.show(request)
 
     def show(self, request):
@@ -125,6 +149,7 @@ class EntityAPI(object):
         '''
         result = {}
         result['object'] = self.url
+        result['driver'] = self.obj.driver
 
         attrs = []
         for x in self.obj.attrs():
@@ -135,6 +160,7 @@ class EntityAPI(object):
         result['actions'] = [x for x in dir(self) if not x.startswith('_') and callable(getattr(self, x))]
 
         return dumps(request, result)
+
 
 class PortInfoAPI(EntityAPI):
     def ports(self, request):
@@ -187,6 +213,7 @@ class PortInfoAPI(EntityAPI):
 
         return dumps(request, self.obj.get_port_attr(**kwargs))
 
+
 class RackAPI(EntityAPI):
     def insert(self, request):
         '''
@@ -200,8 +227,8 @@ class RackAPI(EntityAPI):
         device = request.params['object'].strip('/').split('/')[1]
         device = clusto.get_by_name(device)
         self.obj.insert(device, int(request.params['ru']))
-        clusto.commit()
         return self.contents(request)
+
 
 class ResourceAPI(EntityAPI):
     def allocate(self, request):
@@ -210,8 +237,8 @@ class ResourceAPI(EntityAPI):
         '''
         driver = clusto.DRIVERLIST[request.params['driver']]
         device = self.obj.allocate(driver)
-        clusto.commit()
         return dumps(request, unclusto(device), status=201)
+
 
 class QueryAPI(object):
     @classmethod
@@ -240,6 +267,19 @@ class QueryAPI(object):
         return api.show(request)
 
     @classmethod
+    def get(self, request):
+        if not 'name' in request.params:
+            return Response(status=400, body='400 Bad Request\nYou must specifiy a "name" parameter\n')
+        name = request.params['name']
+
+        result = clusto.get(name)
+        if result is None:
+            return Response(status=404, body='404 Not Found\n')
+
+        result = [EntityAPI(x)._dict() for x in result]
+        return dumps(request, result)
+
+    @classmethod
     def get_from_pools(self, request):
         if not 'pools' in request.params:
             return Response(status=400, body='400 Bad Request\nYou must specify at least one pool\n')
@@ -263,6 +303,7 @@ class QueryAPI(object):
         except:
             return Response(status=404, body='404 Not Found\n')
         return dumps(request, unclusto(ipman))
+
 
 class ClustoApp(object):
     def __init__(self):
@@ -294,7 +335,9 @@ class ClustoApp(object):
         }
 
     def default_delegate(self, request, match):
-        return dumps(request, ['/' + x for x in clusto.typelist.keys()])
+        types = ['/' + x for x in clusto.typelist.keys()]
+        types.sort()
+        return dumps(request, types)
 
     def types_delegate(self, request, match):
         objtype = match.groupdict()['objtype']
@@ -336,7 +379,7 @@ class ClustoApp(object):
                 return Response(status=409, body='409 Conflict\nObject already exists\n')
         except LookupError: pass
 
-        obj = clusto.typelist[objtype](objname)
+        obj = clusto.driverlist[objtype](objname)
 
         obj = EntityAPI(obj)
         response = obj.show(request)
@@ -355,7 +398,6 @@ class ClustoApp(object):
             return Response(status=404, body='404 Not Found\n')
 
         clusto.delete_entity(obj.entity)
-        clusto.commit()
         return Response(status=200, body='200 OK\nObject deleted\n')
 
     def get_action(self, request, match):
@@ -409,5 +451,14 @@ class ClustoApp(object):
                     response = Response(status=500, body=format_exc(),
                                         content_type='text/plain')
                 break
-
         return response(environ, start_response)
+
+
+application = ClustoApp()
+
+
+if __name__ == '__main__':
+    from wsgiref.simple_server import make_server
+    server = make_server('0.0.0.0', 9996, application)
+    log.info('clusto httpd loaded using wsgiref (debug mode)')
+    server.serve_forever()

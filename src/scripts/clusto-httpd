@@ -1,19 +1,34 @@
 #!/usr/bin/env python
 from clusto.services.config import conf
 from clusto.services.http import ClustoApp
-from clusto.scripthelpers import init_script
+from clusto import script_helper
+import clusto
+
+#import sys
+#sys.path.insert(0, './src/clusto/contrib')
+#import clustoec2
+
+class ClustoHTTP(script_helper.Script):
+    def __init__(self):
+        script_helper.Script.__init__(self)
+
+    def run(self, args):
+        from wsgiref.simple_server import make_server, WSGIRequestHandler
+        app = ClustoApp()
+
+        # Disable reverse DNS upon request. It's just stupid.
+        wsgi = WSGIRequestHandler
+        def address_string(self):
+            return self.client_address[0]
+        wsgi.address_string = address_string
+
+        server = make_server(conf('http.bind_address'), conf('http.bind_port'), app, handler_class=wsgi)
+        server.serve_forever()
+
 
 if __name__ == '__main__':
-    from wsgiref.simple_server import make_server, WSGIRequestHandler
-
-    init_script()
-    app = ClustoApp()
-
-    # Disable reverse DNS upon request. It's just stupid.
-    wsgi = WSGIRequestHandler
-    def address_string(self):
-        return self.client_address[0]
-    wsgi.address_string = address_string
-
-    server = make_server(conf('http.bind_address'), conf('http.bind_port'), app, handler_class=wsgi)
-    server.serve_forever()
+    http = ClustoHTTP()
+    parser = script_helper.setup_base_parser()
+    args = parser.parse_args()
+    http.init_script(args, script_helper.get_logger('DEBUG'))
+    http.run(args)
