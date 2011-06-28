@@ -2,7 +2,7 @@
 
 from paramiko import SSHClient, MissingHostKeyPolicy
 from clusto.scripthelpers import init_script
-from clusto.drivers import PenguinServer
+from diggext.drivers import PenguinServer
 import clusto
 
 from optparse import OptionParser

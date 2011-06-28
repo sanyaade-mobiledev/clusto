@@ -4,6 +4,7 @@ from socket import gethostbyname
 
 from clusto.scripthelpers import init_script
 from clusto.drivers import *
+from diggext.drivers import *
 import clusto
 
 def get_factory(name, layout=None):
