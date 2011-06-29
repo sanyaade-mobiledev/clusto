@@ -36,7 +36,6 @@ class ClustoTestBase(unittest.TestCase):
         conf = ConfigParser.ConfigParser()
         conf.add_section('clusto')
         conf.set('clusto', 'dsn', DB)
-        clusto.SESSION.clusto_version = clusto.working_version()
         clusto.connect(conf,echo=ECHO)
         clusto.clear()
         clusto.SESSION.close()
