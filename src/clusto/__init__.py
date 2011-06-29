@@ -4,7 +4,7 @@ from clusto.exceptions import *
 from clusto.drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta, IPManager
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import create_engine
-from sqlalchemy.pool import SingletonThreadPool 
+from sqlalchemy.pool import SingletonThreadPool
 
 from clusto import drivers
 
@@ -26,11 +26,15 @@ def connect(config, echo=False):
 
     @param config: the config object
     """
+
     SESSION.configure(bind=create_engine(config.get('clusto', 'dsn'),
                                          echo=echo,
                                          poolclass=SingletonThreadPool,
                                          pool_recycle=600
                                          ))
+
+    SESSION.clusto_version = None
+
     try:
         memcache_servers = config.get('clusto', 'memcached').split(',')
 #       Memcache should only be imported if we're actually using it, yes?
@@ -212,7 +216,7 @@ def get_by_names(names):
 
     This will return the entities in the same order as the passed argument,
     placing None in the slot with names that don't exist.
-    
+
     parameters:
       name - list of strings; names of the entities
     """
@@ -229,7 +233,7 @@ def get_by_names(names):
 
     return retvals
 
-    
+
 get_by_attr = drivers.base.Driver.get_by_attr
 
 def get_or_create(name, driver, **kwargs):
