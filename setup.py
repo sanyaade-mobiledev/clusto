@@ -21,7 +21,7 @@ setuptools.setup(
     description = "Cluster management and inventory system",
     install_requires = [
         'argparse',
-        'sqlalchemy>=0.6.3',
+        'sqlalchemy>=0.6.3,<0.7',
         'IPython',
         'scapy',
         'IPy',
