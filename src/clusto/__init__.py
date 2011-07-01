@@ -2,7 +2,7 @@ from clusto.schema import *
 from clusto.exceptions import *
 
 from clusto.drivers import DRIVERLIST, TYPELIST, Driver, ClustoMeta, IPManager
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import create_engine
 from sqlalchemy.pool import SingletonThreadPool 
 
@@ -183,11 +183,12 @@ def get_from_pools(pools, clusto_types=(), clusto_drivers=(), search_children=Tr
 
     return reduce(set.intersection, resultsets)
 
-def get_by_name(name):
+def get_by_name(name, assert_driver=None):
     """Return the entity with the given name.
 
     parameters:
       name - string; the name of the entity
+      assert_driver - class; driver class you want to assert this object as
     """
 
     name = u'%s' % name
@@ -196,6 +197,10 @@ def get_by_name(name):
         entity = Entity.query().filter_by(name=name).one()
 
         retval = Driver(entity)
+
+        if assert_driver:
+            if not isinstance(retval, assert_driver):
+                raise TypeError("The object %s is not an instance of %s" % (name, assert_driver))
 
         return retval
     except InvalidRequestError:

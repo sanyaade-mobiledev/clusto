@@ -5,7 +5,7 @@ import clusto
 from clusto.schema import *
 from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter, Pool, BasicServer, IPManager
-from sqlalchemy.exceptions import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError
 
 class TestClustoPlain(testbase.ClustoTestBase):
 
