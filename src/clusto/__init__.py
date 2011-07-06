@@ -330,13 +330,13 @@ def get_latest_version_number():
     return val
 
 
-def _check_transaction_counter():
+def _check_transaction_counter(not_zero=False):
     tl = SESSION()
 
     if not hasattr(tl, 'TRANSACTIONCOUNTER'):
         raise TransactionException("No transaction counter.  Outside of a transaction.")
 
-    if tl.TRANSACTIONCOUNTER < 0:
+    if tl.TRANSACTIONCOUNTER < 0 or (tl.TRANSACTIONCOUNTER == 0 and not_zero):
         raise TransactionException("Negative transaction counter!  SHOULD NEVER HAPPEN!")
 
 def _init_transaction_counter():
@@ -384,12 +384,18 @@ def rollback_transaction():
     """Rollback a transaction"""
 
     tl = SESSION()
-    _check_transaction_counter()
+
+    try:
+      _check_transaction_counter(not_zero=True)
+    except TransactionException, x:
+      raise TransactionException("Can't rollback, no transaction started.")
+
     if SESSION.is_active:
         SESSION.rollback()
         _dec_transaction_counter()
     else:
         _dec_transaction_counter()
+
 
 def change_driver(thingname, newdriver):
     """Change the Driver of a given Entity

@@ -6,6 +6,8 @@ from clusto.schema import *
 from clusto.drivers.base import *
 from clusto.drivers import BasicDatacenter, Pool, BasicServer, IPManager
 from sqlalchemy.exc import InvalidRequestError
+from clusto.exceptions import TransactionException
+
 
 class TestClustoPlain(testbase.ClustoTestBase):
 
@@ -90,6 +92,19 @@ class TestClusto(testbase.ClustoTestBase):
 
         self.assertEqual(d.attr_value('foo'), 1)
 
+
+    def testBadRollback(self):
+
+        clusto.begin_transaction()
+
+        d1 = Entity('d1')
+
+        clusto.get_by_name('d1')
+
+        d2 = Entity('d2')
+        clusto.commit()
+
+        self.assertRaises(TransactionException, clusto.rollback_transaction)
 
     def testTransactionRollback(self):
 
