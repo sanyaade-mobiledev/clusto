@@ -76,6 +76,9 @@ def clear():
     """Clear the changes made to objects in the current session. """
 
     SESSION.expunge_all()
+    if hasattr(SESSION(), "TRANSACTIONCOUNTER"):
+      del SESSION().TRANSACTIONCOUNTER
+
 
 def get_driver_name(name):
     "Return driver name given a name, Driver class, or Driver/Entity instance."
