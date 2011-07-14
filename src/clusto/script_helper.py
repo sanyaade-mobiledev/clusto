@@ -229,7 +229,7 @@ def get_logger(name='', loglevel='INFO'):
 
     format='%(name)s: %(levelname)-8s %(message)s'
     logging.basicConfig(format=format)
-    log = logging.getLogger('clusto.command.%s' % name)
+    log = logging.getLogger('command.%s' % name)
     log.setLevel(levels[loglevel])
     return log
 
@@ -240,6 +240,8 @@ def init_arguments(klass):
         description=obj._get_description())
     obj._add_arguments(this_parser)
     args = this_parser.parse_args()
+    log = get_logger(klass.__module__.split('.')[-1], args.loglevel)
+    obj.init_script(args=args, logger=log)
     return obj, args
 
 def main():
