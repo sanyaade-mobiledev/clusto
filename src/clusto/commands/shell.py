@@ -26,19 +26,43 @@ class Shell(script_helper.Script):
         script_helper.Script.__init__(self)
 
     def run(self, args):
-        opts = ['-prompt_in1', 'clusto [\#]> ', '-prompt_out', 'out [\#]> ']
+        banner = None
+        if not sys.stdin.isatty() or args.files:
+            opts = [
+                '-noautoindent',
+                '-nobanner',
+                '-colors', 'NoColor',
+                '-noconfirm_exit',
+                '-nomessages',
+                '-nosep',
+                '-prompt_in1', '\x00',
+                '-prompt_in2', '\x00',
+                '-prompt_out', '\x00',
+                '-xmode', 'Plain',
+            ]
+        else:
+            opts = [
+                '-prompt_in1', 'clusto [\#]> ',
+                '-prompt_out', 'out [\#]> ',
+            ]
+            banner = '\nThis is the clusto shell. Respect it.'
         if args.loglevel == 'DEBUG':
             opts.append('-debug')
-        ipshell = IPShellEmbed(opts, banner='\nThis is the clusto shell. Respect it.')
+        ipshell = IPShellEmbed(opts)
+        if banner:
+            ipshell.set_banner(banner)
         ipshell()
 
+    def _add_arguments(self, parser):
+        parser.add_argument('files', nargs='?',
+            help='Files to load & run')
+
+    def add_subparser(self, subparsers):
+        parser = self._setup_subparser(subparsers)
+        self._add_arguments(parser)
+
 def main():
-    shell = Shell()
-    parent_parser = script_helper.setup_base_parser()
-    this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=shell._get_description())
-    args = this_parser.parse_args()
-    shell.init_script(args=args, logger=script_helper.get_logger(args.loglevel))
+    shell, args = script_helper.init_arguments(Shell)
     return(shell.run(args))
 
 if __name__ == '__main__':
