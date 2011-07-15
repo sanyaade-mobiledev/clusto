@@ -118,48 +118,6 @@ class Script(object):
         '''
         raise NotImplementedError()
 
-    def load_config(self, filename, dsn=None):
-        '''
-        Find, parse, and return the configuration data needed by clusto
-        '''
-
-        if filename:
-            if not os.path.exists(os.path.realpath(filename)):
-                msg = "Config file %s doesn't exist." % filename
-                self.error(msg)
-                raise CmdLineError(msg)
-        else:
-            msg = "Config file %s doesn't exist." % filename
-            self.error(msg)
-            raise CmdLineError(msg)
-            
-        self.config = ConfigParser.SafeConfigParser()
-        self.debug('Reading %s' % filename)
-        self.config.read([filename])
-
-        if not self.config.has_section('clusto'):
-            self.config.add_section('clusto')
-
-        if self.config.has_option('clusto', 'include'):
-            for pattern in self.config.get('clusto', 'include').split():
-                for filename in glob.glob(pattern):
-                    fn = os.path.realpath(filename)
-                    self.debug('Trying to add config file: "%s"' % fn)
-                    try:
-                        self.config.read(fn)
-                    except ConfigParser.ParsingError, cppe:
-                        self.warn(cppe)
-                    except Exception, e:
-                        self.debug(e)
-        if 'CLUSTODSN' in os.environ:
-            self.config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
-
-        if dsn:
-            self.config.set('clusto', 'dsn', dsn)
-
-        if not self.config.has_option('clusto', 'dsn'):
-            raise CmdLineError("No database given for clusto data.")
-
     def get_conf(self, path, default=None):
         '''
         Returns the config value
@@ -187,11 +145,58 @@ class Script(object):
             filename = os.environ['CLUSTOCONFIG']
         else:
             filename = args.config
-        self.load_config(filename, args.dsn)
+        self.config = load_config(filename, args.dsn, logger)
         self.debug('Connecting to %s' % self.config.get('clusto', 'dsn'))
         clusto.connect(self.config)
 
         return self.config
+
+def load_config(filename, dsn=None, logger=None):
+    '''
+    Find, parse, and return the configuration data needed by clusto
+    '''
+
+    if not logger:
+        logger = get_logger()
+
+    if filename:
+        if not os.path.exists(os.path.realpath(filename)):
+            msg = "Config file %s doesn't exist." % filename
+            logger.error(msg)
+            raise CmdLineError(msg)
+    else:
+        msg = "Config file %s doesn't exist." % filename
+        logger.error(msg)
+        raise CmdLineError(msg)
+        
+    config = ConfigParser.SafeConfigParser()
+    logger.debug('Reading %s' % filename)
+    config.read([filename])
+
+    if not config.has_section('clusto'):
+        config.add_section('clusto')
+
+    if config.has_option('clusto', 'include'):
+        for pattern in config.get('clusto', 'include').split():
+            for filename in glob.glob(pattern):
+                fn = os.path.realpath(filename)
+                logger.debug('Trying to add config file: "%s"' % fn)
+                try:
+                    config.read(fn)
+                except ConfigParser.ParsingError, cppe:
+                    logger.warn(cppe)
+                except Exception, e:
+                    logger.debug(e)
+    if 'CLUSTODSN' in os.environ:
+        config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
+
+    if dsn:
+        config.set('clusto', 'dsn', dsn)
+
+    if not config.has_option('clusto', 'dsn'):
+        raise CmdLineError("No database given for clusto data.")
+
+    return config
 
 def demodule(module):
     '''
