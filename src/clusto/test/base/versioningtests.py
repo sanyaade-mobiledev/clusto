@@ -62,29 +62,29 @@ class TestClustoVersioning(testbase.ClustoTestBase):
         e2 = Entity('e2')
         e3 = Entity('e3')
 
-        self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
+        self.assertEqual(Entity.query().filter(Entity.name.like(u'e%')).count(),
                          3)
 
         SESSION.clusto_version = curver
 
-        self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
+        self.assertEqual(Entity.query().filter(Entity.name.like(u'e%')).count(),
                          0)
 
         SESSION.clusto_version = clusto.working_version()
 
-        self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
+        self.assertEqual(Entity.query().filter(Entity.name.like(u'e%')).count(),
                          3)
 
         SESSION.clusto_version = curver + 1
 
-        self.assertEqual(Entity.query().filter(Entity.name.like('e%')).count(),
+        self.assertEqual(Entity.query().filter(Entity.name.like(u'e%')).count(),
                          1)
 
 
         SESSION.clusto_version = curver + 2
 
         self.assertEqual(sorted([e1,e2]),
-                         Entity.query().filter(Entity.name.like('e%')).all())
+                         Entity.query().filter(Entity.name.like(u'e%')).all())
 
     def testOldVersionsOfAttributes(self):
 
@@ -101,7 +101,7 @@ class TestClustoVersioning(testbase.ClustoTestBase):
 
         self.assertEqual(len(list(e1.attrs)), 1)
         
-        e = Entity.query().filter_by(name='e1').one()
+        e = Entity.query().filter_by(name=u'e1').one()
 
         SESSION.clusto_version = curver + 4
 

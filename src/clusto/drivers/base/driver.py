@@ -77,7 +77,7 @@ class Driver(object):
     def driver(self):
         return self.entity.driver
 
-    def __new__(cls, name_driver_entity, **kwargs):
+    def __new__(cls, name_driver_entity=None, *args, **kwargs):
 
         if isinstance(name_driver_entity, Driver):
             return name_driver_entity
@@ -228,7 +228,7 @@ class Driver(object):
         return d
 
     @classmethod
-    def do_attr_query(cls, key=(), value=(), number=(),
+    def do_attr_query(cls, key=(), value=(), number=(), start_timestamp=(), end_timestamp=(),
                     subkey=(), ignore_hidden=True, sort_by_keys=False,
                     glob=False, count=False, querybase=None, return_query=False,
                     entity=None):
@@ -246,16 +246,25 @@ class Driver(object):
                                       Entity.driver == cls._driver_name,
                                       Entity.type == cls._clusto_type))
 
+        if start_timestamp != () and end_timestamp != ():
+            query = query.filter(and_((Attribute.datetime_value >= start_timestamp)))
+            query = query.filter(and_(Attribute.datetime_value <= end_timestamp))
+
         if entity:
             query = query.filter_by(entity_id=entity.entity_id)
 
         if key is not ():
+            key = unicode(key)
+        
             if glob:
                 query = query.filter(Attribute.key.like(key.replace('*', '%')))
             else:
                 query = query.filter_by(key=key)
 
         if subkey is not ():
+            if subkey is not None:
+                subkey = unicode(subkey)
+        
             if glob and subkey:
                 query = query.filter(Attribute.subkey.like(subkey.replace('*', '%')))
             else:
@@ -272,6 +281,10 @@ class Driver(object):
                 if typename == 'json':
                     typename = 'string'
                     value = json.dumps(value)
+                
+                if typename == 'string':
+                    value = unicode(value)
+                
                 query = query.filter_by(**{typename+'_value':value})
 
         if number is not ():
@@ -287,7 +300,7 @@ class Driver(object):
                 raise TypeError("number must be either a boolean or an integer.")
 
         if ignore_hidden and ((key and not key.startswith('_')) or key is ()):
-            query = query.filter(not_(Attribute.key.like('@_%', escape='@')))
+            query = query.filter(not_(Attribute.key.like(u'@_%', escape=u'@')))
 
         if sort_by_keys:
             query = query.order_by(Attribute.key)

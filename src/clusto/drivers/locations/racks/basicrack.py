@@ -47,13 +47,15 @@ class BasicRack(Location):
 
         return rackU
 
-    def insert(self, device, rackU):
-        """Insert a given device into the given rackU."""
-
-
+    def _ensure_compatible_device(self, device):
         if not isinstance(device, Device):
             raise TypeError("You can only add Devices to a rack.  %s is a"
                             " %s" % (device.name, str(device.__class__)))
+
+    def insert(self, device, rackU):
+        """Insert a given device into the given rackU."""
+
+        self._ensure_compatible_device(device)
 
         rackU = self._ensure_rack_u(rackU)
 
@@ -65,7 +67,7 @@ class BasicRack(Location):
 
         if hasattr(device, 'rack_units') and (len(rackU) != device.rack_units):
             raise TypeError("%s is a %dU device, cannot insert it in %dU"
-                            % (device.name, units, len(rackU)))
+                            % (device.name, device.rack_units, len(rackU)))
 
         for U in rackU:
             dev = self.get_device_in(U)
