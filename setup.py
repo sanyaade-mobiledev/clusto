@@ -30,7 +30,7 @@ setuptools.setup(
         'PyYAML',
         'WebOb',
         'mako',
-        'boto>=2.0b3',
+        'boto>=2.0',
         'kombu',
     ],
     entry_points = {
