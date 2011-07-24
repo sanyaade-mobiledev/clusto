@@ -100,6 +100,14 @@ class PortTests(testbase.ClustoTestBase):
         # try to connect to a device that doesn't have ports
         self.assertRaises(ConnectionException, t1.connect_ports, 'a', 2, p, 1)
 
+        # try to connect non integer ports
+        self.assertRaises(TypeError, t1.connect_ports, 'a', '2', p, 1)
+
+        # try to connect negative ports
+        self.assertRaises(TypeError, t1.connect_ports, 'a', -2, p, 1)
+
+                          
+
     def testDisconnectPort(self):
 
         t1, t2, p = map(clusto.get_by_name, ['t1', 't2', 'p'])
