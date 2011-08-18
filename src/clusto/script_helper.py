@@ -196,6 +196,15 @@ def load_config(filename, dsn=None, logger=None):
     if not config.has_option('clusto', 'dsn'):
         raise CmdLineError("No database given for clusto data.")
 
+    plugins = []
+    if config.has_option('clusto', 'plugins'):
+        plugins += clusto.get('clusto', 'plugins').split(',')
+    if 'CLUSTOPLUGINS' in os.environ:
+        plugins += os.environ['CLUSTOPLUGINS'].split(',')
+    for plugin in plugins:
+        logger.debug('Loading plugin %s' % plugin)
+        module = __import__(plugin)
+
     return config
 
 def demodule(module):
