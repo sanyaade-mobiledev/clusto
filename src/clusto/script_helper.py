@@ -151,7 +151,7 @@ class Script(object):
 
         return self.config
 
-def load_config(filename, dsn=None, logger=None):
+def load_config(filename=None, dsn=None, logger=None):
     '''
     Find, parse, and return the configuration data needed by clusto
     '''
@@ -159,39 +159,37 @@ def load_config(filename, dsn=None, logger=None):
     if not logger:
         logger = get_logger()
 
-    if filename:
+    config = ConfigParser.SafeConfigParser()
+    config.add_section('clusto')
+
+    if filename is not None:
         if not os.path.exists(os.path.realpath(filename)):
             msg = "Config file %s doesn't exist." % filename
             logger.error(msg)
             raise CmdLineError(msg)
-    else:
-        msg = "Config file %s doesn't exist." % filename
-        logger.error(msg)
-        raise CmdLineError(msg)
         
-    config = ConfigParser.SafeConfigParser()
-    logger.debug('Reading %s' % filename)
-    config.read([filename])
+        logger.debug('Reading %s' % filename)
+        config.read([filename])
 
-    if not config.has_section('clusto'):
-        config.add_section('clusto')
+        if not config.has_section('clusto'):
+            config.add_section('clusto')
 
-    if config.has_option('clusto', 'include'):
-        for pattern in config.get('clusto', 'include').split():
-            for filename in glob.glob(pattern):
-                fn = os.path.realpath(filename)
-                logger.debug('Trying to add config file: "%s"' % fn)
-                try:
-                    config.read(fn)
-                except ConfigParser.ParsingError, cppe:
-                    logger.warn(cppe)
-                except Exception, e:
-                    logger.debug(e)
-    if 'CLUSTODSN' in os.environ:
-        config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
+        if config.has_option('clusto', 'include'):
+            for pattern in config.get('clusto', 'include').split():
+                for filename in glob.glob(pattern):
+                    fn = os.path.realpath(filename)
+                    logger.debug('Trying to add config file: "%s"' % fn)
+                    try:
+                        config.read(fn)
+                    except ConfigParser.ParsingError, cppe:
+                        logger.warn(cppe)
+                    except Exception, e:
+                        logger.debug(e)
 
     if dsn:
         config.set('clusto', 'dsn', dsn)
+    elif 'CLUSTODSN' in os.environ:
+        config.set('clusto', 'dsn', os.environ['CLUSTODSN'])
 
     if not config.has_option('clusto', 'dsn'):
         raise CmdLineError("No database given for clusto data.")
