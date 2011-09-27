@@ -226,7 +226,7 @@ def setup_base_parser(add_help=False):
     import argparse
     parser = argparse.ArgumentParser(prog=os.path.basename(sys.argv[0]),
         description='Clusto script', conflict_handler='resolve',
-        add_help=add_help)
+        add_help=add_help, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--config', default='/etc/clusto/clusto.conf',
         help='Config file (defaults to /etc/clusto/clusto.conf)')
     parser.add_argument('--loglevel', default='INFO',
@@ -249,7 +249,7 @@ def init_arguments(klass):
     obj = klass()
     parent_parser = setup_base_parser()
     this_parser = argparse.ArgumentParser(parents=[parent_parser],
-        description=obj._get_description())
+        description=obj._get_description(), formatter_class=argparse.RawTextHelpFormatter)
     obj._add_arguments(this_parser)
     args = this_parser.parse_args()
     log = get_logger(klass.__module__.split('.')[-1], args.loglevel)
