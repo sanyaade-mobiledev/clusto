@@ -1,7 +1,0 @@
-Dependencies
-------------
-Clusto>=0.6
-boto>=2.0b3
-IPy
-
-https://github.com/clusto/clusto
